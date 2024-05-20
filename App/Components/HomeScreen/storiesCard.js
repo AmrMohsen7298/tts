@@ -1,5 +1,5 @@
-import * as React from "react";
-import View, { Text,  StyleSheet, Image } from "react-native";
+import React from "react";
+import {View,  Text,  StyleSheet, Image } from "react-native";
 
 
 // You can import from local files

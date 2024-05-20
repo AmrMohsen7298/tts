@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
-
+import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from "expo-av";
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
-import View, {
-  
+import  {
+  View,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -12,13 +12,13 @@ import View, {
   ImageBackground,
 } from "react-native";
 import TextHighlighter from './../Components/TextHighlighter'
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import {Ionicons} from 'react-native-vector-icons'
+import  FontAwesomeIcon  from '@fortawesome/react-native-fontawesome'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 
 import pic from "../../assets/Images/bird.jpg";
 import Colors from "../Utils/Colors";
-import { MaterialIcons } from "react-native-vector-icons";
-import { AntDesign } from "react-native-vector-icons";
+import  MaterialIcons  from "react-native-vector-icons/MaterialIcons";
+import  AntDesign  from "react-native-vector-icons/AntDesign";
 import KeywordCard from "../Components/KeyWordCard/KeywordCard";
 import Card from "../Components/Card";
 import { LessonTabs } from "../Utils/constants";
@@ -28,7 +28,7 @@ import CustomAudioPlayer from "../Components/AudioPlayer/CustomAudioPlayer";
 import CircularProgress from "../Utils/pie";
 import { useFocusEffect } from "@react-navigation/native";
 import { connect, useSelector } from "react-redux";
-// import CustomAudioPlayer from "../Components/AudioPlayer/CustomAudioPlayer";
+import CustomAudioPlayer from "../Components/AudioPlayer/CustomAudioPlayer";
  export default function LessonScreen(props) {
   const [activeTab, setActiveTab] = useState(0);
   const [playPressed, setPlayPressed] = useState(false);

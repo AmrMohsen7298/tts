@@ -1,7 +1,7 @@
-import View, {  Text } from 'react-native'
+import {View,   Text } from 'react-native'
 import React from 'react'
 import {  Image, TouchableOpacity,StyleSheet } from 'react-native'
-import { MaterialCommunityIcons } from 'react-native-vector-icons';
+import  MaterialCommunityIcons  from 'react-native-vector-icons/MaterialCommunityIcons';
 import user from './../../assets/Images/profile.jpg'
 import setting from './../../assets/setting.png'
 import login from './../../assets/eye.png'

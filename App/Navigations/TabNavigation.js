@@ -1,20 +1,15 @@
-import React, { useState } from "react";
-
+import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { NavigationContainer } from "@react-navigation/native";
 import HomeScreen from "../Screens/HomeScreen";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import {Ionicons} from 'react-native-vector-icons'
-
-import Colors from "../Utils/Colors";
-import TrainingScreen from "../Screens/TrainingScreen";
+import TrainingStack from "./TrainingStack/TrainingStack";
 import LibraryScreen from "../Screens/LibraryScreen";
 import SettingsScreen from "../Screens/SettingsScreen";
-import { createStackNavigator } from "@react-navigation/stack";
-import TrainingKeywords from "../Components/Training/TrainingKeywords";
-import TrainingStack from "./TrainingStack/TrainingStack";
-import { NavigationContainer } from "@react-navigation/native";
-import LessonScreen from "../Screens/LessonScreen";
 import StackNavigation from "./StackNavigation";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faScroll, faDumbbell } from "@fortawesome/free-solid-svg-icons"; // Import specific icons
+import Ionicons from "react-native-vector-icons/Ionicons"; // Correct import path for Ionicons
+import Colors from "../Utils/Colors";
 
 const Tab = createBottomTabNavigator();
 
@@ -33,9 +28,8 @@ export default function TabNavigation() {
           name="Stories"
           component={StackNavigation}
           options={{
-            tabBarIcon: ({ color = Colors.primary, size }) => (
-              // <FontAwesomeIcon name="globe" size={size} color={color} />
-              <FontAwesomeIcon name="scroll" size={size} color={color} />
+            tabBarIcon: ({ color, size }) => (
+              <FontAwesomeIcon icon={faScroll} size={size} color={color} />
             ),
           }}
         />
@@ -44,10 +38,10 @@ export default function TabNavigation() {
           component={TrainingStack}
           options={{
             tabBarIcon: ({ color, size }) => (
-              <FontAwesomeIcon name="dumbbell" size={size} color={color} />
+              <FontAwesomeIcon icon={faDumbbell} size={size} color={color} />
             ),
           }}
-        ></Tab.Screen>
+        />
         <Tab.Screen
           name="My Library"
           component={LibraryScreen}
@@ -67,6 +61,6 @@ export default function TabNavigation() {
           }}
         />
       </Tab.Navigator>
-    
+   
   );
 }

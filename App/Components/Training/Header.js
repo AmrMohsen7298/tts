@@ -1,20 +1,14 @@
-import View, {
-  
-  Text,
-  Image,
-  Button,
-  Pressable,
-  StyleSheet,
-  TouchableOpacity,
-  Modal,
-} from "react-native";
 import React, { useState } from "react";
+import { View, Text, Image, Button, Pressable, StyleSheet, TouchableOpacity, Modal, Alert } from "react-native";
 import Colors from "../../Utils/Colors";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faCircleInfo, faAngleLeft, faCalendar, faCheck } from "@fortawesome/free-solid-svg-icons";
 import { useNavigation } from "@react-navigation/native";
+
 export default function Header() {
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
+
   return (
     <View style={{ marginTop: 50, padding: 20, direction: "rtl" }}>
       <View style={styles.centeredView}>
@@ -57,7 +51,7 @@ export default function Header() {
         </Text>
         <TouchableOpacity onPress={() => setModalVisible(true)}>
           <FontAwesomeIcon
-            icon="circle-info"
+            icon={faCircleInfo}
             style={{ fontSize: 20, fontWeight: 600, fontFamily: "outfit" }}
           />
         </TouchableOpacity>
@@ -71,8 +65,9 @@ export default function Header() {
           gap: 20,
         }}
       >
-        <TouchableOpacity style={styles.easyButton}
-        onPress={() => navigation.navigate("TrainingList")}
+        <TouchableOpacity
+          style={styles.easyButton}
+          onPress={() => navigation.navigate("TrainingList")}
         >
           <Text
             style={{ fontSize: 18, fontWeight: "500", fontFamily: "outfit" }}
@@ -81,7 +76,7 @@ export default function Header() {
           </Text>
           <Text style={styles.easyText}>0 كلمات</Text>
           <FontAwesomeIcon
-            icon="angle-left"
+            icon={faAngleLeft}
             style={styles.easyText}
           ></FontAwesomeIcon>
         </TouchableOpacity>
@@ -93,7 +88,7 @@ export default function Header() {
           </Text>
           <Text style={styles.mediumText}>0 كلمات</Text>
           <FontAwesomeIcon
-            icon="angle-left"
+            icon={faAngleLeft}
             style={styles.mediumText}
           ></FontAwesomeIcon>
         </TouchableOpacity>
@@ -105,7 +100,7 @@ export default function Header() {
           </Text>
           <Text style={styles.hardText}>0 كلمات</Text>
           <FontAwesomeIcon
-            icon="angle-left"
+            icon={faAngleLeft}
             style={styles.hardText}
           ></FontAwesomeIcon>
         </TouchableOpacity>
@@ -122,14 +117,14 @@ export default function Header() {
           style={styles.newButton}
           onPress={() => navigation.navigate("TrainingKeywords")}
         >
-          <FontAwesomeIcon icon="calendar"></FontAwesomeIcon>
+          <FontAwesomeIcon icon={faCalendar}></FontAwesomeIcon>
           <Text style={{ width: "33%", fontSize: 18, fontWeight: "500" }}>
             جديد
           </Text>
           <Text style={styles.easyText}>0</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.newButton}>
-          <FontAwesomeIcon icon="check"></FontAwesomeIcon>
+          <FontAwesomeIcon icon={faCheck}></FontAwesomeIcon>
           <Text style={{ width: "33%", fontSize: 18, fontWeight: "500" }}>
             تم
           </Text>
@@ -144,7 +139,10 @@ export default function Header() {
           gap: 10,
         }}
       >
-        <TouchableOpacity style={styles.reviewButton} onPress={() => navigation.navigate("TrainingKeywords")}>
+        <TouchableOpacity
+          style={styles.reviewButton}
+          onPress={() => navigation.navigate("TrainingKeywords")}
+        >
           <Text
             style={{
               width: "100%",
@@ -161,6 +159,7 @@ export default function Header() {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   centeredView: {
     flex: 1,
