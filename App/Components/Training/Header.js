@@ -1,5 +1,5 @@
-import {
-  View,
+import View, {
+  
   Text,
   Image,
   Button,

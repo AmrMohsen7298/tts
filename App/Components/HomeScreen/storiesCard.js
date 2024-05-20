@@ -1,10 +1,10 @@
 import * as React from "react";
-import { Text, View, StyleSheet, Image } from "react-native";
+import View, { Text,  StyleSheet, Image } from "react-native";
 
 
 // You can import from local files
 
-import Colors from "../../Utils/Colors";
+import {Colors} from "../../Utils/Colors";
 import { useNavigation } from "@react-navigation/native";
 
 // or any pure javascript modules available in npm
@@ -53,23 +53,23 @@ const styles = StyleSheet.create({
     height: "auto",
     bottom: 20,
     padding: 5,
-    backgroundColor: Colors.white,
+    backgroundColor: "white",
     borderRadius: 15,
   },
   card_title: {
-    color: Colors.black,
+    color: "black",
     fontFamily: "outfit",
     fontSize: 18,
     // padding:2
   },
   card_desc: {
-    color: Colors.black,
+    color: "black",
     fontFamily: "outfitLight",
     fontSize: 11,
     padding: 2,
   },
   card_level: {
-    color: Colors.black,
+    color: "black",
     fontFamily: "outfit",
     fontSize: 14,
     padding: 2,
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     top:'3%',
     left:'3.5%',
     padding: 5,
-    backgroundColor: Colors.white,
+    backgroundColor: "white",
     borderRadius: 50,
   },
 });

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import View, { Text,  StyleSheet } from 'react-native';
 
 const TextHighlighter = ({ text, readingSpeed = 300 }) => {
   const words = text.split(' ');

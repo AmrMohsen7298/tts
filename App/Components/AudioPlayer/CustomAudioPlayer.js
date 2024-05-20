@@ -1,7 +1,7 @@
-import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from "expo-av";
+
 import React, { useEffect, useRef, useState } from "react";
 import { View, Button ,TouchableOpacity,Text} from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import {Ionicons} from 'react-native-vector-icons'
 import { useFocusEffect } from "@react-navigation/native";
 import { connect, useDispatch } from "react-redux";
 import { setAudioPlaying } from "../../Actions/StoryActions";

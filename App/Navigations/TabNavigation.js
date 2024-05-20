@@ -2,8 +2,8 @@ import React, { useState } from "react";
 
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeScreen from "../Screens/HomeScreen";
-import { FontAwesome6 } from "@expo/vector-icons";
-import { Ionicons } from "@expo/vector-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import {Ionicons} from 'react-native-vector-icons'
 
 import Colors from "../Utils/Colors";
 import TrainingScreen from "../Screens/TrainingScreen";
@@ -34,8 +34,8 @@ export default function TabNavigation() {
           component={StackNavigation}
           options={{
             tabBarIcon: ({ color = Colors.primary, size }) => (
-              // <FontAwesome6 name="globe" size={size} color={color} />
-              <FontAwesome6 name="scroll" size={size} color={color} />
+              // <FontAwesomeIcon name="globe" size={size} color={color} />
+              <FontAwesomeIcon name="scroll" size={size} color={color} />
             ),
           }}
         />
@@ -44,7 +44,7 @@ export default function TabNavigation() {
           component={TrainingStack}
           options={{
             tabBarIcon: ({ color, size }) => (
-              <FontAwesome6 name="dumbbell" size={size} color={color} />
+              <FontAwesomeIcon name="dumbbell" size={size} color={color} />
             ),
           }}
         ></Tab.Screen>

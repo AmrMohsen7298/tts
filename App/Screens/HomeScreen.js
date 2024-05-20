@@ -1,10 +1,10 @@
-import { View, Text, ScrollView, Touchable,StyleSheet } from "react-native";
+import  View,{ Text, ScrollView, Touchable,StyleSheet } from "react-native";
 import React, { useEffect, useState } from "react";
 import Header from "../Components/HomeScreen/Header";
 import StoriesCard from "../Components/HomeScreen/storiesCard";
 import LevelsCard from "../Components/HomeScreen/levelsCard";
-import Colors from "../Utils/Colors";
-import { Ionicons } from "@expo/vector-icons";
+import {Colors} from "../Utils/Colors";
+import {Ionicons} from 'react-native-vector-icons'
 import { useNavigation } from "@react-navigation/native";
 import StackNavigation from "../Navigations/StackNavigation";
 import { getAllLessons, getLessonById } from "../Services/LessonServices";
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
     paddingRight: "3%",
   },
   card_level: {
-    color: Colors.black,
+    color: "black",
     fontFamily: "outfit",
     fontSize: 14,
     padding: 2,

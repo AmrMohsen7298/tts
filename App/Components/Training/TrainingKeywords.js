@@ -1,11 +1,11 @@
-import { View, Text,Image, StyleSheet,TouchableOpacity } from 'react-native'
+import View,{  Text,Image, StyleSheet,TouchableOpacity } from 'react-native'
 import React, {} from 'react'
 import user from './../../../assets/Images/userProfile.jpg'
 import Colors from '../../Utils/Colors'
 import { TouchableHighlight } from 'react-native-gesture-handler'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import KeywordCard from '../KeyWordCard/KeywordCard'
-import { Ionicons } from "@expo/vector-icons";
+import {Ionicons} from 'react-native-vector-icons'
 export default function TrainingKeywords(props) {
 
   const handleLoginPress = () => {

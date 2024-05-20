@@ -1,8 +1,8 @@
 import * as React from "react";
-import { Text, View, StyleSheet, Image } from "react-native";
+import View, { Text,  StyleSheet, Image } from "react-native";
 // import Constants from "expo-constants";
-import { Entypo } from "@expo/vector-icons";
-import { MaterialIcons } from "@expo/vector-icons";
+import { Entypo } from "react-native-vector-icons";
+import { MaterialIcons } from "react-native-vector-icons";
 // You can import from local files
 
 import Colors from "../Utils/Colors";

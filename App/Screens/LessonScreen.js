@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from "expo-av";
+
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
-import {
-  View,
+import View, {
+  
   ScrollView,
   Text,
   TouchableOpacity,
@@ -13,12 +13,12 @@ import {
 } from "react-native";
 import TextHighlighter from './../Components/TextHighlighter'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { Ionicons } from "@expo/vector-icons";
-import { BlurView } from 'expo-blur';
+import {Ionicons} from 'react-native-vector-icons'
+
 import pic from "../../assets/Images/bird.jpg";
 import Colors from "../Utils/Colors";
-import { MaterialIcons } from "@expo/vector-icons";
-import { AntDesign } from "@expo/vector-icons";
+import { MaterialIcons } from "react-native-vector-icons";
+import { AntDesign } from "react-native-vector-icons";
 import KeywordCard from "../Components/KeyWordCard/KeywordCard";
 import Card from "../Components/Card";
 import { LessonTabs } from "../Utils/constants";
@@ -273,7 +273,7 @@ renderphoto=()=>{
   paddingTop:40,
   paddingBottom:0,
   flexDirection:'row-reverse'}}>
-    <BlurView intensity={70} tint={'regular'} style={{flex: 0,
+    <View  style={{flex: 0,
     width:100,
     height:30,
     paddingTop:0,
@@ -300,13 +300,13 @@ renderphoto=()=>{
     <Ionicons name={"checkmark-outline"} size={15}  color="black" />
     تم التعلم</Text>
     </TouchableOpacity>
-    </BlurView>
+    </View>
   </View>
   <View style={{display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'center'}} >
   
   <View style={{paddingTop:20}}  >
     {selectedWord && SelectedWordTranslation&&
-      <BlurView intensity={70} tint={'regular'} style={{flex: 0,
+      <View  style={{flex: 0,
         width:410,
         height:100,
         paddingBottom:50,
@@ -331,7 +331,7 @@ renderphoto=()=>{
 
       </View>
     </View>
-  </BlurView>
+  </View>
     }
   </View>
   </View>
@@ -372,7 +372,7 @@ renderphoto=()=>{
       paddingTop:40,
       paddingBottom:0,
       flexDirection:'row-reverse'}}>
-        <BlurView intensity={70} tint={'regular'} style={{flex: 0,
+        <View  style={{flex: 0,
         width:100,
         height:30,
         paddingTop:0,
@@ -399,7 +399,7 @@ renderphoto=()=>{
         <Ionicons name={"checkmark-outline"} size={15}  color="black" />
         تم التعلم</Text>
         </TouchableOpacity>
-        </BlurView>
+        </View>
       </View>
       <View>
       
@@ -447,7 +447,7 @@ renderphoto=()=>{
         paddingTop:40,
         paddingBottom:0,
         flexDirection:'row-reverse'}}>
-          <BlurView intensity={70} tint={'regular'} style={{flex: 0,
+          <View  style={{flex: 0,
           width:100,
           height:30,
           paddingTop:0,
@@ -474,7 +474,7 @@ renderphoto=()=>{
           <Ionicons name={"checkmark-outline"} size={15}  color="black" />
           تم التعلم</Text>
           </TouchableOpacity>
-          </BlurView>
+          </View>
         </View>
         <View>
         

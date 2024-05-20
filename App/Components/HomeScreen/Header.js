@@ -1,4 +1,4 @@
-import { View, Text,Image, Touchable } from 'react-native'
+import View, { Text,Image, Touchable } from 'react-native'
 import React from 'react'
 import user from './../../../assets/Images/profile.jpg'
 import Colors from '../../Utils/Colors'
