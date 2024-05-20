@@ -1,9 +1,9 @@
 import * as React from "react";
 import { Text, View, StyleSheet, Image } from "react-native";
-import Constants from "expo-constants";
+
 
 // You can import from local files
-import pic from "../../../assets/Images/test.png";
+
 import Colors from "../../Utils/Colors";
 import { useNavigation } from "@react-navigation/native";
 
