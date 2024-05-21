@@ -15,7 +15,7 @@ const Tab = createBottomTabNavigator();
 
 export default function TabNavigation() {
   return (
-    <NavigationContainer>
+    
       <Tab.Navigator
         screenOptions={{
           headerShown: false,
@@ -61,6 +61,6 @@ export default function TabNavigation() {
           }}
         /> */}
       </Tab.Navigator>
-   </NavigationContainer>
+  
   );
 }

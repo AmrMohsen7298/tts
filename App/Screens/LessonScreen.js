@@ -28,10 +28,10 @@ import { getStoryAudio, getStoryById, getWordByText } from "../Services/LessonSe
 import CircularProgress from "../Utils/pie";
 import { useFocusEffect } from "@react-navigation/native";
 import { connect, useSelector } from "react-redux";
-import CustomAudioPlayer from "../Components/AudioPlayer/CustomAudioPlayer";
+// import CustomAudioPlayer from "../Components/AudioPlayer/CustomAudioPlayer";
  export default function LessonScreen(props) {
   const [activeTab, setActiveTab] = useState(0);
-  const [playPressed, setPlayPressed] = useState(false);
+  //  const [playPressed, setPlayPressed] = useState(false);
   const [trainingPressed, setTrainingPressed] = useState(false);
   const tabs = [LessonTabs.STORY, LessonTabs.QUIZ, LessonTabs.KEYWORDS, LessonTabs.GRAMMAR];
   const [storyParagraph,setStoryParagraph] = useState();
@@ -47,21 +47,21 @@ import CustomAudioPlayer from "../Components/AudioPlayer/CustomAudioPlayer";
   const [translateButton, setTranslateButton] = useState(false);
   const [favoriteButton, setfavoriteButton] = useState(false);
   const re = new RegExp("[.,;:\\s?!]+");
-  const sound = useRef(new Audio.Sound());
-  const storyAudioPlaying = useSelector(state=>state.storyReducer.storyAudioPlaying)
+  // const sound = useRef(new Audio.Sound());
+  // const storyAudioPlaying = useSelector(state=>state.storyReducer.storyAudioPlaying)
   useEffect(()=>{
     console.log("props",props?.route?.params?.lessonId)
     getStoryById(props?.route?.params?.lessonId).then((resp)=>{
       setStoryParagraph(resp?.paragraph)
       setTranslation(resp?.translation)
       setName(resp?.name)
-      getStoryAudio(resp?.id).then((res)=>{
-          var reader = new FileReader();
-          reader.readAsDataURL(res)
-          reader.onload = () => {
-              setAudioSrc(reader?.result?.split(",")[1])
+      // getStoryAudio(resp?.id).then((res)=>{
+      //     var reader = new FileReader();
+      //     reader.readAsDataURL(res)
+      //     reader.onload = () => {
+      //         setAudioSrc(reader?.result?.split(",")[1])
 
-          }})
+      //     }})
     })
 
   },[])
@@ -71,50 +71,50 @@ import CustomAudioPlayer from "../Components/AudioPlayer/CustomAudioPlayer";
       console.log("sentences", storyParagraph.split(["."]))
     }
   },[storyParagraph])
-  _onPlayBackStatusUpdates = playbackStatus =>{
-    if(playbackStatus.didJustFinish){
-      setPlayPressed(false);
-    }
-  }
-  useEffect(()=>{
-    console.log("STORYPLAYING", storyAudioPlaying)
-    let timeout
-    let flag = true
-    if(storyAudioPlaying){
-      // storyParagraph.split(" ").map((word,index)=>{
+  // _onPlayBackStatusUpdates = playbackStatus =>{
+  //   if(playbackStatus.didJustFinish){
+  //     setPlayPressed(false);
+  //   }
+  // }
+  // useEffect(()=>{
+  //   console.log("STORYPLAYING", storyAudioPlaying)
+  //   let timeout
+  //   let flag = true
+  //   if(storyAudioPlaying){
+  //     // storyParagraph.split(" ").map((word,index)=>{
         
-      //    timeout = setTimeout(()=>{setHighlightIndex(index)},530*index)
+  //     //    timeout = setTimeout(()=>{setHighlightIndex(index)},530*index)
          
-      // })
-    }
-    return()=>{
-      clearTimeout(timeout)
-    }
+  //     // })
+  //   }
+  //   return()=>{
+  //     clearTimeout(timeout)
+  //   }
 
-  },[storyAudioPlaying])
-  useEffect(()=>{
-    async function playSound(){
-      await Audio.setAudioModeAsync({
-        playsInSilentModeIOS: true,
-        staysActiveInBackground: false,
-        shouldDuckAndroid: false,
-    interruptionModeIOS: InterruptionModeIOS.DuckOthers,
-    interruptionModeAndroid:InterruptionModeAndroid.DoNotMix,
-  })
-    const { sound: playbackObject }  = await Audio.Sound.createAsync({uri:`data:audio/mp3;base64, ${selectedWordAudio}`}); 
-    playbackObject.setOnPlaybackStatusUpdate(this._onPlayBackStatusUpdates)
-    sound.current = playbackObject
-    const checkLoaded = await sound.current.getStatusAsync();
-    console.log("checkLoaded", checkLoaded);
-    if (checkLoaded.isLoaded === true) {
-      await sound.current.playAsync();
-    }
-    }
-    if(playPressed){
-      playSound();
+  // },[storyAudioPlaying])
+  // useEffect(()=>{
+  //   async function playSound(){
+  //     await Audio.setAudioModeAsync({
+  //       playsInSilentModeIOS: true,
+  //       staysActiveInBackground: false,
+  //       shouldDuckAndroid: false,
+  //   interruptionModeIOS: InterruptionModeIOS.DuckOthers,
+  //   interruptionModeAndroid:InterruptionModeAndroid.DoNotMix,
+  // })
+  //   const { sound: playbackObject }  = await Audio.Sound.createAsync({uri:`data:audio/mp3;base64, ${selectedWordAudio}`}); 
+  //   playbackObject.setOnPlaybackStatusUpdate(this._onPlayBackStatusUpdates)
+  //   sound.current = playbackObject
+  //   const checkLoaded = await sound.current.getStatusAsync();
+  //   console.log("checkLoaded", checkLoaded);
+  //   if (checkLoaded.isLoaded === true) {
+  //     await sound.current.playAsync();
+  //   }
+  //   }
+  //   if(playPressed){
+  //     playSound();
 
-    }
-  },[playPressed])
+  //   }
+  // },[playPressed])
   // useEffect(()=>{
   //   switch (activeTab){
   //     case LessonTabs.STORY:  
@@ -146,7 +146,7 @@ import CustomAudioPlayer from "../Components/AudioPlayer/CustomAudioPlayer";
     getWordByText(word.split(re)[0], props?.route?.params?.lessonId).then(res=>{
       setSelectedWord(res?.text)
       setSelectedWordTranslation(res?.translation)
-      setSelectedWordAudio(res?.audio)
+      //setSelectedWordAudio(res?.audio)
     })
 
   }
@@ -164,7 +164,7 @@ import CustomAudioPlayer from "../Components/AudioPlayer/CustomAudioPlayer";
          
           <View style={{width:'auto',backgroundColor:"white"}}>
             <View style={{display:'flex',paddingBottom:16}}>
-              <Text style={{fontSize:30}}>{name}</Text>
+              <Text style={{fontSize:30,color:"black"}}>{name}</Text>
               {/* <Text
                 style={{
                   color: Colors.black,
@@ -236,7 +236,7 @@ import CustomAudioPlayer from "../Components/AudioPlayer/CustomAudioPlayer";
         return (
           <View style={{ flexDirection:'column',gap:40,alignItems: "center" }}>
             <AntDesign name="sound" size={25} color="#42BB7E" />
-            <Text style={{ fontFamily: "outfit", textAlign: "center" , fontSize:24 }}>
+            <Text style={{ fontFamily: "outfit", textAlign: "center" , fontSize:24,color:"black" }}>
               عدم اهتمام ___ مجالات البحث العلميّ في استخدام اللّغة العربيّة
               كلغةٍ خاصّة في الأبحاث الأكاديميّة والعلميّة
             </Text>
@@ -280,6 +280,8 @@ renderphoto=()=>{
   textAlign: 'center',
   justifyContent: 'center',
   overflow: 'hidden',
+  left:5,
+  backgroundColor:"#dfd1ce",
   borderRadius: 20}}>
 
       <TouchableOpacity
@@ -325,7 +327,7 @@ renderphoto=()=>{
         <Pressable style={trainingPressed? styles.cardButtonUpPressed :styles.cardButtonUp} onPress={()=>{trainingPressed?setTrainingPressed(false): setTrainingPressed(true)}}>
           <FontAwesomeIcon icon='dumbbell'></FontAwesomeIcon>
         </Pressable>
-        <Pressable style={ playPressed || storyAudioPlaying? styles.cardButtonDownPressed :styles.cardButtonDown} onPress={()=>setPlayPressed(true)}>
+        <Pressable >
         <FontAwesomeIcon icon='play'></FontAwesomeIcon>
         </Pressable>
 
@@ -379,6 +381,8 @@ renderphoto=()=>{
       textAlign: 'center',
       justifyContent: 'center',
       overflow: 'hidden',
+      left:5,
+  backgroundColor:"#dfd1ce",
       borderRadius: 20}}>
     
           <TouchableOpacity
@@ -454,6 +458,8 @@ renderphoto=()=>{
         textAlign: 'center',
         justifyContent: 'center',
         overflow: 'hidden',
+        left:5,
+  backgroundColor:"#dfd1ce",
         borderRadius: 20}}>
       
             <TouchableOpacity
@@ -582,7 +588,7 @@ renderphoto=()=>{
 </View>
         {renderContent()}
       </View>
-      <CustomAudioPlayer audioUrl={audioSrc} setHighlightIndex={setHighlightIndex}/>
+      {/* <CustomAudioPlayer audioUrl={audioSrc} setHighlightIndex={setHighlightIndex}/> */}
     </View>
   );
 }

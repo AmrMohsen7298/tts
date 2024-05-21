@@ -1,8 +1,8 @@
 import * as React from "react";
-import View, { Text,  StyleSheet, Image } from "react-native";
+import  {View, Text,  StyleSheet, Image } from "react-native";
 // import Constants from "expo-constants";
-import { Entypo } from "react-native-vector-icons";
-import { MaterialIcons } from "react-native-vector-icons";
+import  Entypo  from "react-native-vector-icons/Entypo";
+import  MaterialIcons  from "react-native-vector-icons/MaterialIcons";
 // You can import from local files
 
 import Colors from "../Utils/Colors";
@@ -15,7 +15,7 @@ export default function App() {
     <View style={styles.container}>
       <View style={styles.card_template}>
         
-          <Text style={{fontFamily:'outfitBold',fontSize:20,textAlign:'right' ,padding:'5%'}}>تعريف النكرة </Text>
+          <Text style={{fontFamily:'outfitBold',fontSize:20,textAlign:'right' ,padding:'5%',color:"black"}}>تعريف النكرة </Text>
         
         <View style={styles.text_container}>
           <Text style={styles.card_title}>
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
   },
   date: {
     fontSize: 13,
-    fontFamily: "outfitLight",
+    fontFamily: "outfitLight",color:"black"
   },
   level_container: {
     // position: "absolute",

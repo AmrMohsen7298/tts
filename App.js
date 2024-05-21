@@ -29,8 +29,10 @@ export default function App() {
   );
   return (
     <Provider store={store}>
-     
+     <NavigationContainer>
+
         <TabNavigation />
+     </NavigationContainer>
       
     </Provider>
   );

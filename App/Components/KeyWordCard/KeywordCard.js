@@ -20,8 +20,8 @@ export default function KeywordCard(props) {
       <View style={styles.cardContainer}>
         <View style={{flexDirection:'column', width: '80%'}}>
           <View style={styles.cardHead}>
-            <Text style={{fontSize:22,bottom:15,left:220}}>كَتَّبَ: (فعل)</Text>
-            <Text style={{fontSize:18,top:25,right:60}}>كتَّبَ يكتِّب ، تَكْتِيبًا ، فهو مُكتِّب ، والمفعول مُكتَّب</Text>
+            <Text style={{fontSize:22,bottom:15,left:220,color:"black"}}>كَتَّبَ: (فعل)</Text>
+            <Text style={{fontSize:18,top:25,right:60,color:"black"}}>كتَّبَ يكتِّب ، تَكْتِيبًا ، فهو مُكتِّب ، والمفعول مُكتَّب</Text>
           </View>
           <Text style={styles.cardDefinition}> {props?.definition}</Text>
         </View>
@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
     height: 100,
-    backgroundColor: 'white',
+    backgroundColor: 'lightgrey',
     borderRadius: 10,
     direction:'rtl'
   },
