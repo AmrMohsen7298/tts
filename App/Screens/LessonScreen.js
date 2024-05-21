@@ -23,7 +23,7 @@ import KeywordCard from "../Components/KeyWordCard/KeywordCard";
 import Card from "../Components/Card";
 import { LessonTabs } from "../Utils/constants";
 import { getStoryAudio, getStoryById, getWordByText } from "../Services/LessonServices";
-import CustomAudioPlayer from "../Components/AudioPlayer/CustomAudioPlayer";
+
 
 import CircularProgress from "../Utils/pie";
 import { useFocusEffect } from "@react-navigation/native";

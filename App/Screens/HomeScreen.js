@@ -4,7 +4,8 @@ import Header from "../Components/HomeScreen/Header";
 import StoriesCard from "../Components/HomeScreen/storiesCard";
 import LevelsCard from "../Components/HomeScreen/levelsCard";
 import { Colors } from "../Utils/Colors";
-import Ionicons from 'react-native-vector-icons/Ionicons'; // Correct import
+ import Ionicons from 'react-native-vector-icons/Ionicons'; // Correct import
+ import { BlurView } from "@react-native-community/blur";
 import { useNavigation } from "@react-navigation/native";
 import StackNavigation from "../Navigations/StackNavigation";
 import { getAllLessons, getLessonById } from "../Services/LessonServices";
@@ -36,12 +37,19 @@ export default function HomeScreen() {
       <View
         style={{
           display: "flex",
+          
           flexDirection: "row",
           gap: 7,
           justifyContent: "flex-end",
           right: "1%",
         }}
       >
+ <BlurView
+        style={styles.absolute}
+        blurType="light"
+        blurAmount={10}
+        reducedTransparencyFallbackColor="white"
+      />
         <Text
           style={{
             fontFamily: "outfit",
