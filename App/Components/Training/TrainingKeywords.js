@@ -15,7 +15,7 @@ export default function TrainingKeywords(props) {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerLabelLeft}>A1</Text>
-        <Text style={styles.headerLabelRight}>New</Text>
+        <Text style={styles.headerLabelRight}>جديد</Text>
       </View>
       <View style={styles.iconContainer}>
         <Ionicons name={"file-tray-full-outline"} size={25} color="black" />
@@ -76,6 +76,7 @@ const styles = StyleSheet.create({
     borderRadius: 7,
     right: 19,
     bottom: 10,
+    padding:5
   },
   headerLabelRight: {
     fontSize: 20,
@@ -89,16 +90,19 @@ const styles = StyleSheet.create({
     borderRadius: 7,
     left: 19,
     bottom: 10,
+    padding:5
   },
   iconContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     margin: 10,
+    padding:5
   },
   iconText: {
     fontSize: 25,
     fontWeight: 'bold',
+    color:"black"
   },
   centerContainer: {
     flexDirection: 'column',
@@ -109,6 +113,7 @@ const styles = StyleSheet.create({
   keywordText: {
     fontSize: 40,
     fontWeight: 'normal',
+    color:"black"
   },
   button: {
     backgroundColor: '#42BB7E',

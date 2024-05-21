@@ -15,13 +15,13 @@ const Tab = createBottomTabNavigator();
 
 export default function TabNavigation() {
   return (
-    
+    <NavigationContainer>
       <Tab.Navigator
         screenOptions={{
           headerShown: false,
           tabBarActiveTintColor: '#42BB7E',
           tabBarIconStyle: { backgroundColor: '#42BB7E' },
-          tabBarStyle: { borderTopLeftRadius: 20, borderTopRightRadius: 20 },
+          // tabBarStyle: { borderTopLeftRadius: 5, borderTopRightRadius: 5 },
         }}
       >
         <Tab.Screen
@@ -51,7 +51,7 @@ export default function TabNavigation() {
             ),
           }}
         />
-        <Tab.Screen
+        {/* <Tab.Screen
           name="Settings"
           component={SettingsScreen}
           options={{
@@ -59,8 +59,8 @@ export default function TabNavigation() {
               <Ionicons name="settings-sharp" size={size} color={color} />
             ),
           }}
-        />
+        /> */}
       </Tab.Navigator>
-   
+   </NavigationContainer>
   );
 }

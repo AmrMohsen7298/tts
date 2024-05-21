@@ -13,7 +13,7 @@ export default function Header() {
   };
 
   return (
-    <View style={{ marginTop: 50, padding: 20 }}>
+    <View style={{  padding: 20 }}>
       <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 190 }}>
         <TouchableOpacity onPress={onPress}>
           <Image source={user} style={{ width: 40, height: 40, borderRadius: 88, right: 25, top: 3 }} />

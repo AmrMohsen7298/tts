@@ -10,7 +10,7 @@ export default function Header() {
   const [modalVisible, setModalVisible] = useState(false);
 
   return (
-    <View style={{ marginTop: 50, padding: 20, direction: "rtl" }}>
+    <View style={{  padding: 20, direction: "rtl" }}>
       <View style={styles.centeredView}>
         <Modal
           animationType="slide"
@@ -44,17 +44,17 @@ export default function Header() {
           justifyContent: "space-between",
         }}
       >
-        <Text
-          style={{ color: Colors.black, fontSize: 23, fontFamily: "outfit" }}
-        >
-          تدريب الكلمات الدالة
-        </Text>
         <TouchableOpacity onPress={() => setModalVisible(true)}>
           <FontAwesomeIcon
             icon={faCircleInfo}
             style={{ fontSize: 20, fontWeight: 600, fontFamily: "outfit" }}
           />
         </TouchableOpacity>
+        <Text
+          style={{ color: Colors.black, fontSize: 23, fontFamily: "outfit" }}
+        >
+          تدريب الكلمات الدالة
+        </Text>
       </View>
       <View
         style={{

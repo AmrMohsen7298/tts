@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from "expo-av";
+// import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from "expo-av";
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import  {
   View,

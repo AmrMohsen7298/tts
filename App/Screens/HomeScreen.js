@@ -5,7 +5,7 @@ import StoriesCard from "../Components/HomeScreen/storiesCard";
 import LevelsCard from "../Components/HomeScreen/levelsCard";
 import { Colors } from "../Utils/Colors";
  import Ionicons from 'react-native-vector-icons/Ionicons'; // Correct import
- import { BlurView } from "@react-native-community/blur";
+
 import { useNavigation } from "@react-navigation/native";
 import StackNavigation from "../Navigations/StackNavigation";
 import { getAllLessons, getLessonById } from "../Services/LessonServices";
@@ -44,12 +44,13 @@ export default function HomeScreen() {
           right: "1%",
         }}
       >
- <BlurView
-        style={styles.absolute}
-        blurType="light"
-        blurAmount={10}
-        reducedTransparencyFallbackColor="white"
-      />
+        <View style={{backgroundColor:"#ccc", display: "flex",
+          
+          flexDirection: "row",
+          gap: 7,
+          justifyContent: "flex-end",
+          right: "1%",
+          borderRadius:6,padding:5}}>
         <Text
           style={{
             fontFamily: "outfit",
@@ -59,6 +60,8 @@ export default function HomeScreen() {
           قصص مجانية
         </Text>
         <Ionicons name="gift-outline" size={19} color="black" />
+        </View>
+       
       </View>
       <View>
         <ScrollView
@@ -87,8 +90,17 @@ export default function HomeScreen() {
         </ScrollView>
       </View>
       <View style={styles.searchContainer}>
-        <View>
-          <Text style={{ fontFamily: "outfit", fontSize: 17 }}>بحث بالمستوي : كل</Text>
+      <View style={{
+        display: "flex",
+          
+        flexDirection: "row",
+        gap: 7,
+        justifyContent: "flex-end",
+        
+        borderRadius:6,padding:5,
+          left: "3%",
+          }}> 
+          <Text style={{fontFamily: "outfit", fontSize: 17,color:"black" }}>بحث بالمستوي : كل</Text>
         </View>
         <View style={{ paddingRight: 140 }}>
           <TouchableOpacity

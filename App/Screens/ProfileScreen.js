@@ -79,7 +79,16 @@ export default function ProfileScreen() {
         </View>
       </View>
       <View style={{display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'flex-end',gap:150,marginTop:50}}>
+      <View style={{backgroundColor:"#42BB7E", display: "flex",
+          
+          flexDirection: "row",
+          gap: 7,
+          justifyContent: "flex-end",
+          right: "1%",
+          borderRadius:6,padding:5}}>
+
         <Text style={{fontSize:20,fontWeight:'bold'}}>نوع الحساب: مجاني</Text>
+          </View>
          <Image source={user}
         style={{width:60,height:60,borderRadius:88,right:25,top:3}}></Image>
       </View>
@@ -137,6 +146,7 @@ const styles = StyleSheet.create({
     fontSize: 25,
     fontWeight: 'bold',
     marginBottom: 10,
+    color:"black"
   },
   row: {
     flexDirection: 'row',
@@ -153,6 +163,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 17,
+    color:"black"
   },
   counterContainer: {
     flex: 1,
@@ -161,10 +172,12 @@ const styles = StyleSheet.create({
   counter: {
     fontSize: 20,
     fontWeight: 'bold',
+    color:"black"
   },
   calendarLabel: {
     fontSize: 16,
     marginLeft: 10,
+    color:"black"
   },
   button: {
     backgroundColor: '#42BB7E',
