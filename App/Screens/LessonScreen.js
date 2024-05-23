@@ -12,7 +12,8 @@ import  {
   ImageBackground,
 } from "react-native";
 import TextHighlighter from './../Components/TextHighlighter'
-import  FontAwesomeIcon  from '@fortawesome/react-native-fontawesome'
+import  {FontAwesomeIcon}  from '@fortawesome/react-native-fontawesome'
+// import { faDumbbell, faPlay } from "@fortawesome/free-solid-svg-icons";
 import Ionicons from 'react-native-vector-icons/Ionicons'
 
 import pic from "../../assets/Images/bird.jpg";
@@ -27,9 +28,12 @@ import { getStoryAudio, getStoryById, getWordByText } from "../Services/LessonSe
 
 import CircularProgress from "../Utils/pie";
 import { useFocusEffect } from "@react-navigation/native";
-import { connect, useSelector } from "react-redux";
+import { connect, useDispatch, useSelector } from "react-redux";
+import CustomAudioPlayer from "../Components/AudioPlayer/CustomAudioPlayer";
+import { addFavorite, removeFavorite } from "../Actions/StoryActions";
 // import CustomAudioPlayer from "../Components/AudioPlayer/CustomAudioPlayer";
  export default function LessonScreen(props) {
+  const favorites = useSelector((state)=>state.storyReducer.favorites)
   const [activeTab, setActiveTab] = useState(0);
   //  const [playPressed, setPlayPressed] = useState(false);
   const [trainingPressed, setTrainingPressed] = useState(false);
@@ -43,9 +47,9 @@ import { connect, useSelector } from "react-redux";
   const [SelectedWordTranslation, setSelectedWordTranslation] = useState()
   const [translation, setTranslation] = useState();
   const [name, setName] = useState();
-  const [favorites, setFavorites] = useState([]);
   const [translateButton, setTranslateButton] = useState(false);
-  const [favoriteButton, setfavoriteButton] = useState(false);
+  const [favoriteButton, setfavoriteButton] = useState(favorites.some(id=> id == props?.route?.params?.lessonId));
+  const dispatch = useDispatch();
   const re = new RegExp("[.,;:\\s?!]+");
   // const sound = useRef(new Audio.Sound());
   // const storyAudioPlaying = useSelector(state=>state.storyReducer.storyAudioPlaying)
@@ -54,15 +58,14 @@ import { connect, useSelector } from "react-redux";
     getStoryById(props?.route?.params?.lessonId).then((resp)=>{
       setStoryParagraph(resp?.paragraph)
       setTranslation(resp?.translation)
-      setName(resp?.name)
-      // getStoryAudio(resp?.id).then((res)=>{
-      //     var reader = new FileReader();
-      //     reader.readAsDataURL(res)
-      //     reader.onload = () => {
-      //         setAudioSrc(reader?.result?.split(",")[1])
+      getStoryAudio(resp?.id).then((res)=>{
+          var reader = new FileReader();
+          reader.readAsDataURL(res)
+          reader.onload = () => {
+              setAudioSrc(reader?.result?.split(",")[1])
+          }
 
-      //     }})
-    })
+    })})
 
   },[])
   useEffect(()=>{
@@ -71,6 +74,7 @@ import { connect, useSelector } from "react-redux";
       console.log("sentences", storyParagraph.split(["."]))
     }
   },[storyParagraph])
+
   // _onPlayBackStatusUpdates = playbackStatus =>{
   //   if(playbackStatus.didJustFinish){
   //     setPlayPressed(false);
@@ -128,18 +132,17 @@ import { connect, useSelector } from "react-redux";
 
 
   // },[activeTab])
+  // addFavorite = (item) => {
+  //   setFavorites([...favorites, item]);
+  // };
+  //  removeFavorite = (id) => {
+  //   setFavorites(favorites.filter((item) => item.id !== id));
+  // };
 
   onPressWord=(word,index)=>{
     // storySentences.map((sentence, index)=>{
     //   if(sentence.includes(word))
     //     storySentences.split(" ").findIndex
-      
-    addFavorite = (item) => {
-      setFavorites([...favorites, item]);
-    };
-     removeFavorite = (id) => {
-      setFavorites(favorites.filter((item) => item.id !== id));
-    };
     // })
     setHighlightIndex(index)
     //get word logic
@@ -149,6 +152,15 @@ import { connect, useSelector } from "react-redux";
       //setSelectedWordAudio(res?.audio)
     })
 
+  }
+  setFavorties = (flag,lessonId) =>{
+    if(flag){
+      dispatch(addFavorite(lessonId))
+    } else{
+      dispatch(removeFavorite(lessonId))
+    }
+
+    setfavoriteButton(!favoriteButton)
   }
 
   const renderContent = () => {
@@ -200,7 +212,7 @@ import { connect, useSelector } from "react-redux";
                 name="favorite"
                 size={22}
                 color={favoriteButton ? "red":"rgba(0, 0, 0, 0.2)"}
-                onPress={()=>setFavorites()}
+                onPress={()=>favoriteButton? setFavorties(false,props?.route?.params?.lessonId): setFavorties(true,props?.route?.params?.lessonId)}
               />
             </View>
             
@@ -281,7 +293,8 @@ renderphoto=()=>{
   justifyContent: 'center',
   overflow: 'hidden',
   left:5,
-  backgroundColor:"#dfd1ce",
+  backgroundColor:"#ccc",
+  opacity:0.8,
   borderRadius: 20}}>
 
       <TouchableOpacity
@@ -306,10 +319,12 @@ renderphoto=()=>{
   </View>
   <View style={{display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'center'}} >
   
-  <View style={{paddingTop:20}}  >
+  <View style={{paddingTop:20, borderRadius: 20}}  >
     {selectedWord && SelectedWordTranslation&&
-      <View  style={{flex: 0,
-        width:410,
+      <View  style={{
+        opacity: 0.8,
+        backgroundColor:"#ccc",
+        width:"100%",
         height:100,
         paddingBottom:50,
       textAlign: 'center',
@@ -382,7 +397,8 @@ renderphoto=()=>{
       justifyContent: 'center',
       overflow: 'hidden',
       left:5,
-  backgroundColor:"#dfd1ce",
+  backgroundColor:"#ccc",
+  opacity:0.8,
       borderRadius: 20}}>
     
           <TouchableOpacity
@@ -459,7 +475,8 @@ renderphoto=()=>{
         justifyContent: 'center',
         overflow: 'hidden',
         left:5,
-  backgroundColor:"#dfd1ce",
+  backgroundColor:"#ccc",
+  opacity:0.8,
         borderRadius: 20}}>
       
             <TouchableOpacity
@@ -588,7 +605,7 @@ renderphoto=()=>{
 </View>
         {renderContent()}
       </View>
-      {/* <CustomAudioPlayer audioUrl={audioSrc} setHighlightIndex={setHighlightIndex}/> */}
+      <CustomAudioPlayer audioUrl={audioSrc} setHighlightIndex={setHighlightIndex}/>
     </View>
   );
 }

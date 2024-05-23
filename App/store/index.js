@@ -1,13 +1,20 @@
 
-import { SET_AUDIO_PLAYING } from "../Actions/StoryActions";
+import { ADD_FAVORITE, REMOVE_FAVORITE, SET_AUDIO_PLAYING } from "../Actions/StoryActions";
 import { combineReducers, createStore } from "redux";
+import storage from 'redux-persist/lib/storage';
+import { persistStore, persistReducer } from 'redux-persist';
 
 const initialState = {
-    storyAudioPlaying: false
+    storyAudioPlaying: false,
+    favorites: []
 
     // Define your initial state properties here
     
     };
+const persistConfig = {
+        key: 'root',
+        storage,
+    }
 const reducer = (state = initialState, action) => {
     const type = action && action.type;
     const payload = action && action.payload;
@@ -17,6 +24,16 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 storyAudioPlaying: payload
             }
+        case ADD_FAVORITE:
+            return{
+                ...state,
+                favorites: [...state.favorites, payload]
+            }
+        case REMOVE_FAVORITE:
+            return {
+                ...state,
+                favorties: state.favorites.filter((id)=>id !== payload)
+            }
     }
     return state;
     // Handle different action types and update the state accordingly
@@ -24,5 +41,7 @@ const reducer = (state = initialState, action) => {
     const rootReducer = combineReducers({
         storyReducer: reducer
     })
+    const persistedReducer = persistReducer(persistConfig, rootReducer)
  const store = createStore(rootReducer);
- export default store;
+ const persistor = persistStore(store)
+ export {store,persistor}

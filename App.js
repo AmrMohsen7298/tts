@@ -12,7 +12,8 @@ import { faCircleCheck } from "@fortawesome/free-solid-svg-icons";
 import { faDumbbell } from "@fortawesome/free-solid-svg-icons";
 import { faPlay } from "@fortawesome/free-solid-svg-icons";
 import { Provider } from "react-redux";
-import store from "./App/store";
+import {persistor,store} from "./App/store";
+import { PersistGate } from 'redux-persist/integration/react'
 export default function App() {
 
   // in App.js
@@ -29,11 +30,12 @@ export default function App() {
   );
   return (
     <Provider store={store}>
+       <PersistGate loading={null} persistor={persistor}>
      <NavigationContainer>
 
         <TabNavigation />
      </NavigationContainer>
-      
+     </PersistGate>
     </Provider>
   );
 }

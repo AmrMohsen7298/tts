@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faScroll, faDumbbell } from "@fortawesome/free-solid-svg-icons"; // Import specific icons
 import Ionicons from "react-native-vector-icons/Ionicons"; // Correct import path for Ionicons
 import Colors from "../Utils/Colors";
+import LibraryStack from "./LibraryStack";
 
 const Tab = createBottomTabNavigator();
 
@@ -44,7 +45,7 @@ export default function TabNavigation() {
         />
         <Tab.Screen
           name="My Library"
-          component={LibraryScreen}
+          component={LibraryStack}
           options={{
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="document-text-sharp" size={size} color={color} />

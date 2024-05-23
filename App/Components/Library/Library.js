@@ -2,7 +2,10 @@ import { View, Text,Image, Button, Pressable, StyleSheet, TouchableOpacity, Moda
 import React, { useState } from 'react'
 import Colors from '../../Utils/Colors'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { useNavigation } from '@react-navigation/native';
+import LibraryStack from '../../Navigations/LibraryStack';
 export default function Library() {
+  const navigator = useNavigation(LibraryStack)
   return (
     
     <View style={{padding:20}}>
@@ -10,7 +13,8 @@ export default function Library() {
             <Text style={{color:"black",fontSize:23,fontFamily:'outfit'}}>مكتبتي</Text>
       </View>
       <View style={{marginTop: 50,display:'flex',flexDirection:'column',alignItems:'center',gap:20}}>
-        <TouchableOpacity style={styles.easyButton}>
+        <TouchableOpacity style={styles.easyButton}
+        onPress={()=>{navigator.navigate("Favorites")}}>
             <FontAwesomeIcon icon="angle-left" style={{color: 'grey'}}></FontAwesomeIcon>
             <View style={{display: 'flex', flexDirection:'column', gap:10}}>
             <Text style={{width: '100%', fontSize: 18, fontWeight: '500',color:"black"}}>المفضلة</Text>
