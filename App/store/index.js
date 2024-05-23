@@ -3,6 +3,7 @@ import { ADD_FAVORITE, REMOVE_FAVORITE, SET_AUDIO_PLAYING } from "../Actions/Sto
 import { combineReducers, createStore } from "redux";
 import storage from 'redux-persist/lib/storage';
 import { persistStore, persistReducer } from 'redux-persist';
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const initialState = {
     storyAudioPlaying: false,
@@ -13,7 +14,7 @@ const initialState = {
     };
 const persistConfig = {
         key: 'root',
-        storage,
+        storage:AsyncStorage,
     }
 const reducer = (state = initialState, action) => {
     const type = action && action.type;
@@ -42,6 +43,6 @@ const reducer = (state = initialState, action) => {
         storyReducer: reducer
     })
     const persistedReducer = persistReducer(persistConfig, rootReducer)
- const store = createStore(rootReducer);
+ const store = createStore(persistedReducer);
  const persistor = persistStore(store)
  export {store,persistor}

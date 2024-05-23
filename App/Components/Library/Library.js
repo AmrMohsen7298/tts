@@ -14,7 +14,7 @@ export default function Library() {
       </View>
       <View style={{marginTop: 50,display:'flex',flexDirection:'column',alignItems:'center',gap:20}}>
         <TouchableOpacity style={styles.easyButton}
-        onPress={()=>{navigator.navigate("Favorites")}}>
+        onPress={()=>{navigator.navigate("المفضله")}}>
             <FontAwesomeIcon icon="angle-left" style={{color: 'grey'}}></FontAwesomeIcon>
             <View style={{display: 'flex', flexDirection:'column', gap:10}}>
             <Text style={{width: '100%', fontSize: 18, fontWeight: '500',color:"black"}}>المفضلة</Text>
