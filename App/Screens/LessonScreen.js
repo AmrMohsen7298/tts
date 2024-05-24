@@ -30,18 +30,20 @@ import CircularProgress from "../Utils/pie";
 import { useFocusEffect } from "@react-navigation/native";
 import { connect, useDispatch, useSelector } from "react-redux";
 import CustomAudioPlayer from "../Components/AudioPlayer/CustomAudioPlayer";
-import { addFavorite, removeFavorite } from "../Actions/StoryActions";
+import { addFavorite, removeFavorite, setAudioPlaying } from "../Actions/StoryActions";
+import Sound from "react-native-sound";
+import RNFetchBlob from 'rn-fetch-blob';
 // import CustomAudioPlayer from "../Components/AudioPlayer/CustomAudioPlayer";
  export default function LessonScreen(props) {
   const favorites = useSelector((state)=>state.storyReducer.favorites)
   const [activeTab, setActiveTab] = useState(0);
-  //  const [playPressed, setPlayPressed] = useState(false);
+   const [playPressed, setPlayPressed] = useState(false);
   const [trainingPressed, setTrainingPressed] = useState(false);
   const tabs = [LessonTabs.STORY, LessonTabs.QUIZ, LessonTabs.KEYWORDS, LessonTabs.GRAMMAR];
   const [storyParagraph,setStoryParagraph] = useState();
   const [storySentences, setStorySentences] = useState();
   const [audioSrc, setAudioSrc] = useState();
-  const [highlightIndex, setHighlightIndex] = useState([]);
+  const [highlightIndex, setHighlightIndex] = useState();
   const [selectedWord, setSelectedWord] = useState();
   const [selectedWordAudio, setSelectedWordAudio] = useState();
   const [SelectedWordTranslation, setSelectedWordTranslation] = useState()
@@ -52,8 +54,8 @@ import { addFavorite, removeFavorite } from "../Actions/StoryActions";
   const dispatch = useDispatch();
   const re = new RegExp("[.,;:\\s?!]+");
   const [timePoints, setTimePoints] = useState([])
-  // const sound = useRef(new Audio.Sound());
-  // const storyAudioPlaying = useSelector(state=>state.storyReducer.storyAudioPlaying)
+  const sound = useRef();
+  const storyAudioPlaying = useSelector(state=>state.storyReducer.storyAudioPlaying)
   useEffect(()=>{
     console.log("props",props?.route?.params?.lessonId)
     getStoryById(props?.route?.params?.lessonId).then((resp)=>{
@@ -102,29 +104,41 @@ import { addFavorite, removeFavorite } from "../Actions/StoryActions";
   //   }
 
   // },[storyAudioPlaying])
-  // useEffect(()=>{
-  //   async function playSound(){
-  //     await Audio.setAudioModeAsync({
-  //       playsInSilentModeIOS: true,
-  //       staysActiveInBackground: false,
-  //       shouldDuckAndroid: false,
-  //   interruptionModeIOS: InterruptionModeIOS.DuckOthers,
-  //   interruptionModeAndroid:InterruptionModeAndroid.DoNotMix,
-  // })
-  //   const { sound: playbackObject }  = await Audio.Sound.createAsync({uri:`data:audio/mp3;base64, ${selectedWordAudio}`}); 
-  //   playbackObject.setOnPlaybackStatusUpdate(this._onPlayBackStatusUpdates)
-  //   sound.current = playbackObject
-  //   const checkLoaded = await sound.current.getStatusAsync();
-  //   console.log("checkLoaded", checkLoaded);
-  //   if (checkLoaded.isLoaded === true) {
-  //     await sound.current.playAsync();
-  //   }
-  //   }
-  //   if(playPressed){
-  //     playSound();
+  useEffect(()=>{
+    const filePath = `${RNFetchBlob.fs.dirs.CacheDir}/audio-wordAudio.mp3`;
 
-  //   }
-  // },[playPressed])
+    async function saveAudioToFileSystem() {
+      try {
+        // Save the audio Blob to the file system
+        await RNFetchBlob.fs.writeFile(filePath, selectedWordAudio, 'base64');
+        console.log(filePath)
+        sound.current = new Sound(filePath, "", (error) => {
+          if (error) {
+            console.log("failed to load the sound", error);
+            return;
+          }
+          console.log("duration in seconds: " + sound.current.getDuration() + "number of channels: " + sound.current.getNumberOfChannels());
+        });
+      } catch (error) {
+        console.error("Error while saving audio to file system:", error);
+      }
+    }
+  
+    if(selectedWordAudio){
+    saveAudioToFileSystem();
+    }
+    const playSound = async () => {
+      sound.current.play(((success)=>{
+        if(success){
+          setPlayPressed(false)
+        }
+      }));
+};
+    if(playPressed){
+      playSound();
+
+    }
+  },[playPressed, selectedWordAudio])
   // useEffect(()=>{
   //   switch (activeTab){
   //     case LessonTabs.STORY:  
@@ -150,13 +164,15 @@ import { addFavorite, removeFavorite } from "../Actions/StoryActions";
     //   if(sentence.includes(word))
     //     storySentences.split(" ").findIndex
     // })
+    dispatch(setAudioPlaying(false))
     setHighlightIndex([index])
     //get word logic
     getWordByText(word.split(re)[0], props?.route?.params?.lessonId).then(res=>{
       setSelectedWord(res?.text)
       setSelectedWordTranslation(res?.translation)
-      //setSelectedWordAudio(res?.audio)
+      setSelectedWordAudio(res?.audio)
     })
+    setPlayPressed(false)
 
   }
   setFavorites = (flag,lessonId) =>{
@@ -223,7 +239,7 @@ import { addFavorite, removeFavorite } from "../Actions/StoryActions";
               />
             </View>
             
-            <View style={{flexDirection:translateButton? 'row':'row-reverse',flexWrap: 'wrap', gap: translateButton? 3: 5}}>
+            <View style={{flexDirection:translateButton? 'row':'row-reverse',flexWrap: 'wrap', gap: translateButton? 3: 0}}>
             { translateButton? translation?.split(" ").map((word, index)=>{
               return (<Pressable  key={index} onPress={()=>onPressWord(word,index)}style={{flex: 0,textAlign: 'center',justifyContent: 'center',
               overflow: 'hidden',borderRadius:5,backgroundColor: index == highlightIndex ? '#42BB7E' : 'transparent'}}>
@@ -236,9 +252,9 @@ import { addFavorite, removeFavorite } from "../Actions/StoryActions";
 
             }) : storyParagraph?.split(" ").map((word, index)=>{
               return (<Pressable  key={index} onPress={()=>onPressWord(word,index)} style={{flex: 0,textAlign: 'center',justifyContent: 'center',
-               overflow: 'hidden',borderRadius:5,backgroundColor: highlightIndex?.some(idx=>idx == index) ? '#42BB7E' : 'transparent'}}>
+               overflow: 'hidden',borderRadius: storyAudioPlaying? 1.5:5,backgroundColor: highlightIndex?.length > 0 && highlightIndex?.some(idx=>idx == index) ? '#42BB7E' : 'transparent',paddingHorizontal: 3}}>
                 <Text>
-                <Text style={{    color:  highlightIndex?.some(idx=>idx == index) ? 'white':'black' ,   fontFamily:'outfit',fontSize:20, textAlign: "center"}}>
+                <Text style={{    color:  highlightIndex?.some(idx=>idx == index) ? 'white':'black' ,   fontFamily:'outfit',fontSize:20, textAlign: "center",}}>
                    {word}
                 </Text>
                 </Text>
@@ -349,7 +365,7 @@ renderphoto=()=>{
         <Pressable style={trainingPressed? styles.cardButtonUpPressed :styles.cardButtonUp} onPress={()=>{trainingPressed?setTrainingPressed(false): setTrainingPressed(true)}}>
           <FontAwesomeIcon icon='dumbbell'></FontAwesomeIcon>
         </Pressable>
-        <Pressable >
+        <Pressable style={playPressed? styles.cardButtonDownPressed :styles.cardButtonDown} onPress={()=>{playPressed? setPlayPressed(false): setPlayPressed(true)}} >
         <FontAwesomeIcon icon='play'></FontAwesomeIcon>
         </Pressable>
 
@@ -714,7 +730,7 @@ const styles = StyleSheet.create({
 
   },
   cardButtonUp:{
-    backgroundColor: '#42BB7E',
+    backgroundColor: 'lightgrey',
     borderRadius: 10,
     height: '50%',
     width: '50%',
@@ -726,7 +742,7 @@ const styles = StyleSheet.create({
 
   },
   cardButtonUpPressed:{
-    backgroundColor: 'lightgrey',
+    backgroundColor: '#42BB7E',
     borderRadius: 10,
     height: '50%',
     width: '50%',
@@ -739,7 +755,7 @@ const styles = StyleSheet.create({
 
   },
   cardButtonDown:{
-    backgroundColor: '#42BB7E',
+    backgroundColor: 'lightgrey',
     borderRadius: 10,
     height: '50%',
     width: '50%',
@@ -753,7 +769,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row'
   },
   cardButtonDownPressed:{
-    backgroundColor: 'lightgrey',
+    backgroundColor: '#42BB7E',
     borderRadius: 10,
     height: '50%',
     width: '50%',

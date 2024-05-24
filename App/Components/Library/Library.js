@@ -4,8 +4,10 @@ import Colors from '../../Utils/Colors'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useNavigation } from '@react-navigation/native';
 import LibraryStack from '../../Navigations/LibraryStack';
+import { useSelector } from 'react-redux';
 export default function Library() {
   const navigator = useNavigation(LibraryStack)
+  const favorites = useSelector(state=>state.storyReducer.favorites)
   return (
     
     <View style={{padding:20}}>
@@ -18,7 +20,7 @@ export default function Library() {
             <FontAwesomeIcon icon="angle-left" style={{color: 'grey'}}></FontAwesomeIcon>
             <View style={{display: 'flex', flexDirection:'column', gap:10}}>
             <Text style={{width: '100%', fontSize: 18, fontWeight: '500',color:"black"}}>المفضلة</Text>
-            <Text style={styles.easyText}>0 اغراض</Text>
+            <Text style={styles.easyText}>{favorites?.length} اغراض</Text>
             </View>
             <FontAwesomeIcon icon ='heart' size={25} color={'#42BB7E'}></FontAwesomeIcon>
             </TouchableOpacity>

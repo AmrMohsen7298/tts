@@ -3,7 +3,7 @@ import { View, TouchableOpacity, Text } from "react-native";
 import Sound from "react-native-sound";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useFocusEffect } from "@react-navigation/native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setAudioPlaying } from "../../Actions/StoryActions";
 import RNFetchBlob from 'rn-fetch-blob';
 
@@ -12,6 +12,7 @@ const CustomAudioPlayer = ({ audioUrl, setHighlightIndex, selectedSentence, time
   const [isPlaying, setIsPlaying] = useState(false);
   const dispatch = useDispatch();
   const [onRepeat, setOnRepeat] = useState(false);
+  const storyAudioPlaying = useSelector(state=>state.storyReducer.storyAudioPlaying)
   let timeouts = []
   useFocusEffect(
     React.useCallback(() => {
@@ -99,6 +100,12 @@ const CustomAudioPlayer = ({ audioUrl, setHighlightIndex, selectedSentence, time
     //     sound.current.release();
     //   }
     }, [audioUrl]);
+    useEffect(()=>{
+      if(!storyAudioPlaying){
+        stopSound()
+      }
+
+    },[storyAudioPlaying])
 
     const transcribeAudio = async (audioFilePath) => {
       try {
