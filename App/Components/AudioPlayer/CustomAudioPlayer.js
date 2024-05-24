@@ -12,6 +12,7 @@ const CustomAudioPlayer = ({ audioUrl, setHighlightIndex, selectedSentence, time
   const [isPlaying, setIsPlaying] = useState(false);
   const dispatch = useDispatch();
   const [onRepeat, setOnRepeat] = useState(false);
+  let timeouts = []
   useFocusEffect(
     React.useCallback(() => {
       return () => {
@@ -45,7 +46,7 @@ const CustomAudioPlayer = ({ audioUrl, setHighlightIndex, selectedSentence, time
           }else{
           delay =timePoints[sentenceIndex - 1] * 1000; 
           console.log("timePoints", timePoints)
-           ZOBREMANGA(delay, wordIndexes); 
+           timeouts.push(  ZOBREMANGA(delay, wordIndexes)); 
           }// Await ZOBREMANGA function
 //           if (sentenceIndex !== 0) {
 // // Update delay
@@ -56,16 +57,18 @@ const CustomAudioPlayer = ({ audioUrl, setHighlightIndex, selectedSentence, time
       };
   
       highlightWordsRecursive(); // Start highlighting recursively
+      return () => {
+        timeouts.forEach(timeout => clearTimeout(timeout));
+        timeouts =[] // Clear all timeouts
+      };
     }
   }, [timePoints, storyParagraph, isPlaying]);
   
   const ZOBREMANGA = (delay, wordIndexes) => {
-    return new Promise(resolve => {
-      setTimeout(() => {
+      return setTimeout(() => {
         setHighlightIndex([...wordIndexes]);
-        resolve(); // Resolve the promise after setting highlight index
+ // Resolve the promise after setting highlight index
       }, delay);
-    });
   };
   useEffect(() => {
     if(audioUrl){
@@ -148,6 +151,8 @@ const CustomAudioPlayer = ({ audioUrl, setHighlightIndex, selectedSentence, time
       setIsPlaying(false);
       dispatch(setAudioPlaying(false));
       setHighlightIndex([]);
+      timeouts.forEach(timeout => clearTimeout(timeout));
+      timeouts =[]
     }
   };
   
