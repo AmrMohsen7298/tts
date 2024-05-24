@@ -8,12 +8,15 @@ import { useSelector } from "react-redux";
 import LibraryStack from "../../Navigations/LibraryStack";
 import Colors from "../../Utils/Colors";
 import { levels } from "../../Utils/constants";
+import { useIsFocused } from "@react-navigation/native";
 export default function Favorites() {
   const navigation = useNavigation(LibraryStack);
   const [lessons, setLessons] = useState([]);
   const [activeTab, setActiveTab] = useState(0);
+  const isFocused = useIsFocused();
 
   const favorites = useSelector(state => state.storyReducer.favorites);
+  const [favoritesLocal, setFavoritesLocal] = useState([])
   const tabs = [
     levels.A1, levels.A2, levels.A3, levels.A4, levels.A5, levels.A6, 
     levels.B1, levels.B2, levels.B3, levels.C1, levels.C2, levels.C3
@@ -21,12 +24,21 @@ export default function Favorites() {
 
   useEffect(() => {
     console.log(favorites);
+
     favorites.map(id => {
+      console.log("FAVORITESLOCAL", favoritesLocal)
       console.log("ID", id);
       getLessonById(id).then(lesson => {
         setLessons(prevLessons => [...prevLessons, lesson]);
       });
+      if(favoritesLocal.some((idx)=>idx == id) && favorites.some((idx)=>idx == id)){
+        setLessons(lessons.filter((idx)=> idx !== id))
+      }
     });
+    if(favorites.length == 0){
+      setLessons([])
+    }
+    setFavoritesLocal(favorites)
   }, [favorites]);
 
   useEffect(() => {
@@ -80,7 +92,7 @@ export default function Favorites() {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 10, gap: 12 }}
       >
-        {lessons?.length > 0 && lessons.map((lesson, index) => (
+        {lessons.map((lesson, index) => (
           <TouchableOpacity
             key={index}
             onPress={() => handleOnPress(lesson?.id, 'data:image/png;base64,' + lesson?.image)}

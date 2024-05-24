@@ -5,34 +5,74 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import { useFocusEffect } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 import { setAudioPlaying } from "../../Actions/StoryActions";
-import RNFetchBlob from 'rn-fetch-blob'
+import RNFetchBlob from 'rn-fetch-blob';
 
-const CustomAudioPlayer = ({ audioUrl, setHighlightIndex, selectedSentence }) => {
+const CustomAudioPlayer = ({ audioUrl, setHighlightIndex, selectedSentence, timePoints, storyParagraph }) => {
   const sound = useRef();
   const [isPlaying, setIsPlaying] = useState(false);
   const dispatch = useDispatch();
   const [onRepeat, setOnRepeat] = useState(false);
-
   useFocusEffect(
     React.useCallback(() => {
       return () => {
         setIsPlaying(false);
         dispatch(setAudioPlaying(false));
-        setHighlightIndex(null);
+        setHighlightIndex([]);
         if (sound.current) {
           sound.current.release();
         }
       };
     }, [])
   );
-
   useEffect(() => {
+    if (timePoints && storyParagraph && isPlaying) {
+      setHighlightIndex([]); // Reset highlight index array
+      const sentences = storyParagraph.split(".");
+      let delay = 0; // Initialize delay for setTimeout
+      const words = storyParagraph.split(" ").map((word, index) => index);
+      let sentenceIndex = 0;
+  
+      const highlightWordsRecursive = async () => {
+        if (sentenceIndex < sentences.length) {
+          let wordIndexes = [];
+          const sentence = sentences[sentenceIndex];
+          const sentenceWords = sentence.split(" ");
+          for (let i = 0; i < sentenceWords.length; i++) {
+            wordIndexes.push(words.shift()); // Collect word indexes for the current sentence
+          }
+          if(sentenceIndex == 0){
+            setHighlightIndex([...wordIndexes])
+          }else{
+          delay =timePoints[sentenceIndex - 1] * 1000; 
+          console.log("timePoints", timePoints)
+           ZOBREMANGA(delay, wordIndexes); 
+          }// Await ZOBREMANGA function
+//           if (sentenceIndex !== 0) {
+// // Update delay
+//           }
+          sentenceIndex++;
+          highlightWordsRecursive(); // Call recursively for the next sentence
+        }
+      };
+  
+      highlightWordsRecursive(); // Start highlighting recursively
+    }
+  }, [timePoints, storyParagraph, isPlaying]);
+  
+  const ZOBREMANGA = (delay, wordIndexes) => {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        setHighlightIndex([...wordIndexes]);
+        resolve(); // Resolve the promise after setting highlight index
+      }, delay);
+    });
+  };
+  useEffect(() => {
+    if(audioUrl){
     const filePath = `${RNFetchBlob.fs.dirs.CacheDir}/audio.mp3`;
 
     async function saveAudioToFileSystem() {
       try {
-        console.log("AUDIOURL", audioUrl);
-        console.log("PATH", filePath);
         // Save the audio Blob to the file system
         await RNFetchBlob.fs.writeFile(filePath, audioUrl, 'base64');
         sound.current = new Sound(filePath, "", (error) => {
@@ -48,6 +88,8 @@ const CustomAudioPlayer = ({ audioUrl, setHighlightIndex, selectedSentence }) =>
     }
   
     saveAudioToFileSystem();
+    transcribeAudio(filePath)
+  }
   
     // return () => {
     //   if (sound.current) {
@@ -55,25 +97,45 @@ const CustomAudioPlayer = ({ audioUrl, setHighlightIndex, selectedSentence }) =>
     //   }
     }, [audioUrl]);
 
-  const _onPlayBackStatusUpdate = (playbackStatus) => {
-    if (playbackStatus.didJustFinish) {
-      setIsPlaying(false);
-      dispatch(setAudioPlaying(false));
-      setHighlightIndex(null);
-    }
-    if (playbackStatus.isPlaying) {
-      const wordDuration = 500;
-      const index = Math.floor(playbackStatus.currentTime / wordDuration);
-      setHighlightIndex(index);
-    }
-  };
+    const transcribeAudio = async (audioFilePath) => {
+      try {
+        const audioData = await RNFetchBlob.fs.readFile(audioFilePath, 'base64');
+        const response = await fetch('https://speech.googleapis.com/v1/speech:recognize?key=AIzaSyBQtRaiCZXfOMkgn4gQAcw46TKROwPzkbs', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            audio: {
+              content: audioData,
+            },
+            config: {
+              encoding: 'LINEAR16',
+              sampleRateHertz: 16000,
+              languageCode: 'en-US',
+              alternativeLanguageCodes: [
+                'ar-EG',
+                'en-US'
+              ],
+              enableWordTimeOffsets: true,
+            },
+          }),
+        });
+    
+        const data = await response.json();
+        // Process the response data containing the transcription and timestamps
+        console.log("GOOGLE_DATA",data);
+      } catch (error) {
+        console.error('Error transcribing audio:', error);
+      }
+    };
 
   const playSound = async () => {
           sound.current.play(((success)=>{
             if(success){
                 setIsPlaying(false);
                 dispatch(setAudioPlaying(false));
-                setHighlightIndex(null);
+                setHighlightIndex([]);
             }
           }));
           setIsPlaying(true);
@@ -85,7 +147,7 @@ const CustomAudioPlayer = ({ audioUrl, setHighlightIndex, selectedSentence }) =>
       sound.current.stop();
       setIsPlaying(false);
       dispatch(setAudioPlaying(false));
-      setHighlightIndex(null);
+      setHighlightIndex([]);
     }
   };
   

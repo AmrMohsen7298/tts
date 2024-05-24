@@ -19,6 +19,7 @@ const persistConfig = {
 const reducer = (state = initialState, action) => {
     const type = action && action.type;
     const payload = action && action.payload;
+    console.log
     switch(type){
         case SET_AUDIO_PLAYING:
             return{
@@ -28,12 +29,12 @@ const reducer = (state = initialState, action) => {
         case ADD_FAVORITE:
             return{
                 ...state,
-                favorites: [...state.favorites, payload]
+                favorites: !state.favorites.some((id)=>id==payload) ? [...state.favorites, payload] : state.favorites
             }
         case REMOVE_FAVORITE:
             return {
                 ...state,
-                favorties: state.favorites.filter((id)=>id !== payload)
+                favorites: state.favorites.filter((id)=>id !== payload)
             }
     }
     return state;

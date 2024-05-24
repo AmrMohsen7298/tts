@@ -23,7 +23,7 @@ import  AntDesign  from "react-native-vector-icons/AntDesign";
 import KeywordCard from "../Components/KeyWordCard/KeywordCard";
 import Card from "../Components/Card";
 import { LessonTabs } from "../Utils/constants";
-import { getStoryAudio, getStoryById, getWordByText } from "../Services/LessonServices";
+import { getAudioTimePoints, getStoryAudio, getStoryById, getWordByText } from "../Services/LessonServices";
 
 
 import CircularProgress from "../Utils/pie";
@@ -41,7 +41,7 @@ import { addFavorite, removeFavorite } from "../Actions/StoryActions";
   const [storyParagraph,setStoryParagraph] = useState();
   const [storySentences, setStorySentences] = useState();
   const [audioSrc, setAudioSrc] = useState();
-  const [highlightIndex, setHighlightIndex] = useState();
+  const [highlightIndex, setHighlightIndex] = useState([]);
   const [selectedWord, setSelectedWord] = useState();
   const [selectedWordAudio, setSelectedWordAudio] = useState();
   const [SelectedWordTranslation, setSelectedWordTranslation] = useState()
@@ -51,6 +51,7 @@ import { addFavorite, removeFavorite } from "../Actions/StoryActions";
   const [favoriteButton, setfavoriteButton] = useState(favorites.some(id=> id == props?.route?.params?.lessonId));
   const dispatch = useDispatch();
   const re = new RegExp("[.,;:\\s?!]+");
+  const [timePoints, setTimePoints] = useState([])
   // const sound = useRef(new Audio.Sound());
   // const storyAudioPlaying = useSelector(state=>state.storyReducer.storyAudioPlaying)
   useEffect(()=>{
@@ -64,8 +65,13 @@ import { addFavorite, removeFavorite } from "../Actions/StoryActions";
           reader.onload = () => {
               setAudioSrc(reader?.result?.split(",")[1])
           }
-
-    })})
+      })
+      getAudioTimePoints(resp?.id).then((res)=>{
+        res?.map((time)=>{
+          setTimePoints(prevTimePoints=> [...prevTimePoints, time?.["timeSeconds_"]])
+        })
+      })
+    })
 
   },[])
   useEffect(()=>{
@@ -144,7 +150,7 @@ import { addFavorite, removeFavorite } from "../Actions/StoryActions";
     //   if(sentence.includes(word))
     //     storySentences.split(" ").findIndex
     // })
-    setHighlightIndex(index)
+    setHighlightIndex([index])
     //get word logic
     getWordByText(word.split(re)[0], props?.route?.params?.lessonId).then(res=>{
       setSelectedWord(res?.text)
@@ -153,12 +159,13 @@ import { addFavorite, removeFavorite } from "../Actions/StoryActions";
     })
 
   }
-  setFavorties = (flag,lessonId) =>{
+  setFavorites = (flag,lessonId) =>{
     if(flag){
       dispatch(addFavorite(lessonId))
     } else{
       dispatch(removeFavorite(lessonId))
     }
+    console.log("FAVORITEBUTTON",favoriteButton)
 
     setfavoriteButton(!favoriteButton)
   }
@@ -212,7 +219,7 @@ import { addFavorite, removeFavorite } from "../Actions/StoryActions";
                 name="favorite"
                 size={22}
                 color={favoriteButton ? "red":"rgba(0, 0, 0, 0.2)"}
-                onPress={()=>favoriteButton? setFavorties(false,props?.route?.params?.lessonId): setFavorties(true,props?.route?.params?.lessonId)}
+                onPress={()=>favoriteButton? setFavorites(false,props?.route?.params?.lessonId): setFavorites(true,props?.route?.params?.lessonId)}
               />
             </View>
             
@@ -227,18 +234,18 @@ import { addFavorite, removeFavorite } from "../Actions/StoryActions";
                 </Text>
               </Pressable>)
 
-            }) :  storyParagraph?.split(" ").map((word, index)=>{
+            }) : storyParagraph?.split(" ").map((word, index)=>{
               return (<Pressable  key={index} onPress={()=>onPressWord(word,index)} style={{flex: 0,textAlign: 'center',justifyContent: 'center',
-               overflow: 'hidden',borderRadius:5,backgroundColor: index == highlightIndex ? '#42BB7E' : 'transparent'}}>
+               overflow: 'hidden',borderRadius:5,backgroundColor: highlightIndex?.some(idx=>idx == index) ? '#42BB7E' : 'transparent'}}>
                 <Text>
-                <Text style={{    color: index == highlightIndex? 'white':'black' ,   fontFamily:'outfit',fontSize:20, textAlign: "center"}}>
+                <Text style={{    color:  highlightIndex?.some(idx=>idx == index) ? 'white':'black' ,   fontFamily:'outfit',fontSize:20, textAlign: "center"}}>
                    {word}
                 </Text>
                 </Text>
               </Pressable>)
-
             })
             }
+            
              
             </View>
           </View>
@@ -605,7 +612,7 @@ renderphoto=()=>{
 </View>
         {renderContent()}
       </View>
-      <CustomAudioPlayer audioUrl={audioSrc} setHighlightIndex={setHighlightIndex}/>
+      <CustomAudioPlayer audioUrl={audioSrc} setHighlightIndex={setHighlightIndex} timePoints={timePoints} storyParagraph={storyParagraph}/>
     </View>
   );
 }

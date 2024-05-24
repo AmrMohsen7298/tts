@@ -15,6 +15,7 @@ export const addFavorite = (lessonId) =>{
     }
 }
 export const removeFavorite = (lessonId) =>{
+    console.log("REMOVEFAV", lessonId)
     return {
         type: REMOVE_FAVORITE,
         payload: lessonId
