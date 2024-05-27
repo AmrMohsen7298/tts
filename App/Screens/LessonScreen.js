@@ -303,78 +303,43 @@ renderphoto=()=>{
       return(
       <View style={styles.photoContainer}>
       <ImageBackground style={styles.photo} source={{uri: props?.route?.params?.image}} resizeMode="cover" >
-      <View style={{  alignItems: "center",
-  paddingLeft:20,
-  paddingTop:40,
-  paddingBottom:0,
-  flexDirection:'row-reverse'}}>
-    <View  style={{flex: 0,
-    width:100,
-    height:30,
-    paddingTop:0,
-  textAlign: 'center',
-  justifyContent: 'center',
-  overflow: 'hidden',
-  left:5,
-  backgroundColor:"#ccc",
-  opacity:0.8,
-  borderRadius: 20}}>
-
-      <TouchableOpacity
-   
-    
-   style={{
-     backgroundColor:  "transparent" ,
-  
-     borderRadius: 10, // Adjust this value to control the roundness of the button
-     width: 80, // Adjust this value to control the width of the button
-     height: 35, // Adjust this value to control the height of the button
-     alignItems: "center",
-     justifyContent: "center",
-     margin: 10, // Adjust this value to control the margin between buttons
-   }}
- >
-      <Text style={{fontFamily:"outfit",fontSize:17}} >
-    <Ionicons name={"checkmark-outline"} size={15}  color="black" />
-    تم التعلم</Text>
-    </TouchableOpacity>
-    </View>
-  </View>
-  <View style={{display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'center'}} >
-  
-  <View style={{paddingTop:20, borderRadius: 20}}  >
-    {selectedWord && SelectedWordTranslation&&
-      <View  style={{
-        opacity: 0.8,
-        backgroundColor:"#ccc",
-        width:"100%",
-        height:100,
-        paddingBottom:50,
-      textAlign: 'center',
-      justifyContent: 'center',
-      overflow: 'hidden',
-      borderRadius: 20,display:'flex'}}>
-     <View style={styles.cardContainer}>
-      <View style={{flexDirection:'column', width: '80%', flexWrap: 'wrap', direction:'rtl'}}>
-        <View style={styles.cardHead}>
-          <Text style={{fontSize:22,color:'black'}}>{selectedWord}</Text>
+      <View style={styles.outerContainer}>
+      <View style={styles.buttonWrapper}>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.touchable}>
+            <Text style={styles.touchableText}>
+              <Ionicons name="checkmark-outline" size={15} color="black" /> تم التعلم
+            </Text>
+          </TouchableOpacity>
         </View>
-        <Text style={{fontSize:18,color:'black'}}>{SelectedWordTranslation}</Text>
       </View>
-      <View style={styles.cardButtons}>
-        <Pressable style={trainingPressed? styles.cardButtonUpPressed :styles.cardButtonUp} onPress={()=>{trainingPressed?setTrainingPressed(false): setTrainingPressed(true)}}>
-          <FontAwesomeIcon icon='dumbbell'></FontAwesomeIcon>
-        </Pressable>
-        <Pressable style={playPressed? styles.cardButtonDownPressed :styles.cardButtonDown} onPress={()=>{playPressed? setPlayPressed(false): setPlayPressed(true)}} >
-        <FontAwesomeIcon icon='play'></FontAwesomeIcon>
-        </Pressable>
 
+      <View style={styles.textContainer}>
+        {selectedWord && SelectedWordTranslation &&
+          <View style={styles.translationContainer}>
+            <View style={styles.cardContainer}>
+              <View style={styles.cardHead}>
+                <Text style={styles.selectedWordText}>{selectedWord}</Text>
+              </View>
+              <Text style={styles.translationText}>{SelectedWordTranslation}</Text>
+            </View>
+            <View style={styles.cardButtons}>
+              <Pressable
+                style={trainingPressed ? styles.cardButtonUpPressed : styles.cardButtonUp}
+                onPress={() => { trainingPressed ? setTrainingPressed(false) : setTrainingPressed(true) }}>
+                <FontAwesomeIcon icon='dumbbell' />
+              </Pressable>
+              <Pressable
+                style={playPressed ? styles.cardButtonDownPressed : styles.cardButtonDown}
+                onPress={() => { playPressed ? setPlayPressed(false) : setPlayPressed(true) }}>
+                <FontAwesomeIcon icon='play' />
+              </Pressable>
+            </View>
+          </View>
+        }
       </View>
     </View>
-  </View>
-    }
-  </View>
-  </View>
+  
         </ImageBackground>
         </View>
       
@@ -485,48 +450,42 @@ renderphoto=()=>{
           case 3:
             return(<View style={styles.photoContainer}>
             <ImageBackground style={styles.photo} source={{uri: props?.route?.params?.image}} resizeMode="cover" >
-            <View style={{  alignItems: "center",
-        paddingLeft:20,
-        paddingTop:40,
-        paddingBottom:0,
-        flexDirection:'row-reverse'}}>
-          <View  style={{flex: 0,
-          width:100,
-          height:30,
-          paddingTop:0,
-        textAlign: 'center',
-        justifyContent: 'center',
-        overflow: 'hidden',
-        left:5,
-  backgroundColor:"#ccc",
-  opacity:0.8,
-        borderRadius: 20}}>
-      
-            <TouchableOpacity
-         
-          
-         style={{
-           backgroundColor:  "transparent" ,
-        
-           borderRadius: 10, // Adjust this value to control the roundness of the button
-           width: 80, // Adjust this value to control the width of the button
-           height: 35, // Adjust this value to control the height of the button
-           alignItems: "center",
-           justifyContent: "center",
-           margin: 10, // Adjust this value to control the margin between buttons
-         }}
-       >
-            <Text style={{fontFamily:"outfit",fontSize:17}} >
-          <Ionicons name={"checkmark-outline"} size={15}  color="black" />
-          تم التعلم</Text>
+            <View style={styles.outerContainer}>
+      <View style={styles.buttonWrapper}>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.touchable}>
+            <Text style={styles.touchableText}>
+              <Ionicons name="checkmark-outline" size={15} color="black" /> تم التعلم
+            </Text>
           </TouchableOpacity>
+        </View>
+      </View>
+
+      <View style={styles.textContainer}>
+        {selectedWord && SelectedWordTranslation &&
+          <View style={styles.translationContainer}>
+            <View style={styles.cardContainer}>
+              <View style={styles.cardHead}>
+                <Text style={styles.selectedWordText}>{selectedWord}</Text>
+              </View>
+              <Text style={styles.translationText}>{SelectedWordTranslation}</Text>
+            </View>
+            <View style={styles.cardButtons}>
+              <Pressable
+                style={trainingPressed ? styles.cardButtonUpPressed : styles.cardButtonUp}
+                onPress={() => { trainingPressed ? setTrainingPressed(false) : setTrainingPressed(true) }}>
+                <FontAwesomeIcon icon='dumbbell' />
+              </Pressable>
+              <Pressable
+                style={playPressed ? styles.cardButtonDownPressed : styles.cardButtonDown}
+                onPress={() => { playPressed ? setPlayPressed(false) : setPlayPressed(true) }}>
+                <FontAwesomeIcon icon='play' />
+              </Pressable>
+            </View>
           </View>
-        </View>
-        <View>
-        
-       
-      
-        </View>
+        }
+      </View>
+    </View>
               </ImageBackground>
               
               </View>
@@ -784,6 +743,93 @@ const styles = StyleSheet.create({
     width: '100%',
     bottom:25
     
+  },
+  outerContainer: {
+    flex: 1,
+    alignItems: 'center',
+    padding: 20,
+  },
+  buttonWrapper: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    paddingTop: 40,
+  },
+  buttonContainer: {
+    width: 100,
+    height: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#ccc',
+    opacity: 0.8,
+    borderRadius: 20,
+    marginHorizontal: 5,
+  },
+  touchable: {
+    backgroundColor: 'transparent',
+    borderRadius: 10,
+    width: 80,
+    height: 35,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  touchableText: {
+    fontFamily: 'outfit',
+    fontSize: 17,
+  },
+  textContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 20,
+    width: '100%',
+  },
+  translationContainer: {
+    opacity: 0.8,
+    backgroundColor: '#ccc',
+    width: '90%',
+    padding: 10,
+    textAlign: 'center',
+    justifyContent: 'center',
+    borderRadius: 20,
+  },
+  cardContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  cardHead: {
+    flexDirection: 'column',
+    width: '80%',
+    flexWrap: 'wrap',
+  },
+  selectedWordText: {
+    fontSize: 22,
+    color: 'black',
+  },
+  translationText: {
+    fontSize: 18,
+    color: 'black',
+  },
+  cardButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '20%',
+    borderRadius:20
+  },
+  cardButtonUp: {
+    padding: 10,
+  },
+  cardButtonUpPressed: {
+    padding: 10,
+    backgroundColor: '#42BB7E',
+   
+  },
+  cardButtonDown: {
+    padding: 10,
+  },
+  cardButtonDownPressed: {
+    padding: 10,
+    backgroundColor: '#42BB7E',
   },
 });
 

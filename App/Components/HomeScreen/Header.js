@@ -1,4 +1,4 @@
-import { View, Text, Image, TouchableOpacity } from 'react-native'; // Correct import statement
+import { View, Text, Image, TouchableOpacity , StyleSheet} from 'react-native'; // Correct import statement
 import React from 'react';
 import user from './../../../assets/Images/profile.jpg';
 import Colors from '../../Utils/Colors';
@@ -13,15 +13,36 @@ export default function Header() {
   };
 
   return (
-    <View style={{  padding: 20 }}>
-      <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 190 }}>
+    <View style={styles.container}>
+      <View style={styles.row}>
         <TouchableOpacity onPress={onPress}>
-          <Image source={user} style={{ width: 40, height: 40, borderRadius: 88, right: 25, top: 3 }} />
+          <Image source={user} style={styles.image} />
         </TouchableOpacity>
         <View>
-          <Text style={{ color: Colors.black, fontSize: 23, fontFamily: 'outfit' }}>اكتشف العربية</Text>
+          <Text style={styles.text}>اكتشف العربية</Text>
         </View>
       </View>
     </View>
   );
 }
+const styles = StyleSheet.create({
+  container: {
+    padding: 20,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between', // Use space-between to dynamically distribute space
+    width: '100%', // Make sure the row takes full width of the container
+  },
+  image: {
+    width: 40,
+    height: 40,
+    borderRadius: 20, // Half of width/height to make it a circle
+  },
+  text: {
+    color: 'black',
+    fontSize: 23,
+    fontFamily: 'outfit',
+  },
+});
