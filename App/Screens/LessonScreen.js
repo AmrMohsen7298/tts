@@ -61,6 +61,7 @@ import RNFetchBlob from 'rn-fetch-blob';
     getStoryById(props?.route?.params?.lessonId).then((resp)=>{
       setStoryParagraph(resp?.paragraph)
       setTranslation(resp?.translation)
+      setName(resp?.name)
       getStoryAudio(resp?.id).then((res)=>{
           var reader = new FileReader();
           reader.readAsDataURL(res)
@@ -83,27 +84,7 @@ import RNFetchBlob from 'rn-fetch-blob';
     }
   },[storyParagraph])
 
-  // _onPlayBackStatusUpdates = playbackStatus =>{
-  //   if(playbackStatus.didJustFinish){
-  //     setPlayPressed(false);
-  //   }
-  // }
-  // useEffect(()=>{
-  //   console.log("STORYPLAYING", storyAudioPlaying)
-  //   let timeout
-  //   let flag = true
-  //   if(storyAudioPlaying){
-  //     // storyParagraph.split(" ").map((word,index)=>{
-        
-  //     //    timeout = setTimeout(()=>{setHighlightIndex(index)},530*index)
-         
-  //     // })
-  //   }
-  //   return()=>{
-  //     clearTimeout(timeout)
-  //   }
-
-  // },[storyAudioPlaying])
+ 
   useEffect(()=>{
     const filePath = `${RNFetchBlob.fs.dirs.CacheDir}/audio-wordAudio.mp3`;
 
@@ -139,25 +120,7 @@ import RNFetchBlob from 'rn-fetch-blob';
 
     }
   },[playPressed, selectedWordAudio])
-  // useEffect(()=>{
-  //   switch (activeTab){
-  //     case LessonTabs.STORY:  
-  //     if(!storyParagraph){
-
-  //       getStoryById(props?.lessonId).then(resp=>console.log(resp.paragraph))
-  //     }
-  //     break;
-
-  //   }
-
-
-  // },[activeTab])
-  // addFavorite = (item) => {
-  //   setFavorites([...favorites, item]);
-  // };
-  //  removeFavorite = (id) => {
-  //   setFavorites(favorites.filter((item) => item.id !== id));
-  // };
+ 
 
   onPressWord=(word,index)=>{
     // storySentences.map((sentence, index)=>{
@@ -191,37 +154,28 @@ import RNFetchBlob from 'rn-fetch-blob';
       case 0:
         return (
           
-          <ScrollView style={{bottom:10,backgroundColor:"white"}}
+          <ScrollView style={{bottom:'auto',backgroundColor:"white"}}
           horizontal={false}
           showsHorizontalScrollIndicator={true}
-          contentContainerStyle={{ paddingHorizontal: 20, gap: 5 }}
+          contentContainerStyle={{ paddingHorizontal: 'auto' }}
         >
-         
-          <View style={{width:'auto',backgroundColor:"white"}}>
-            <View style={{display:'flex',paddingBottom:16}}>
+         <View style={{display:'flex',paddingBottom:"8%"}}>
               <Text style={{fontSize:30,color:"black"}}>{name}</Text>
-              {/* <Text
-                style={{
-                  color: Colors.black,
-                  fontFamily: "outfitBold",
-                  fontSize: 20,
-                  textAlign: "right",
-                }}
-              >
-                اكتشاف جديد في اللغة العربية
-              </Text> */}
+              
             </View>
+          <View style={{width:'100%',backgroundColor:"white",display:'flex',direction:'rtl'}}>
+            
             <View
               style={{
-                display: "flex",
+                
                 flexDirection: "row",
-                justifyContent: "flex-end",
+                justifyContent: "flex-start",
                 gap: 15,
-                padding: 1,
-                paddingBottom:25
+                padding: 'auto',
+                paddingBottom:'5%',position:'absolute',right:1
               }}
             >
-              <View style={styles.level_container}>
+              <View >
                 <Text style={styles.card_level}>A1</Text>
               </View>
 
@@ -239,7 +193,7 @@ import RNFetchBlob from 'rn-fetch-blob';
               />
             </View>
             
-            <View style={{flexDirection:translateButton? 'row':'row-reverse',flexWrap: 'wrap', gap: translateButton? 3: 0}}>
+            <View style={{flexDirection:translateButton? 'row':'row-reverse',flexWrap: 'wrap', gap: translateButton? 3: 0,position:'relative',paddingTop:'15%'}}>
             { translateButton? translation?.split(" ").map((word, index)=>{
               return (<Pressable  key={index} onPress={()=>onPressWord(word,index)}style={{flex: 0,textAlign: 'center',justifyContent: 'center',
               overflow: 'hidden',borderRadius:5,backgroundColor: index == highlightIndex ? '#42BB7E' : 'transparent'}}>
@@ -317,12 +271,13 @@ renderphoto=()=>{
       <View style={styles.textContainer}>
         {selectedWord && SelectedWordTranslation &&
           <View style={styles.translationContainer}>
-            <View style={styles.cardContainer}>
+            <View style={styles.cardContainer_}>
               <View style={styles.cardHead}>
                 <Text style={styles.selectedWordText}>{selectedWord}</Text>
               </View>
               <Text style={styles.translationText}>{SelectedWordTranslation}</Text>
             </View>
+            
             <View style={styles.cardButtons}>
               <Pressable
                 style={trainingPressed ? styles.cardButtonUpPressed : styles.cardButtonUp}
@@ -335,6 +290,7 @@ renderphoto=()=>{
                 <FontAwesomeIcon icon='play' />
               </Pressable>
             </View>
+            
           </View>
         }
       </View>
@@ -461,30 +417,7 @@ renderphoto=()=>{
         </View>
       </View>
 
-      <View style={styles.textContainer}>
-        {selectedWord && SelectedWordTranslation &&
-          <View style={styles.translationContainer}>
-            <View style={styles.cardContainer}>
-              <View style={styles.cardHead}>
-                <Text style={styles.selectedWordText}>{selectedWord}</Text>
-              </View>
-              <Text style={styles.translationText}>{SelectedWordTranslation}</Text>
-            </View>
-            <View style={styles.cardButtons}>
-              <Pressable
-                style={trainingPressed ? styles.cardButtonUpPressed : styles.cardButtonUp}
-                onPress={() => { trainingPressed ? setTrainingPressed(false) : setTrainingPressed(true) }}>
-                <FontAwesomeIcon icon='dumbbell' />
-              </Pressable>
-              <Pressable
-                style={playPressed ? styles.cardButtonDownPressed : styles.cardButtonDown}
-                onPress={() => { playPressed ? setPlayPressed(false) : setPlayPressed(true) }}>
-                <FontAwesomeIcon icon='play' />
-              </Pressable>
-            </View>
-          </View>
-        }
-      </View>
+     
     </View>
               </ImageBackground>
               
@@ -499,67 +432,7 @@ renderphoto=()=>{
     
     <View style={styles.container}>
         
-        {/* <ImageBackground style={styles.photo} source={{uri: props?.route?.params?.image}} resizeMode="cover" >
-        <View style={{  alignItems: "center",
-    paddingLeft:20,
-    paddingTop:40,
-    paddingBottom:0,
-    flexDirection:'row-reverse'}}>
-      <BlurView intensity={70} tint={'regular'} style={{flex: 0,
-      width:100,
-      height:30,
-      paddingTop:0,
-    textAlign: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
-    borderRadius: 20}}>
-
-        <TouchableOpacity
-     
-      
-     style={{
-       backgroundColor:  "transparent" ,
-    
-       borderRadius: 10, // Adjust this value to control the roundness of the button
-       width: 80, // Adjust this value to control the width of the button
-       height: 35, // Adjust this value to control the height of the button
-       alignItems: "center",
-       justifyContent: "center",
-       margin: 10, // Adjust this value to control the margin between buttons
-     }}
-   >
-        <Text style={{fontFamily:"outfit",fontSize:17}} >
-      <Ionicons name={"checkmark-outline"} size={15}  color="black" />
-      تم التعلم</Text>
-      </TouchableOpacity>
-      </BlurView>
-    </View>
-    <View>
-    
-    <View >
-      <View style={styles.cardContainer}>
-        <View style={{flexDirection:'column', width: '80%'}}>
-          <View style={styles.cardHead}>
-            <Text style={{fontSize:22,bottom:15,left:220,color:'white'}}>كَتَّبَ: (فعل)</Text>
-            <Text style={{fontSize:18,top:25,right:60,color:'white'}}>كتَّبَ يكتِّب ، تَكْتِيبًا ، فهو مُكتِّب ، والمفعول مُكتَّب</Text>
-          </View>
-          <Text style={styles.cardDefinition}> {props?.definition}</Text>
-        </View>
-        <View style={styles.cardButtons}>
-          <Pressable style={trainingPressed? styles.cardButtonUpPressed :styles.cardButtonUp} onPress={()=>{trainingPressed?setTrainingPressed(false): setTrainingPressed(true)}}>
-            <FontAwesomeIcon icon='dumbbell'></FontAwesomeIcon>
-          </Pressable>
-          <Pressable style={ playPressed? styles.cardButtonDownPressed :styles.cardButtonDown} onPress={()=>setPlayPressed(true)}>
-          <FontAwesomeIcon icon='play'></FontAwesomeIcon>
-          </Pressable>
-
-        </View>
-      </View>
-    </View>
-  
-    </View>
-          </ImageBackground>
-       */}
+       
        {this.renderphoto()}
 
       <View style={styles.tabsContainer}>
@@ -614,20 +487,22 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
+    width:'100%',
     color:"white"
   },
   tab: {
-    paddingVertical: 5,
-    paddingHorizontal: 15,
-    marginHorizontal: 5,
+    paddingVertical: '0.5%',
+    paddingHorizontal: '3%',
+    marginHorizontal: '5%',
     borderRadius: 20,
-    borderWidth: 1,
+    borderWidth: 3,
     borderColor: "transparent",
     // backgroundColor:'black'
   },
   activeTab: {
     backgroundColor: '#42BB7E',
     borderColor: 'white',
+    width:'auto',
     borderRadius:20
   },
   tabText: {
@@ -648,7 +523,7 @@ const styles = StyleSheet.create({
     color: Colors.black,
     fontFamily: "outfit",
     fontSize: 14,
-    padding: 2,
+    padding: 'auto',
   },
   button: {
     backgroundColor: "white",
@@ -669,79 +544,84 @@ const styles = StyleSheet.create({
     width:'100%',
     textAlign:'center'
   },
-  cardContainer:{
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: 400,
-    height: 100,
+  cardContainer_:{
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    width: '50%',
+    height: '30%',
     backgroundColor: 'transparent',
     borderRadius: 20,
+    margin:'10%'
     
-    paddingTop:40,
-    paddingLeft:30
+   
   },
   cardButtons:{
     flexDirection: 'column',
     alignSelf: 'flex-end',
     width: '20%',
-    height: '100%'
+    height: '50%',
+    paddingBottom:'0%',
+    paddingTop:'0%',
+    margin:'13%',
+    gap:5
+    
 
 
   },
   cardButtonUp:{
     backgroundColor: 'lightgrey',
     borderRadius: 10,
-    height: '50%',
-    width: '50%',
+    height: '70%',
+    width: '100%',
     flexGrow:1,
     justifyContent: 'center',
     alignItems: 'center',
     borderBottomColor: 'transparent',
-    margin:5
+    
 
   },
   cardButtonUpPressed:{
     backgroundColor: '#42BB7E',
     borderRadius: 10,
-    height: '50%',
-    width: '50%',
+    height: '70%',
+    width: '100%',
     flexGrow:1,
     justifyContent: 'center',
     alignItems: 'center',
     borderBottomColor: 'transparent',
-    margin:5
+   
     
 
   },
   cardButtonDown:{
     backgroundColor: 'lightgrey',
     borderRadius: 10,
-    height: '50%',
-    width: '50%',
+    height: '70%',
+    width: '100%',
     flexGrow:1,
     justifyContent: 'center',
     alignItems: 'center',
-    margin:5,
+    
 
   },
-  cardHead:{
+  cardHead_:{
     flexDirection: 'row'
   },
   cardButtonDownPressed:{
     backgroundColor: '#42BB7E',
     borderRadius: 10,
-    height: '50%',
-    width: '50%',
+    height: '70%',
+    width: '100%',
     flexGrow:1,
     justifyContent: 'center',
     alignItems: 'center',
-    margin:5
+    
   },
   hairlineLeft: {
     borderBlockColor: '#A2A2A2',
     borderWidth:1,
     width: '100%',
-    bottom:25
+    bottom:'auto'
     
   },
   outerContainer: {
@@ -780,17 +660,25 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 20,
+    marginTop: '1%',
     width: '100%',
+    height:'70%',
+    
   },
   translationContainer: {
+    display:'flex',
+    flexDirection:'row',
+    alignSelf:'center',
     opacity: 0.8,
     backgroundColor: '#ccc',
-    width: '90%',
-    padding: 10,
+    width: '100%',
+    height:'100%',
+    
     textAlign: 'center',
     justifyContent: 'center',
     borderRadius: 20,
+  
+   
   },
   cardContainer: {
     flexDirection: 'row',
@@ -799,38 +687,39 @@ const styles = StyleSheet.create({
   },
   cardHead: {
     flexDirection: 'column',
-    width: '80%',
+    width: '100%',
     flexWrap: 'wrap',
+    
   },
   selectedWordText: {
-    fontSize: 22,
+    fontSize: 18,
     color: 'black',
   },
   translationText: {
     fontSize: 18,
     color: 'black',
   },
-  cardButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '20%',
-    borderRadius:20
-  },
-  cardButtonUp: {
-    padding: 10,
-  },
-  cardButtonUpPressed: {
-    padding: 10,
-    backgroundColor: '#42BB7E',
+  // cardButtons: {
+  //   flexDirection: 'row-reverse',
+  //   justifyContent: 'space-between',
+  //   width: '25%',
+  //   borderRadius:20
+  // },
+  // cardButtonUp: {
+  //   padding: 'auto',
+  // },
+  // cardButtonUpPressed: {
+  //   padding: 'auto',
+  //   backgroundColor: '#42BB7E',
    
-  },
-  cardButtonDown: {
-    padding: 10,
-  },
-  cardButtonDownPressed: {
-    padding: 10,
-    backgroundColor: '#42BB7E',
-  },
+  // },
+  // cardButtonDown: {
+  //   padding: 'auto',
+  // },
+  // cardButtonDownPressed: {
+  //   padding: 'auto',
+  //   backgroundColor: '#42BB7E',
+  // },
 });
 
 
