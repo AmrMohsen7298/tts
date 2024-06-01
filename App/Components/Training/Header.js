@@ -10,7 +10,7 @@ export default function Header() {
   const [modalVisible, setModalVisible] = useState(false);
 
   return (
-    <View style={{  padding: 20, direction: "rtl" }}>
+    <View style={{  padding: '10%', direction: "rtl" }}>
       <View style={styles.centeredView}>
         <Modal
           animationType="slide"

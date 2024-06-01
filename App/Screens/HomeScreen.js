@@ -50,7 +50,7 @@ export default function HomeScreen() {
           gap: 7,
           justifyContent: "flex-end",
           right: "1%",
-          borderRadius:6,padding:5}}>
+          borderRadius:6,padding:'1%'}}>
         <Text
           style={{
             fontFamily: "outfit",
@@ -77,7 +77,7 @@ export default function HomeScreen() {
                   key={index}
                   onPress={() => handleOnPress(lesson?.id, 'data:image/png;base64,' + lesson?.image)}
                 >
-                  <View style={{ paddingTop: 20, paddingBottom: 20, paddingLeft: 30 }}>
+                  <View style={{ paddingTop: '7%', paddingBottom: '5%', paddingLeft: '2%' }}>
                     <StoriesCard
                       title={lesson?.title}
                       description={lesson?.description}
@@ -97,12 +97,12 @@ export default function HomeScreen() {
         gap: 7,
         justifyContent: "flex-end",
         
-        borderRadius:6,padding:5,
+        borderRadius:'',padding:'5%',
           left: "3%",
           }}> 
           <Text style={{fontFamily: "outfit", fontSize: 17,color:"black" }}>بحث بالمستوي : كل</Text>
         </View>
-        <View style={{ paddingRight: 140 }}>
+        <View style={{ paddingRight: '35%' }}>
           <TouchableOpacity
             style={styles.hideButton}
           >
@@ -134,7 +134,7 @@ export default function HomeScreen() {
         <ScrollView
           horizontal={false}
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: 10, gap: 12 }}
+          contentContainerStyle={{ paddingHorizontal: '1%', gap: 12 }}
         >
           {lessons?.length > 0 && lessons.map((lesson, index) => (
             lesson?.paid && (
@@ -163,22 +163,26 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   tabsContainer: {
     alignItems: "center",
-    paddingLeft: 20,
-    paddingTop: 20,
-    paddingBottom: 20
+    paddingLeft: '5%',
+    paddingTop: '5%',
+    paddingBottom: '0.5%',
+    width:'100%'
   },
   tabsContentContainer: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
+  overflow:'visible'
   },
   tab: {
-    paddingVertical: 5,
-    paddingHorizontal: 15,
-    marginHorizontal: 5,
+    paddingVertical: '0.5%',
+    paddingHorizontal: '0.08%',
+     marginHorizontal: 'auto',
     borderRadius: 20,
     borderWidth: 1,
     borderColor: "transparent",
+    
+    
   },
   activeTab: {
     backgroundColor: '#42BB7E',
@@ -191,19 +195,19 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     alignItems: "center",
-    paddingLeft: 20,
-    paddingTop: 0,
-    paddingBottom: 0,
+    paddingLeft: '20%',
+  width:'100%',
+  height:'4%',
     flexDirection: 'row-reverse'
   },
   hideButton: {
     backgroundColor: "#ccc",
     borderRadius: 10,
-    width: 110,
-    height: 35,
+    width: '100%',
+    height: '60%',
     alignItems: "center",
     justifyContent: "center",
-    margin: 10,
+   
   },
   contentContainer: {
     flex: 1,

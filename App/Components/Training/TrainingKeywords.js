@@ -48,8 +48,8 @@ export default function TrainingKeywords(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
+    paddingHorizontal: 'auto',
+    paddingVertical: 'auto',
     borderTopWidth: 2,
     borderLeftWidth: 2,
     borderRightWidth: 2,
@@ -69,35 +69,35 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: 'bold',
     backgroundColor: 'grey',
-    width: 50,
-    height: 40,
+    width: '20%',
+    height: '100%',
     alignContent: 'center',
     alignItems: 'center',
     borderRadius: 7,
-    right: 19,
-    bottom: 10,
-    padding:5
+    right: 'auto',
+    bottom: 'auto',
+    padding:'auto'
   },
   headerLabelRight: {
     fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',
     backgroundColor: 'grey',
-    width: 80,
-    height: 40,
+    width: '20%',
+    height: '100%',
     alignContent: 'center',
     alignItems: 'center',
     borderRadius: 7,
-    left: 19,
-    bottom: 10,
-    padding:5
+    left: 'auto',
+    bottom: 'auto',
+    padding:'auto'
   },
   iconContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    margin: 10,
-    padding:5
+    margin: 'auto',
+    padding:'auto'
   },
   iconText: {
     fontSize: 25,
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    margin: 100,
+    margin: 'auto',
   },
   keywordText: {
     fontSize: 40,
@@ -117,8 +117,10 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: '#42BB7E',
-    paddingVertical: 5,
-    paddingHorizontal: 10,
+    paddingVertical: 'auto',
+    paddingHorizontal: 'auto',
+    width:'100%',
+    height:'20%',
     borderRadius: 10,
   },
   buttonText: {
@@ -126,24 +128,25 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
+    paddingTop:'2%'
   },
   hairlineContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    margin: 50,
+    margin: 'auto',
   },
   hairlineLeft: {
     backgroundColor: '#A2A2A2',
     height: 2,
     width: 160,
-    marginRight: 30,
+    marginRight: '5%',
   },
   hairlineRight: {
     backgroundColor: '#A2A2A2',
     height: 2,
     width: 160,
-    marginLeft: 30,
+    marginLeft: '5%',
   },
   headerLabelCenterContainer: {
     position: 'absolute',
@@ -153,18 +156,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   repeatIcon: {
-    bottom: 15,
+    bottom: 'auto',
   },
   bottomButtonContainer: {
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 180,
+    marginTop: '50%',
   },
   button_: {
     backgroundColor: '#42BB7E',
-    paddingVertical: 15,
-    paddingHorizontal: 140,
+   
+    width:'100%',
+    height:'30%',
     borderRadius: 10,
   },
   buttonText_: {
@@ -172,5 +176,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
+    paddingTop:'3%'
   },
 });
