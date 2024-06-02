@@ -204,7 +204,7 @@ export default function LessonScreen(props) {
             </View>
             <View
               style={{
-                width: '100%',
+                width: width * 0.9,
                 backgroundColor: 'white',
                 display: 'flex',
                 direction: 'rtl',
@@ -214,8 +214,8 @@ export default function LessonScreen(props) {
                   flexDirection: 'row',
                   justifyContent: 'flex-start',
                   gap: 15,
-                  padding: 'auto',
-                  paddingBottom: '5%',
+                  // padding: 'auto',
+                  paddingBottom: height * 0.02,
                   position: 'absolute',
                   right: 1,
                 }}>
@@ -247,7 +247,7 @@ export default function LessonScreen(props) {
                   flexWrap: 'wrap',
                   gap: translateButton ? 3 : 0,
                   position: 'relative',
-                  paddingTop: '15%',
+                  paddingTop: height * 0.06,
                 }}>
                 {translateButton
                   ? translation?.split(' ').map((word, index) => {
@@ -282,7 +282,7 @@ export default function LessonScreen(props) {
                         </Pressable>
                       );
                     })
-                  : storyParagraph?.split(' ').map((word, index) => {
+                  : storyParagraph?.split(/[\s.]+/).map((word, index) => {
                       return (
                         <Pressable
                           key={index}
@@ -292,13 +292,18 @@ export default function LessonScreen(props) {
                             textAlign: 'center',
                             justifyContent: 'center',
                             overflow: 'hidden',
-                            borderRadius: storyAudioPlaying ? 1.5 : 5,
+                            // borderRadius: storyAudioPlaying && (index == highlightIndex[highlightIndex.length-1] || index == highlightIndex[0]) ? 5: 0,
+                            borderTopRightRadius: storyAudioPlaying && index == highlightIndex?.[0] ? 5: 0,
+                           borderBottomRightRadius: storyAudioPlaying && index == highlightIndex?.[0] ? 5: 0,
+                           borderTopLeftRadius: storyAudioPlaying && index == highlightIndex?.[highlightIndex?.length-1] ? 5: 0,
+                           borderBottomLeftRadius: storyAudioPlaying && index == highlightIndex?.[highlightIndex?.length-1] ? 5: 0,
                             backgroundColor:
                               highlightIndex?.length > 0 &&
                               highlightIndex?.some(idx => idx == index)
                                 ? '#42BB7E'
                                 : 'transparent',
                             paddingHorizontal: 3,
+                            marginVertical:height * 0.005
                           }}>
                           <Text>
                             <Text

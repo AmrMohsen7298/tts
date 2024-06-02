@@ -1,9 +1,10 @@
-import { View, Text,Image, StyleSheet, Pressable, TouchableOpacity } from 'react-native'
+import { View, Text,Image, StyleSheet, Pressable, TouchableOpacity,Dimensions } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import user from './../../../assets/Images/userProfile.jpg'
 import Colors from '../../Utils/Colors'
 import { TouchableHighlight } from 'react-native-gesture-handler'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+const {width, height} = Dimensions.get('window');
 export default function KeywordCard(props) {
   const [playPressed, setPlayPressed] = useState(false);
   const [trainingPressed, setTrainingPressed] = useState(false);
@@ -16,12 +17,12 @@ export default function KeywordCard(props) {
     }
   },[playPressed])
   return (
-    <View >
-      <View style={styles.cardContainer}>
-        <View style={{flexDirection:'column', width: '80%'}}>
+    <View style={styles.cardContainer}>
+      <View >
+        <View style={{flexDirection:'column', width: width*0.8}}>
           <View style={styles.cardHead}>
-            <Text style={{fontSize:22,bottom:'5%',left:'auto',color:"black"}}>كَتَّبَ: (فعل)</Text>
-            <Text style={{fontSize:18,top:'10%',right:'auto',color:"black"}}>كتَّبَ يكتِّب ، تَكْتِيبًا ، فهو مُكتِّب ، والمفعول مُكتَّب</Text>
+            <Text style={{fontSize:22,top:height*0.05,left:width*0.4,color:"black"}}>كَتَّبَ: (فعل)</Text>
+            <Text style={{fontSize:18,top:height*0.1,right:width*0.1,color:"black",maxWidth:width*0.5}}>كتَّبَ يكتِّب ، تَكْتِيبًا ، فهو مُكتِّب ، والمفعول مُكتَّب</Text>
           </View>
           <Text style={styles.cardDefinition}> {props?.definition}</Text>
         </View>
@@ -42,66 +43,73 @@ const styles = StyleSheet.create({
   cardContainer:{
     flexDirection: 'row',
     alignItems: 'center',
-    width: '100%',
-    height: '50%',
+    width: width*0.9,
+    height: height*0.15,
     backgroundColor: '#ccc',
     opacity: 0.8,
     borderRadius: 10,
     direction:'rtl',
-    margin:'auto'
+    marginHorizontal:width*0.5,
+    marginVertical:height*0.02,
   },
   cardButtons:{
     flexDirection: 'column',
-    alignSelf: 'flex-end',
-    width: '20%',
-    height: '100%'
+    left:width*0.7,
+    bottom:height*0.03,
+    width: width*0.2,
+    height: height*0.15,
 
 
   },
   cardButtonUp:{
     backgroundColor: 'lightgrey',
     borderTopEndRadius: 10,
-    height: '50%',
-    width: '100%',
+    height: height*0.040,
+    width: width*0.2,
     flexGrow:1,
     justifyContent: 'center',
     alignItems: 'center',
     borderBottomColor: 'white',
-    borderBottomWidth: 1
+    borderBottomWidth: 1,
+    bottom:height*0.01
 
   },
   cardButtonUpPressed:{
     backgroundColor: '#bdf0bd',
     borderTopEndRadius: 10,
-    height: '50%',
-    width: '100%',
+    height: height*0.04,
+    width: width*0.2,
     flexGrow:1,
     justifyContent: 'center',
     alignItems: 'center',
     borderBottomColor: 'white',
-    borderBottomWidth: 1
+    borderBottomWidth: 1,
+    bottom:height*0.01
 
   },
   cardButtonDown:{
     backgroundColor: 'lightgrey',
     borderBottomEndRadius: 10,
-    height: '50%',
-    width: '100%',
+    height: height*0.04,
+    width: width*0.2,
     flexGrow:1,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    bottom:height*0.01
 
   },
   cardHead:{
-    flexDirection: 'row'
+    flexDirection: 'row',
+    display:'flex'
   },
   cardButtonDownPressed:{
     backgroundColor: '#bdf0bd',
     borderBottomEndRadius: 10,
-    height: '50%',
-    width: '100%',
+    height: height*0.04,
+    width: width*0.2,
     flexGrow:1,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    bottom:height*0.01
   }
 })

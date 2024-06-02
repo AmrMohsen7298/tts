@@ -1,19 +1,59 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet ,Dimensions} from "react-native";
-import Header from "../Components/HomeScreen/Header";
-import StoriesCard from "../Components/HomeScreen/storiesCard";
-import LevelsCard from "../Components/HomeScreen/levelsCard";
-import { Colors } from "../Utils/Colors";
- import Ionicons from 'react-native-vector-icons/Ionicons'; // Correct import
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+  Pressable,
+  FlatList,
+} from 'react-native';
+import Header from '../Components/HomeScreen/Header';
+import StoriesCard from '../Components/HomeScreen/storiesCard';
+import LevelsCard from '../Components/HomeScreen/levelsCard';
 
-import { useNavigation } from "@react-navigation/native";
-import StackNavigation from "../Navigations/StackNavigation";
-import { getAllLessons, getLessonById } from "../Services/LessonServices";
-import { levels } from "../Utils/constants";
+import Ionicons from 'react-native-vector-icons/Ionicons'; // Correct import
+
+import {useNavigation} from '@react-navigation/native';
+import StackNavigation from '../Navigations/StackNavigation';
+import {getAllLessons, getLessonById} from '../Services/LessonServices';
+import {levels} from '../Utils/constants';
 
 const {width, height} = Dimensions.get('window');
 
-
+const HorizontalFlatList = ({lessons}) => {
+  return (
+    <FlatList
+      horizontal
+      data={lessons}
+      contentContainerStyle={{
+        marginLeft: width * 0.02,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+      keyExtractor={item => item.id.toString()}
+      showsHorizontalScrollIndicator={false}
+      renderItem={({item, index}) =>
+        !item.paid && (
+          <Pressable
+            style={{
+              paddingRight: index !== lessons.length - 1 ? width * 0.03 : 0,
+            }}
+            onPress={() =>
+              handleOnPress(item.id, 'data:image/png;base64,' + item.image)
+            }>
+            <StoriesCard
+              title={item.title}
+              description={item.description}
+              image={'data:image/png;base64,' + item.image}
+            />
+          </Pressable>
+        )
+      }
+    />
+  );
+};
 
 export default function HomeScreen() {
   const navigation = useNavigation(StackNavigation);
@@ -21,97 +61,92 @@ export default function HomeScreen() {
   const [activeTab, setActiveTab] = useState(0);
 
   const tabs = [
-    levels.A1, levels.A2, levels.A3, levels.A4, levels.A5, levels.A6, 
-    levels.B1, levels.B2, levels.B3, levels.C1, levels.C2, levels.C3
+    levels.A1,
+    levels.A2,
+    levels.A3,
+    levels.A4,
+    levels.A5,
+    levels.A6,
+    levels.B1,
+    levels.B2,
+    levels.B3,
+    levels.C1,
+    levels.C2,
+    levels.C3,
   ];
-  
+
   useEffect(() => {
-    getAllLessons().then((resp) => setLessons(resp));
+    getAllLessons().then(resp => setLessons(resp));
   }, []);
 
   const handleOnPress = (lessonId, lessonImage) => {
-    getLessonById(lessonId).then((resp) => {
-      navigation.navigate("LessonScreen", { lessonId, image: lessonImage });
+    getLessonById(lessonId).then(resp => {
+      navigation.navigate('LessonScreen', {lessonId, image: lessonImage});
     });
   };
 
   return (
-    <ScrollView>
+    <ScrollView style={styles.mainStyles}>
       <Header />
       <View
         style={{
-          display: "flex",
-          
-          flexDirection: "row",
+          display: 'flex',
+          flexDirection: 'row',
           gap: 7,
-          justifyContent: "flex-end",
-          right: "1%",
-        }}
-      >
-        <View style={{backgroundColor:"#ccc", display: "flex",
-          
-          flexDirection: "row",
-          gap: 7,
-          justifyContent: "flex-end",
-          right: "1%",
-          borderRadius:6,padding:'1%'}}>
-        <Text
+          justifyContent: 'flex-end',
+          right: '1%',
+        }}>
+        <View
           style={{
-            fontFamily: "outfit",
-            fontSize: 17,
-          }}
-        >
-          قصص مجانية
-        </Text>
-        <Ionicons name="gift-outline" size={19} color="black" />
+            display: 'flex',
+
+            flexDirection: 'row',
+            gap: 7,
+            justifyContent: 'flex-end',
+            right: '1%',
+            borderRadius: 6,
+            padding: '1%',
+          }}>
+          <Text
+            style={{
+              fontFamily: 'outfit',
+              fontSize: 17,
+              color: '#333',
+            }}>
+            قصص مجانية
+          </Text>
+          <Ionicons name="gift-outline" size={19} color="black" />
         </View>
-       
       </View>
-      <View>
-        <ScrollView
-          horizontal={true}
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ gap: 12 }}
-          keyboardShouldPersistTaps="always"
-        >
-          {lessons?.length > 0 &&
-            lessons.map((lesson, index) => (
-              !lesson?.paid && (
-                <TouchableOpacity
-                  key={index}
-                  onPress={() => handleOnPress(lesson?.id, 'data:image/png;base64,' + lesson?.image)}
-                >
-                  <View style={{ paddingTop: '7%', paddingBottom: '5%', paddingLeft: '2%' }}>
-                    <StoriesCard
-                      title={lesson?.title}
-                      description={lesson?.description}
-                      image={'data:image/png;base64,' + lesson?.image}
-                    />
-                  </View>
-                </TouchableOpacity>
-              )
-            ))}
-        </ScrollView>
+      <View style={{width: width, padding: 10, justifyContent: 'center'}}>
+        <HorizontalFlatList lessons={lessons} />
       </View>
+
       <View style={styles.searchContainer}>
-      <View style={{
-        display: "flex",
-          
-        flexDirection: "row",
-        gap: 7,
-        justifyContent: "flex-end",
-        
-        borderRadius:'',padding:'5%',
-          left: "3%",
-          }}> 
-          <Text style={{fontFamily: "outfit", fontSize: 17,color:"black" }}>بحث بالمستوي : كل</Text>
+        <View
+          style={{
+            display: 'flex',
+
+            flexDirection: 'row',
+            gap: 7,
+            justifyContent: 'flex-end',
+
+            borderRadius: '',
+            padding: '5%',
+            left: '3%',
+          }}>
+          <Text style={{fontFamily: 'outfit', fontSize: 17, color: 'black'}}>
+            بحث بالمستوي : كل
+          </Text>
         </View>
-        <View style={{ paddingRight: width * 0.28 }}>
-          <TouchableOpacity
-            style={styles.hideButton}
-          >
-            <Text style={{ fontFamily: "outfit", fontSize: 17 }}>
-              <Ionicons name="checkmark-circle-outline" size={18} color="white" />
+        <View style={{paddingRight: width * 0.28}}>
+          <TouchableOpacity style={styles.hideButton}>
+            <Text style={{fontFamily: 'outfit', fontSize: 17, color: '#333'}}>
+              <Ionicons
+                name="checkmark-circle-outline"
+                size={18}
+                color="#333"
+              />
               اخفاء ما تعلمت
             </Text>
           </TouchableOpacity>
@@ -121,43 +156,58 @@ export default function HomeScreen() {
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.tabsContentContainer}
-        >
+          contentContainerStyle={styles.tabsContentContainer}>
           {tabs.map((tab, index) => (
             <TouchableOpacity
               key={index}
               style={[styles.tab, activeTab === index && styles.activeTab]}
-              onPress={() => setActiveTab(index)}
-            >
-              <Text style={activeTab === index ? styles.tabTextActive : styles.tabText}>{tab.text}</Text>
+              onPress={() => setActiveTab(index)}>
+              <Text
+                style={
+                  activeTab === index ? styles.tabTextActive : styles.tabText
+                }>
+                {tab.text}
+              </Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
       </View>
-      <View style={{ marginTop: "5%" }}>
+      <View\
+      \
+     /</ScrollView> >
         <ScrollView
           horizontal={false}
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: '1%', gap: 12 }}
-        >
-          {lessons?.length > 0 && lessons.map((lesson, index) => (
-            lesson?.paid && (
-              <TouchableOpacity
-                key={index}
-                onPress={() => handleOnPress(lesson?.id, 'data:image/png;base64,' + lesson?.image)}
-              >
-                <View>
-                  <LevelsCard
-                    title={lesson?.title}
-                    description={lesson?.description}
-                    image={'data:image/png;base64,' + lesson?.image}
+          contentContainerStyle={{paddingHorizontal: '1%', gap: 5}}>
+          {lessons?.length > 0 &&
+            lessons.map(
+              (lesson, index) =>
+                lesson?.paid && (
+                  <Pressable
                     key={index}
-                    onPress={() => handleOnPress(lesson?.id, 'data:image/png;base64,' + lesson?.image)}
-                  />
-                </View>
-              </TouchableOpacity>
-            )
-          ))}
+                    onPress={() =>
+                      handleOnPress(
+                        lesson?.id,
+                        'data:image/png;base64,' + lesson?.image,
+                      )
+                    }>
+                    <View>
+                      <LevelsCard
+                        title={lesson?.title}
+                        description={lesson?.description}
+                        image={'data:image/png;base64,' + lesson?.image}
+                        key={index}
+                        onPress={() =>
+                          handleOnPress(
+                            lesson?.id,
+                            'data:image/png;base64,' + lesson?.image,
+                          )
+                        }
+                      />
+                    </View>
+                  </Pressable>
+                ),
+            )}
         </ScrollView>
       </View>
     </ScrollView>
@@ -165,34 +215,38 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
+  mainStyles: {
+    backgroundColor: '#f5f5f5',
+  },
   tabsContainer: {
-    alignItems: "center",
+    alignItems: 'center',
     paddingLeft: width * 0.07,
     paddingTop: height * 0.02,
     paddingBottom: height * 0.01,
-    width:width*0.9
+    width: width * 0.9,
+  },
+  horizontalScroll: {
+    width: 'fit-content',
   },
   tabsContentContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-  overflow:'visible'
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'visible',
   },
   tab: {
     paddingVertical: height * 0.008,
     paddingHorizontal: width * 0.02,
-  
+
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: "transparent",
-    
-    
+    borderColor: 'transparent',
   },
 
   activeTab: {
     backgroundColor: '#42BB7E',
     borderColor: 'white',
-    borderRadius: 20
+    borderRadius: 20,
   },
   tabTextActive: {
     fontSize: 20,
@@ -200,42 +254,41 @@ const styles = StyleSheet.create({
   },
   tabText: {
     fontSize: 17,
-    color: "#333",
+    color: '#333',
   },
   searchContainer: {
-    alignItems: "center",
+    alignItems: 'center',
     paddingLeft: '20%',
-  width:'100%',
-  height:'4%',
-    flexDirection: 'row-reverse'
+    width: '100%',
+    height: '4%',
+    flexDirection: 'row-reverse',
   },
   hideButton: {
-    backgroundColor: "#ccc",
+    backgroundColor: 'white',
     borderRadius: 15,
     width: width * 0.3,
     height: height * 0.04,
-    alignItems: "center",
-    justifyContent: "center",
-   
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   contentContainer: {
     flex: 1,
-    marginTop: "10%",
+    marginTop: '10%',
     justifyContent: 'flex-start',
-    alignItems: "center",
+    alignItems: 'center',
     padding: 0,
     margin: 0,
-    paddingLeft: "3%",
-    paddingRight: "3%",
+    paddingLeft: '3%',
+    paddingRight: '3%',
   },
   card_level: {
-    color: "black",
-    fontFamily: "outfit",
+    color: 'black',
+    fontFamily: 'outfit',
     fontSize: 14,
     padding: 2,
   },
   button: {
-    backgroundColor: "white",
+    backgroundColor: 'white',
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 5,
@@ -244,13 +297,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     width: 200,
     height: 50,
-    alignItems: 'center'
+    alignItems: 'center',
   },
   buttonText: {
-    fontFamily: "outfitSemi",
+    fontFamily: 'outfitSemi',
     fontSize: 16,
     color: '#42BB7E',
     width: '100%',
-    textAlign: 'center'
+    textAlign: 'center',
   },
 });

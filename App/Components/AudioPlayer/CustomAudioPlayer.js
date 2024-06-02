@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View, TouchableOpacity, Text } from "react-native";
+import { View, TouchableOpacity, Text,Dimensions } from "react-native";
 import Sound from "react-native-sound";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useFocusEffect } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { setAudioPlaying } from "../../Actions/StoryActions";
 import RNFetchBlob from 'rn-fetch-blob';
-
+const {width, height} = Dimensions.get('window');
 const CustomAudioPlayer = ({ audioUrl, setHighlightIndex, selectedSentence, timePoints, storyParagraph }) => {
   const sound = useRef();
   const [isPlaying, setIsPlaying] = useState(false);
@@ -29,15 +29,16 @@ const CustomAudioPlayer = ({ audioUrl, setHighlightIndex, selectedSentence, time
   useEffect(() => {
     if (timePoints && storyParagraph && isPlaying) {
       setHighlightIndex([]); // Reset highlight index array
-      const sentences = storyParagraph.split(".");
+      const sentences = storyParagraph.split('.').filter(sentence => sentence.trim() !== '');
       let delay = 0; // Initialize delay for setTimeout
-      const words = storyParagraph.split(" ").map((word, index) => index);
+      const words = storyParagraph.split(/[\s.]+/).map((word, index) => index);
       let sentenceIndex = 0;
   
       const highlightWordsRecursive = async () => {
         if (sentenceIndex < sentences.length) {
           let wordIndexes = [];
           const sentence = sentences[sentenceIndex];
+          console.log("SENTENCES",sentence)
           const sentenceWords = sentence.split(" ");
           for (let i = 0; i < sentenceWords.length; i++) {
             wordIndexes.push(words.shift()); // Collect word indexes for the current sentence
@@ -183,7 +184,8 @@ const CustomAudioPlayer = ({ audioUrl, setHighlightIndex, selectedSentence, time
         height: height,
         alignItems: "center",
         justifyContent: "center",
-        margin: 10,
+        marginHorizontal:width*0.18,
+        marginVertical:height*0.05
       }}
     >
       <Ionicons name={iconName} size={20} color="white" />
@@ -192,32 +194,34 @@ const CustomAudioPlayer = ({ audioUrl, setHighlightIndex, selectedSentence, time
 
   return (
     <>
-      <View style={{ flexDirection: "row", justifyContent: "center", padding: 10, gap: 10 }}>
+      <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 5 }}>
         <View
           style={{
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "center",
             backgroundColor: "rgba(0,0,0,0.08)",
-            padding: 0,
-            width: "40%",
+           
+            paddingVertical:height*0.033,
+            width: width * 0.4,
             borderRadius: 50,
-            height: 50,
+            height: height * 0.06,
           }}
         >
-          <RoundedButton onPress={playSound} disabled={isPlaying} iconName="play" width={35} height={35} onRepeat={false} />
-          <RoundedButton onPress={stopSound} disabled={!isPlaying} iconName="stop" width={35} height={35} onRepeat={true} />
+          <RoundedButton onPress={playSound} disabled={isPlaying} iconName="play" width={width * 0.1} height={height * 0.05} onRepeat={false} />
+          <RoundedButton onPress={stopSound} disabled={!isPlaying} iconName="stop" width={width * 0.1} height={height * 0.05} onRepeat={true} />
           <TouchableOpacity
       onPress={repeatSound}
       disabled={false}
       style={{
         backgroundColor: !onRepeat ? "#ccc" : "#42BB7E",
         borderRadius: 25,
-        width: 35,
-        height: 35,
+        width: width * 0.1,
+        height: height * 0.05,
         alignItems: "center",
         justifyContent: "center",
-        margin: 10,
+        marginHorizontal:width*0.02,
+        marginVertical:height*0.02
       }}
     >
       <Ionicons name="repeat" size={20} color="white" />
@@ -231,12 +235,12 @@ const CustomAudioPlayer = ({ audioUrl, setHighlightIndex, selectedSentence, time
               justifyContent: "center",
               backgroundColor: "rgba(0,0,0,0.08)",
               padding: 1,
-              width: "30%",
+              width: width * 0.35,
               borderRadius: 60,
-              height: 40,
+              height: height * 0.06,
             }}
           >
-            <RoundedButton onPress={playSound} disabled={isPlaying} iconName="play" width={28} height={28} />
+            <RoundedButton onPress={playSound} disabled={isPlaying} iconName="play" width={width * 0.1} height={height * 0.05} />
             <Text>sentences</Text>
           </View>
         )}
