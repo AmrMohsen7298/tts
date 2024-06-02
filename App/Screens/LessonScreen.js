@@ -322,6 +322,7 @@ export default function LessonScreen(props) {
         );
       case 1:
         return (
+          <ScrollView>
           <View
             style={{flexDirection: 'column', gap: 40, alignItems: 'center'}}>
             <AntDesign name="sound" size={25} color="#42BB7E" />
@@ -347,6 +348,7 @@ export default function LessonScreen(props) {
               </TouchableOpacity>
             </View>
           </View>
+          </ScrollView>
         );
       case 2:
         return <KeywordCard></KeywordCard>;
@@ -645,27 +647,29 @@ const styles = StyleSheet.create({
   cardContainer_: {
     flexDirection: 'column',
     alignItems: 'flex-start',
-    width: '50%',
-    height: '30%',
+    width: width * 0.4,
+    // height: height * 0.6,
     backgroundColor: 'transparent',
     borderRadius: 20,
-    margin: '10%',
+    marginHorizontal: width * 0.13,
+    marginVertical: height * 0.04,
   },
   cardButtons: {
     flexDirection: 'column',
     alignSelf: 'flex-end',
-    width: '20%',
-    height: '50%',
-    paddingBottom: '0%',
-    paddingTop: '0%',
-    margin: '13%',
+    width: width * 0.15,
+    height: height * 0.07,
+    // paddingBottom: '0%',
+    // paddingTop: '0%',
+    marginHorizontal: width * 0.14,
+    marginVertical:height * 0.055,
     gap: 5,
   },
   cardButtonUp: {
     backgroundColor: 'lightgrey',
     borderRadius: 10,
-    height: '70%',
-    width: '100%',
+    width: width * 0.15,
+    height: height * 0.05,
     flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
@@ -674,8 +678,8 @@ const styles = StyleSheet.create({
   cardButtonUpPressed: {
     backgroundColor: '#42BB7E',
     borderRadius: 10,
-    height: '70%',
-    width: '100%',
+    width: width * 0.15,
+    height: height * 0.05,
     flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
@@ -684,8 +688,8 @@ const styles = StyleSheet.create({
   cardButtonDown: {
     backgroundColor: 'lightgrey',
     borderRadius: 10,
-    height: '70%',
-    width: '100%',
+    width: width * 0.15,
+    height: height * 0.05,
     flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
@@ -696,8 +700,8 @@ const styles = StyleSheet.create({
   cardButtonDownPressed: {
     backgroundColor: '#42BB7E',
     borderRadius: 10,
-    height: '70%',
-    width: '100%',
+    width: width * 0.15,
+    height: height * 0.05,
     flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
@@ -746,9 +750,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: '1%',
-    width: '100%',
-    height: '70%',
+   marginTop: height * 0.035,
+    width: width * 0.88,
+    height: height * 0.15,
+
   },
   translationContainer: {
     display: 'flex',
@@ -756,8 +761,8 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     opacity: 0.8,
     backgroundColor: '#ccc',
-    width: '100%',
-    height: '100%',
+    width: width * 0.88,
+    height: height * 0.15,
 
     textAlign: 'center',
     justifyContent: 'center',
@@ -770,7 +775,7 @@ const styles = StyleSheet.create({
   },
   cardHead: {
     flexDirection: 'column',
-    width: '100%',
+    // width: width ,
     flexWrap: 'wrap',
   },
   selectedWordText: {
@@ -787,25 +792,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignContent: 'space-around',
   },
-  // cardButtons: {
-  //   flexDirection: 'row-reverse',
-  //   justifyContent: 'space-between',
-  //   width: '25%',
-  //   borderRadius:20
-  // },
-  // cardButtonUp: {
-  //   padding: 'auto',
-  // },
-  // cardButtonUpPressed: {
-  //   padding: 'auto',
-  //   backgroundColor: '#42BB7E',
 
-  // },
-  // cardButtonDown: {
-  //   padding: 'auto',
-  // },
-  // cardButtonDownPressed: {
-  //   padding: 'auto',
-  //   backgroundColor: '#42BB7E',
-  // },
 });
