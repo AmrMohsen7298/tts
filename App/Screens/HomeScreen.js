@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet ,Dimensions} from "react-native";
 import Header from "../Components/HomeScreen/Header";
 import StoriesCard from "../Components/HomeScreen/storiesCard";
 import LevelsCard from "../Components/HomeScreen/levelsCard";
@@ -10,6 +10,10 @@ import { useNavigation } from "@react-navigation/native";
 import StackNavigation from "../Navigations/StackNavigation";
 import { getAllLessons, getLessonById } from "../Services/LessonServices";
 import { levels } from "../Utils/constants";
+
+const {width, height} = Dimensions.get('window');
+
+
 
 export default function HomeScreen() {
   const navigation = useNavigation(StackNavigation);
@@ -102,7 +106,7 @@ export default function HomeScreen() {
           }}> 
           <Text style={{fontFamily: "outfit", fontSize: 17,color:"black" }}>بحث بالمستوي : كل</Text>
         </View>
-        <View style={{ paddingRight: '35%' }}>
+        <View style={{ paddingRight: width * 0.28 }}>
           <TouchableOpacity
             style={styles.hideButton}
           >
@@ -125,7 +129,7 @@ export default function HomeScreen() {
               style={[styles.tab, activeTab === index && styles.activeTab]}
               onPress={() => setActiveTab(index)}
             >
-              <Text style={styles.tabText}>{tab.text}</Text>
+              <Text style={activeTab === index ? styles.tabTextActive : styles.tabText}>{tab.text}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -163,10 +167,10 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   tabsContainer: {
     alignItems: "center",
-    paddingLeft: '5%',
-    paddingTop: '5%',
-    paddingBottom: '0.5%',
-    width:'100%'
+    paddingLeft: width * 0.07,
+    paddingTop: height * 0.02,
+    paddingBottom: height * 0.01,
+    width:width*0.9
   },
   tabsContentContainer: {
     flexDirection: "row",
@@ -175,19 +179,24 @@ const styles = StyleSheet.create({
   overflow:'visible'
   },
   tab: {
-    paddingVertical: '0.5%',
-    paddingHorizontal: '0.08%',
-     marginHorizontal: 'auto',
+    paddingVertical: height * 0.008,
+    paddingHorizontal: width * 0.02,
+  
     borderRadius: 20,
     borderWidth: 1,
     borderColor: "transparent",
     
     
   },
+
   activeTab: {
     backgroundColor: '#42BB7E',
     borderColor: 'white',
     borderRadius: 20
+  },
+  tabTextActive: {
+    fontSize: 20,
+    color: 'white',
   },
   tabText: {
     fontSize: 17,
@@ -202,9 +211,9 @@ const styles = StyleSheet.create({
   },
   hideButton: {
     backgroundColor: "#ccc",
-    borderRadius: 10,
-    width: '100%',
-    height: '60%',
+    borderRadius: 15,
+    width: width * 0.3,
+    height: height * 0.04,
     alignItems: "center",
     justifyContent: "center",
    

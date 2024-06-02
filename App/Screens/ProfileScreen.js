@@ -282,7 +282,7 @@ const ProfileScreen = () => {
     <SafeAreaView style={styles.mainContainer}>
       <ScrollView>
         <View style={styles.headerContainer}>
-          <Image source={setting} style={styles.settingIcon} />
+       
           <Text style={styles.accountText}>الحساب</Text>
         </View>
         <View style={styles.profileContainer}>
@@ -337,6 +337,7 @@ const styles = StyleSheet.create({
     color: Colors.black,
     fontSize: width * 0.06,
     fontFamily: 'outfit',
+    paddingLeft:width*0.04
   },
   profileContainer: {
     flexDirection: 'row',
