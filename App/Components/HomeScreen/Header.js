@@ -36,9 +36,9 @@ const styles = StyleSheet.create({
     width: '100%', // Make sure the row takes full width of the container
   },
   image: {
-    width: 40,
-    height: 40,
-    borderRadius: 20, // Half of width/height to make it a circle
+    width: 35,
+    height: 35,
+    borderRadius: 0, // Half of width/height to make it a circle
   },
   text: {
     color: 'black',

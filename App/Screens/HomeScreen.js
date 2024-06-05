@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   View,
   Text,
@@ -85,9 +85,37 @@ export default function HomeScreen() {
     });
   };
 
+  const [locationY, setLocationY] = useState(0);
+  const [positionChanged, setPositionChanged] = useState(0);
+  const viewRef = useRef(null);
+  const scrollViewRef = useRef(null);
+
+  const handleLayout = event => {
+    // const layout = event.nativeEvent.layout;
+    // const tabWidth = layout.width / tabs.length;
+    // setActiveTab(Math.floor(layout.x / tabWidth));
+    const {y} = event.nativeEvent.layout;
+    // viewPosition.current = y;
+    setPositionChanged(y);
+  };
+
+  useEffect(() => {
+    viewRef.current.measure((x, y, viewWidth, viewHeight, pageX, pageY) => {
+      const scrollY = scrollViewRef.current?.scrollY || 0;
+      if (pageY <= scrollY + height && pageY + viewHeight >= scrollY) {
+        setLocationY(scrollY);
+      } else {
+        setLocationY(scrollY);
+      }
+    });
+  }, [positionChanged]);
+
   return (
-    <ScrollView style={styles.mainStyles}>
+    <ScrollView style={styles.mainStyles} ref={scrollViewRef}>
       <Header />
+      <Text style={{padding: 10, color: 'black', fontFamily: 'outfit'}}>
+        {'current location: ' + locationY}
+      </Text>
       <View
         style={{
           display: 'flex',
@@ -122,7 +150,10 @@ export default function HomeScreen() {
         <HorizontalFlatList lessons={lessons} />
       </View>
 
-      <View style={styles.searchContainer}>
+      <View
+        style={styles.searchContainer}
+        onLayout={handleLayout}
+        ref={viewRef}>
         <View
           style={{
             display: 'flex',
@@ -141,11 +172,12 @@ export default function HomeScreen() {
         </View>
         <View style={{paddingRight: width * 0.28}}>
           <TouchableOpacity style={styles.hideButton}>
-            <Text style={{fontFamily: 'outfit', fontSize: 17, color: '#333'}}>
+            <Text
+              style={{fontFamily: 'outfit', fontSize: 17, color: '#33333395'}}>
               <Ionicons
                 name="checkmark-circle-outline"
                 size={18}
-                color="#333"
+                color="#33333395"
               />
               اخفاء ما تعلمت
             </Text>
@@ -172,44 +204,40 @@ export default function HomeScreen() {
           ))}
         </ScrollView>
       </View>
-      <View\
-      \
-     /</ScrollView> >
-        <ScrollView
-          horizontal={false}
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{paddingHorizontal: '1%', gap: 5}}>
-          {lessons?.length > 0 &&
-            lessons.map(
-              (lesson, index) =>
-                lesson?.paid && (
-                  <Pressable
-                    key={index}
-                    onPress={() =>
-                      handleOnPress(
-                        lesson?.id,
-                        'data:image/png;base64,' + lesson?.image,
-                      )
-                    }>
-                    <View>
-                      <LevelsCard
-                        title={lesson?.title}
-                        description={lesson?.description}
-                        image={'data:image/png;base64,' + lesson?.image}
-                        key={index}
-                        onPress={() =>
-                          handleOnPress(
-                            lesson?.id,
-                            'data:image/png;base64,' + lesson?.image,
-                          )
-                        }
-                      />
-                    </View>
-                  </Pressable>
-                ),
-            )}
-        </ScrollView>
-      </View>
+      <ScrollView
+        horizontal={false}
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{paddingHorizontal: '1%', gap: 5}}>
+        {lessons?.length > 0 &&
+          lessons.map(
+            (lesson, index) =>
+              lesson?.paid && (
+                <Pressable
+                  key={index}
+                  onPress={() =>
+                    handleOnPress(
+                      lesson?.id,
+                      'data:image/png;base64,' + lesson?.image,
+                    )
+                  }>
+                  <View>
+                    <LevelsCard
+                      title={lesson?.title}
+                      description={lesson?.description}
+                      image={'data:image/png;base64,' + lesson?.image}
+                      key={index}
+                      onPress={() =>
+                        handleOnPress(
+                          lesson?.id,
+                          'data:image/png;base64,' + lesson?.image,
+                        )
+                      }
+                    />
+                  </View>
+                </Pressable>
+              ),
+          )}
+      </ScrollView>
     </ScrollView>
   );
 }
@@ -221,9 +249,10 @@ const styles = StyleSheet.create({
   tabsContainer: {
     alignItems: 'center',
     paddingLeft: width * 0.07,
+    paddingRight: width * 0.02,
     paddingTop: height * 0.02,
     paddingBottom: height * 0.01,
-    width: width * 0.9,
+    width: width,
   },
   horizontalScroll: {
     width: 'fit-content',
@@ -236,20 +265,20 @@ const styles = StyleSheet.create({
   },
   tab: {
     paddingVertical: height * 0.008,
-    paddingHorizontal: width * 0.02,
-
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: 'transparent',
+    paddingHorizontal: width * 0.01,
+    marginRight: width * 0.02,
+    backgroundColor: 'white',
+    borderRadius: 10,
   },
-
   activeTab: {
+    paddingVertical: height * 0.008,
+    paddingHorizontal: width * 0.01,
     backgroundColor: '#42BB7E',
     borderColor: 'white',
-    borderRadius: 20,
+    borderRadius: 10,
   },
   tabTextActive: {
-    fontSize: 20,
+    fontSize: 17,
     color: 'white',
   },
   tabText: {
