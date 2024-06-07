@@ -42,6 +42,7 @@ import {
 } from '../Actions/StoryActions';
 import Sound from 'react-native-sound';
 import RNFetchBlob from 'rn-fetch-blob';
+import {useStateValue} from '../store/contextStore/StateContext';
 // import CustomAudioPlayer from "../Components/AudioPlayer/CustomAudioPlayer";
 
 const {width, height} = Dimensions.get('window');
@@ -66,6 +67,7 @@ export default function LessonScreen(props) {
   const [activeTab, setActiveTab] = useState(0);
   const [playPressed, setPlayPressed] = useState(false);
   const [trainingPressed, setTrainingPressed] = useState(false);
+
   const tabs = [
     LessonTabs.STORY,
     LessonTabs.QUIZ,
@@ -85,14 +87,17 @@ export default function LessonScreen(props) {
   const [favoriteButton, setfavoriteButton] = useState(
     favorites.some(id => id == props?.route?.params?.lessonId),
   );
-  const dispatch = useDispatch();
+  const {state, dispatch: contextDispatch} = useStateValue();
+
   const re = new RegExp('[.,;:\\s?!]+');
   const [timePoints, setTimePoints] = useState([]);
   const sound = useRef();
   const storyAudioPlaying = useSelector(
     state => state.storyReducer.storyAudioPlaying,
   );
+
   useEffect(() => {
+    contextDispatch({type: 'SHOW_NAVBAR', payload: false});
     console.log('props', props?.route?.params?.lessonId);
     getStoryById(props?.route?.params?.lessonId).then(resp => {
       setStoryParagraph(resp?.paragraph);
@@ -293,17 +298,33 @@ export default function LessonScreen(props) {
                             justifyContent: 'center',
                             overflow: 'hidden',
                             // borderRadius: storyAudioPlaying && (index == highlightIndex[highlightIndex.length-1] || index == highlightIndex[0]) ? 5: 0,
-                            borderTopRightRadius: storyAudioPlaying && index == highlightIndex?.[0] ? 5: 0,
-                           borderBottomRightRadius: storyAudioPlaying && index == highlightIndex?.[0] ? 5: 0,
-                           borderTopLeftRadius: storyAudioPlaying && index == highlightIndex?.[highlightIndex?.length-1] ? 5: 0,
-                           borderBottomLeftRadius: storyAudioPlaying && index == highlightIndex?.[highlightIndex?.length-1] ? 5: 0,
+                            borderTopRightRadius:
+                              storyAudioPlaying && index == highlightIndex?.[0]
+                                ? 5
+                                : 0,
+                            borderBottomRightRadius:
+                              storyAudioPlaying && index == highlightIndex?.[0]
+                                ? 5
+                                : 0,
+                            borderTopLeftRadius:
+                              storyAudioPlaying &&
+                              index ==
+                                highlightIndex?.[highlightIndex?.length - 1]
+                                ? 5
+                                : 0,
+                            borderBottomLeftRadius:
+                              storyAudioPlaying &&
+                              index ==
+                                highlightIndex?.[highlightIndex?.length - 1]
+                                ? 5
+                                : 0,
                             backgroundColor:
                               highlightIndex?.length > 0 &&
                               highlightIndex?.some(idx => idx == index)
                                 ? '#42BB7E'
                                 : 'transparent',
                             paddingHorizontal: 3,
-                            marginVertical:height * 0.005
+                            marginVertical: height * 0.005,
                           }}>
                           <Text>
                             <Text
@@ -328,31 +349,36 @@ export default function LessonScreen(props) {
       case 1:
         return (
           <ScrollView>
-          <View
-            style={{flexDirection: 'column', gap: 40, alignItems: 'center'}}>
-            <AntDesign name="sound" size={25} color="#42BB7E" />
-            <Text
-              style={{
-                fontFamily: 'outfit',
-                textAlign: 'center',
-                fontSize: 24,
-                color: 'black',
-              }}>
-              عدم اهتمام ___ مجالات البحث العلميّ في استخدام اللّغة العربيّة
-              كلغةٍ خاصّة في الأبحاث الأكاديميّة والعلميّة
-            </Text>
-            <View style={{flexDirection: 'column', gap: 10, marginTop: 10}}>
-              <TouchableOpacity style={styles.button}>
-                <Text style={styles.buttonText}>مُعظم</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.button}>
-                <Text style={styles.buttonText}>بعض</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.button}>
-                <Text style={styles.buttonText}>شيئ</Text>
-              </TouchableOpacity>
+            <View
+              style={{flexDirection: 'column', gap: 40, alignItems: 'center'}}>
+              <AntDesign
+                name="sound"
+                size={25}
+                color="#42BB7E"
+                style={{marginTop: height * 0.02}}
+              />
+              <Text
+                style={{
+                  fontFamily: 'outfit',
+                  textAlign: 'center',
+                  fontSize: 24,
+                  color: 'black',
+                }}>
+                عدم اهتمام ___ مجالات البحث العلميّ في استخدام اللّغة العربيّة
+                كلغةٍ خاصّة في الأبحاث الأكاديميّة والعلميّة
+              </Text>
+              <View style={{flexDirection: 'column', gap: 10, marginTop: 10}}>
+                <TouchableOpacity style={styles.button}>
+                  <Text style={styles.buttonText}>مُعظم</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.button}>
+                  <Text style={styles.buttonText}>بعض</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.button}>
+                  <Text style={styles.buttonText}>شيئ</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
           </ScrollView>
         );
       case 2:
@@ -667,7 +693,7 @@ const styles = StyleSheet.create({
     // paddingBottom: '0%',
     // paddingTop: '0%',
     marginHorizontal: width * 0.14,
-    marginVertical:height * 0.055,
+    marginVertical: height * 0.055,
     gap: 5,
   },
   cardButtonUp: {
@@ -755,10 +781,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-   marginTop: height * 0.035,
+    marginTop: height * 0.035,
     width: width * 0.88,
     height: height * 0.15,
-
   },
   translationContainer: {
     display: 'flex',
@@ -797,5 +822,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignContent: 'space-around',
   },
-
 });

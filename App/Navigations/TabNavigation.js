@@ -12,14 +12,19 @@ import {faScroll, faDumbbell} from '@fortawesome/free-solid-svg-icons'; // Impor
 import Ionicons from 'react-native-vector-icons/Ionicons'; // Correct import path for Ionicons
 import Colors from '../Utils/Colors';
 import LibraryStack from './LibraryStack';
+import {useStateValue} from '../store/contextStore/StateContext';
 
 const {width, height} = Dimensions.get('window');
 
 const Tab = createBottomTabNavigator();
 
 export default function TabNavigation() {
+  const {state, dispatch} = useStateValue();
+
+  console.log('csdfa', state.showNavbar);
+
   return (
-    <View style={styles.navBarBg}>
+    <View style={{...styles.navBarBg}}>
       <Tab.Navigator
         screenOptions={{
           headerShown: false,
@@ -30,6 +35,7 @@ export default function TabNavigation() {
             borderTopRightRadius: 20,
             backgroundColor: '#fff',
             height: height * 0.08,
+            display: state.showNavbar ? 'block' : 'none',
           },
         }}>
         <Tab.Screen

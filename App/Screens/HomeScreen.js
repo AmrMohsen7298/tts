@@ -19,46 +19,16 @@ import {useNavigation} from '@react-navigation/native';
 import StackNavigation from '../Navigations/StackNavigation';
 import {getAllLessons, getLessonById} from '../Services/LessonServices';
 import {levels} from '../Utils/constants';
+import { useStateValue } from '../store/contextStore/StateContext';
 
 const {width, height} = Dimensions.get('window');
-
-const HorizontalFlatList = ({lessons}) => {
-  return (
-    <FlatList
-      horizontal
-      data={lessons}
-      contentContainerStyle={{
-        marginLeft: width * 0.02,
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-      keyExtractor={item => item.id.toString()}
-      showsHorizontalScrollIndicator={false}
-      renderItem={({item, index}) =>
-        !item.paid && (
-          <Pressable
-            style={{
-              paddingRight: index !== lessons.length - 1 ? width * 0.03 : 0,
-            }}
-            onPress={() =>
-              handleOnPress(item.id, 'data:image/png;base64,' + item.image)
-            }>
-            <StoriesCard
-              title={item.title}
-              description={item.description}
-              image={'data:image/png;base64,' + item.image}
-            />
-          </Pressable>
-        )
-      }
-    />
-  );
-};
 
 export default function HomeScreen() {
   const navigation = useNavigation(StackNavigation);
   const [lessons, setLessons] = useState([]);
   const [activeTab, setActiveTab] = useState(0);
+  const {state, dispatch: contextDispatch} = useStateValue();
+
 
   const tabs = [
     levels.A1,
@@ -85,37 +55,42 @@ export default function HomeScreen() {
     });
   };
 
-  const [locationY, setLocationY] = useState(0);
-  const [positionChanged, setPositionChanged] = useState(0);
-  const viewRef = useRef(null);
-  const scrollViewRef = useRef(null);
-
-  const handleLayout = event => {
-    // const layout = event.nativeEvent.layout;
-    // const tabWidth = layout.width / tabs.length;
-    // setActiveTab(Math.floor(layout.x / tabWidth));
-    const {y} = event.nativeEvent.layout;
-    // viewPosition.current = y;
-    setPositionChanged(y);
+  const HorizontalFlatList = ({lessons}) => {
+    return (
+      <FlatList
+        horizontal
+        data={lessons}
+        contentContainerStyle={{
+          marginLeft: width * 0.02,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+        keyExtractor={item => item.id.toString()}
+        showsHorizontalScrollIndicator={false}
+        renderItem={({item, index}) =>
+          !item.paid && (
+            <Pressable
+              style={{
+                paddingRight: index !== lessons.length - 1 ? width * 0.03 : 0,
+              }}
+              onPress={() =>
+                handleOnPress(item.id, 'data:image/png;base64,' + item.image)
+              }>
+              <StoriesCard
+                title={item.title}
+                description={item.description}
+                image={'data:image/png;base64,' + item.image}
+              />
+            </Pressable>
+          )
+        }
+      />
+    );
   };
-
-  useEffect(() => {
-    viewRef.current.measure((x, y, viewWidth, viewHeight, pageX, pageY) => {
-      const scrollY = scrollViewRef.current?.scrollY || 0;
-      if (pageY <= scrollY + height && pageY + viewHeight >= scrollY) {
-        setLocationY(scrollY);
-      } else {
-        setLocationY(scrollY);
-      }
-    });
-  }, [positionChanged]);
-
   return (
-    <ScrollView style={styles.mainStyles} ref={scrollViewRef}>
+    <ScrollView style={styles.mainStyles}>
       <Header />
-      <Text style={{padding: 10, color: 'black', fontFamily: 'outfit'}}>
-        {'current location: ' + locationY}
-      </Text>
+      <Text style={{padding: 10, color: 'black', fontFamily: 'outfit'}}></Text>
       <View
         style={{
           display: 'flex',
@@ -151,25 +126,20 @@ export default function HomeScreen() {
       </View>
 
       <View
-        style={styles.searchContainer}
-        onLayout={handleLayout}
-        ref={viewRef}>
-        <View
-          style={{
-            display: 'flex',
+        style={{
+          display: 'flex',
 
-            flexDirection: 'row',
-            gap: 7,
-            justifyContent: 'flex-end',
+          flexDirection: 'row',
+          gap: 7,
+          justifyContent: 'flex-end',
 
-            borderRadius: '',
-            padding: '5%',
-            left: '3%',
-          }}>
-          <Text style={{fontFamily: 'outfit', fontSize: 17, color: 'black'}}>
-            بحث بالمستوي : كل
-          </Text>
-        </View>
+          borderRadius: '',
+          padding: '5%',
+          left: '3%',
+        }}>
+        <Text style={{fontFamily: 'outfit', fontSize: 17, color: 'black'}}>
+          بحث بالمستوي : كل
+        </Text>
         <View style={{paddingRight: width * 0.28}}>
           <TouchableOpacity style={styles.hideButton}>
             <Text

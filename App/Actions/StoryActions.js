@@ -1,12 +1,19 @@
 export const SET_AUDIO_PLAYING = "SET_AUDIO_PLAYING"
 export const ADD_FAVORITE = "ADD_FAVORITE"
 export const REMOVE_FAVORITE = "REMOVE_FAVORITE"
+export const SHOW_NAVBAR = "SHOW_NAVBAR"
 export const setAudioPlaying = (playingFlag) =>{
     return {
         type:  SET_AUDIO_PLAYING,
         payload: playingFlag
     }
 
+}
+export const setShowNavbar = (showNavbar) =>{
+    return {
+        type:  SHOW_NAVBAR,
+        payload: showNavbar
+    }
 }
 export const addFavorite = (lessonId) =>{
     return {

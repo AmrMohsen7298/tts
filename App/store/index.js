@@ -1,5 +1,5 @@
 
-import { ADD_FAVORITE, REMOVE_FAVORITE, SET_AUDIO_PLAYING } from "../Actions/StoryActions";
+import { ADD_FAVORITE, REMOVE_FAVORITE, SET_AUDIO_PLAYING, SHOW_NAVBAR } from "../Actions/StoryActions";
 import { combineReducers, createStore } from "redux";
 import storage from 'redux-persist/lib/storage';
 import { persistStore, persistReducer } from 'redux-persist';
@@ -7,10 +7,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const initialState = {
     storyAudioPlaying: false,
-    favorites: []
+    favorites: [],
+    showNavbar: true
 
     // Define your initial state properties here
-    
     };
 const persistConfig = {
         key: 'root',
@@ -23,7 +23,7 @@ const reducer = (state = initialState, action) => {
     switch(type){
         case SET_AUDIO_PLAYING:
             return{
-                ...state,
+                ...state, 
                 storyAudioPlaying: payload
             }
         case ADD_FAVORITE:
@@ -35,6 +35,11 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 favorites: state.favorites.filter((id)=>id !== payload)
+            }
+        case SHOW_NAVBAR:
+            return {
+                ...state,
+                showNavbar: payload
             }
     }
     return state;
