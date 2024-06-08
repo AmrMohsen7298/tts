@@ -47,6 +47,41 @@ import {useStateValue} from '../store/contextStore/StateContext';
 
 const {width, height} = Dimensions.get('window');
 
+const quizDummyData = [
+  {
+    question_ID: 1,
+    quiz_id: 1,
+    code: 'vcr4', // Assuming there's no code associated with these questions
+    text: 'عدم اهتمام ___ مجالات البحث العلميّ في استخدام اللّغة العربيّة للتعلم الكلغةٍ خاصّة في الأبحاث الأكاديميّة والعلميّة',
+    choices: 'مُعظم,بعض,شيئ',
+    answer: 'مُعظم', // No answer provided in the data
+  },
+  {
+    question_ID: 2,
+    quiz_id: 1,
+    code: 'cdw2',
+    text: 'تُعدّ ___ من أهمّ العواملِ المؤثّرةِ على نموّ الشركاتِ الناشئةِ في الدولِ الناميةِ.',
+    choices: 'التمويل,الابتكار,المواردُ البشريّةُ',
+    answer: 'التمويل',
+  },
+  {
+    question_ID: 3,
+    quiz_id: 1,
+    code: 'ncd7',
+    text: 'يواجهُ ___ من الطلاب صعوباتٍ في فهمِ مفاهيمِ الرياضياتِ، خاصّةً في المراحلِ الثانويّةِ.',
+    choices: 'معظم,بعض,عددٌ قليلٌ',
+    answer: 'معظم',
+  },
+  {
+    question_ID: 4,
+    quiz_id: 1,
+    code: 'fn37',
+    text: 'يُؤدّي ___ من التغيّراتِ المناخيّةِ إلى تفاقمِ ظاهرةِ الجفافِ في مختلفِ أنحاءِ العالمِ.',
+    choices: 'ارتفاعُ درجاتِ الحرارة,تغيّرُ أنماطِ الهطول,زيادةُ ظاهرةِ التصحر',
+    answer: 'ارتفاعُ درجاتِ الحرارة',
+  },
+];
+
 const DoneLearning = () => {
   return (
     <View style={styles.buttonWrapper}>
@@ -84,6 +119,10 @@ export default function LessonScreen(props) {
   const [translation, setTranslation] = useState();
   const [name, setName] = useState();
   const [translateButton, setTranslateButton] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [answerPressed, setAnswerPressed] = useState(false);
+  const [score, setScore] = useState(0);
+  const [chosenAnswer, setChosenAnswer] = useState(null);
   const [favoriteButton, setfavoriteButton] = useState(
     favorites.some(id => id == props?.route?.params?.lessonId),
   );
@@ -193,6 +232,44 @@ export default function LessonScreen(props) {
     console.log('FAVORITEBUTTON', favoriteButton);
 
     setfavoriteButton(!favoriteButton);
+  };
+
+  const checkAnswer = ({question, answer}) => {
+    setAnswerPressed(true);
+    setChosenAnswer(answer);
+    if (question.answer === answer) {
+      setScore(prev => prev + 1);
+    }
+    setTimeout(() => {
+      if (currentIndex + 1 < quizDummyData.length) {
+        setAnswerPressed(false);
+        setCurrentIndex(prev => prev + 1);
+      }
+    }, 2000);
+  };
+
+  const getAnsBgColor = ({question, choice}) => {
+    if (!answerPressed) return 'white';
+    if (choice === question.answer) return '#42BB7E';
+    if (chosenAnswer !== question.answer && choice === chosenAnswer)
+      return '#FF3333';
+    return 'white';
+  };
+
+  const getAnsBorderColor = ({question, choice}) => {
+    if (!answerPressed) return '#42BB7E';
+    if (choice === question.answer) return '#42BB7E';
+    if (chosenAnswer !== question.answer && choice === chosenAnswer)
+      return '#FF3333';
+    return '#42BB7E';
+  };
+
+  const getAnsTextColor = ({question, choice}) => {
+    if (!answerPressed) return '#42BB7E';
+    if (choice === question.answer) return 'white';
+    if (chosenAnswer !== question.answer && choice === chosenAnswer)
+      return 'white';
+    return '#42BB7E';
   };
 
   const renderContent = () => {
@@ -348,38 +425,62 @@ export default function LessonScreen(props) {
         );
       case 1:
         return (
-          <ScrollView>
-            <View
-              style={{flexDirection: 'column', gap: 40, alignItems: 'center'}}>
-              <AntDesign
-                name="sound"
-                size={25}
-                color="#42BB7E"
-                style={{marginTop: height * 0.02}}
-              />
-              <Text
-                style={{
-                  fontFamily: 'outfit',
-                  textAlign: 'center',
-                  fontSize: 24,
-                  color: 'black',
-                }}>
-                عدم اهتمام ___ مجالات البحث العلميّ في استخدام اللّغة العربيّة
-                كلغةٍ خاصّة في الأبحاث الأكاديميّة والعلميّة
-              </Text>
-              <View style={{flexDirection: 'column', gap: 10, marginTop: 10}}>
-                <TouchableOpacity style={styles.button}>
-                  <Text style={styles.buttonText}>مُعظم</Text>
+          <View
+            style={{
+              flexDirection: 'column',
+              gap: 40,
+              alignItems: 'center',
+            }}>
+            <AntDesign
+              name="sound"
+              size={25}
+              color="#42BB7E"
+              style={{marginTop: height * 0.02}}
+            />
+            <Text
+              style={{
+                fontFamily: 'outfit',
+                textAlign: 'center',
+                fontSize: 24,
+                color: 'black',
+              }}>
+              {quizDummyData[currentIndex].text}
+            </Text>
+            <View style={{flexDirection: 'column', gap: 10, marginTop: 10}}>
+              {quizDummyData[currentIndex].choices.split(',').map(choice => (
+                <TouchableOpacity
+                  disabled={answerPressed}
+                  style={{
+                    ...styles.button,
+                    backgroundColor: getAnsBgColor({
+                      question: quizDummyData[currentIndex],
+                      choice,
+                    }),
+                    borderColor: getAnsBorderColor({
+                      question: quizDummyData[currentIndex],
+                      choice,
+                    }),
+                  }}
+                  onPress={() =>
+                    checkAnswer({
+                      question: quizDummyData[currentIndex],
+                      answer: choice,
+                    })
+                  }>
+                  <Text
+                    style={{
+                      ...styles.buttonText,
+                      color: getAnsTextColor({
+                        question: quizDummyData[currentIndex],
+                        choice,
+                      }),
+                    }}>
+                    {choice}
+                  </Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.button}>
-                  <Text style={styles.buttonText}>بعض</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.button}>
-                  <Text style={styles.buttonText}>شيئ</Text>
-                </TouchableOpacity>
-              </View>
+              ))}
             </View>
-          </ScrollView>
+          </View>
         );
       case 2:
         return <KeywordCard></KeywordCard>;
@@ -456,7 +557,7 @@ export default function LessonScreen(props) {
             <AnimatedCircularProgress
               size={150}
               width={15}
-              fill={(1 / 4) * 100}
+              fill={((currentIndex + 1) / quizDummyData.length) * 100}
               tintColor="white"
               onAnimationComplete={() => console.log('onAnimationComplete')}
               backgroundColor="#3d5875"
@@ -464,7 +565,7 @@ export default function LessonScreen(props) {
               {fill => (
                 <Text
                   style={{fontSize: 25, fontWeight: 'bold', color: 'white'}}>
-                  {1 + ' / ' + 4}
+                  {currentIndex + 1 + ' / ' + quizDummyData.length}
                 </Text>
               )}
             </AnimatedCircularProgress>
@@ -738,7 +839,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   hairlineLeft: {
-    borderBlockColor: '#ddd',
+    borderBlockColor: '#eee',
+    borderColor: '#eee',
     borderWidth: 1,
     width: '100%',
     bottom: 'auto',
@@ -776,6 +878,7 @@ const styles = StyleSheet.create({
   touchableText: {
     fontFamily: 'outfit',
     fontSize: 20,
+    color: 'white',
   },
   textContainer: {
     flexDirection: 'row',
