@@ -47,7 +47,7 @@ import {useStateValue} from '../store/contextStore/StateContext';
 
 const {width, height} = Dimensions.get('window');
 
-const quizDummyData = [
+const quizData = [
   {
     question_ID: 1,
     quiz_id: 1,
@@ -241,9 +241,9 @@ export default function LessonScreen(props) {
       setScore(prev => prev + 1);
     }
     setTimeout(() => {
-      if (currentIndex + 1 < quizDummyData.length) {
+      setCurrentIndex(prev => prev + 1);
+      if (currentIndex + 1 < quizData.length) {
         setAnswerPressed(false);
-        setCurrentIndex(prev => prev + 1);
       }
     }, 2000);
   };
@@ -425,62 +425,145 @@ export default function LessonScreen(props) {
         );
       case 1:
         return (
-          <View
-            style={{
-              flexDirection: 'column',
-              gap: 40,
-              alignItems: 'center',
-            }}>
-            <AntDesign
-              name="sound"
-              size={25}
-              color="#42BB7E"
-              style={{marginTop: height * 0.02}}
-            />
-            <Text
-              style={{
-                fontFamily: 'outfit',
-                textAlign: 'center',
-                fontSize: 24,
-                color: 'black',
-              }}>
-              {quizDummyData[currentIndex].text}
-            </Text>
-            <View style={{flexDirection: 'column', gap: 10, marginTop: 10}}>
-              {quizDummyData[currentIndex].choices.split(',').map(choice => (
-                <TouchableOpacity
-                  disabled={answerPressed}
+          <>
+            {currentIndex < quizData.length ? (
+              <View
+                style={{
+                  flexDirection: 'column',
+                  gap: 40,
+                  alignItems: 'center',
+                }}>
+                <AntDesign
+                  name="sound"
+                  size={25}
+                  color="#42BB7E"
+                  style={{marginTop: height * 0.02}}
+                />
+                <Text
                   style={{
-                    ...styles.button,
-                    backgroundColor: getAnsBgColor({
-                      question: quizDummyData[currentIndex],
-                      choice,
-                    }),
-                    borderColor: getAnsBorderColor({
-                      question: quizDummyData[currentIndex],
-                      choice,
-                    }),
-                  }}
-                  onPress={() =>
-                    checkAnswer({
-                      question: quizDummyData[currentIndex],
-                      answer: choice,
-                    })
-                  }>
+                    fontFamily: 'outfit',
+                    textAlign: 'center',
+                    fontSize: 24,
+                    color: 'black',
+                  }}>
+                  {quizData[currentIndex].text}
+                </Text>
+                <View style={{flexDirection: 'column', gap: 10, marginTop: 10}}>
+                  {quizData[currentIndex].choices.split(',').map(choice => (
+                    <TouchableOpacity
+                      disabled={answerPressed}
+                      style={{
+                        ...styles.button,
+                        backgroundColor: getAnsBgColor({
+                          question: quizData[currentIndex],
+                          choice,
+                        }),
+                        borderColor: getAnsBorderColor({
+                          question: quizData[currentIndex],
+                          choice,
+                        }),
+                      }}
+                      onPress={() =>
+                        checkAnswer({
+                          question: quizData[currentIndex],
+                          answer: choice,
+                        })
+                      }>
+                      <Text
+                        style={{
+                          ...styles.buttonText,
+                          color: getAnsTextColor({
+                            question: quizData[currentIndex],
+                            choice,
+                          }),
+                        }}>
+                        {choice}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+            ) : (
+              <ScrollView style={styles.scrollableResults}>
+                <View style={styles.resultsHeader}>
+                  <View style={styles.resultsHeaderTextContainer}>
+                    <Text style={styles.resultsHeaderText}>عمل رائع!</Text>
+                    <Text style={styles.resultsBodyText}>
+                      لقد حصلت على ٣ من ٤. إستمر على مستواك!
+                    </Text>
+                  </View>
+                  <View style={styles.resultsHeaderIconContainer}>
+                    <Ionicons
+                      name="checkmark-circle-outline"
+                      size={80}
+                      color="#42BB7E"
+                    />
+                  </View>
+                </View>
+                <View style={styles.quizResults}>
+                  <Text style={styles.resultsHeaderText}>نتيجتك</Text>
+                  <View style={styles.resultsDetailsBox}>
+                    <Text style={styles.resultsHeaderText}>
+                      <AnimatedCircularProgress
+                        size={60}
+                        width={6}
+                        fill={(3 / 4) * 100}
+                        tintColor="#42BB7E"
+                        onAnimationComplete={() =>
+                          console.log('onAnimationComplete')
+                        }
+                        backgroundColor="#c73434"
+                        rotation={0}>
+                        {fill => (
+                          <Text
+                            style={{
+                              fontSize: 15,
+                              fontWeight: 'bold',
+                              color: 'black',
+                            }}>
+                            {((currentIndex + 1) / quizData.length) * 100}%
+                          </Text>
+                        )}
+                      </AnimatedCircularProgress>
+                    </Text>
+                    <View style={styles.correctIncorrect}>
+                      <Text style={styles.correctIncorrectText}>Correct</Text>
+                      <Text style={styles.correctIncorrectText}>Incorrect</Text>
+                    </View>
+                    <View style={styles.correctIncorrect}>
+                      <Text
+                        style={{
+                          ...styles.correctIncorrectNumbers,
+                          color: '#42BB7E',
+                          backgroundColor: '#42BB7E30',
+                        }}>
+                        3
+                      </Text>
+                      <Text
+                        style={{
+                          ...styles.correctIncorrectNumbers,
+                          color: '#ff0000',
+                          backgroundColor: '#ff000020',
+                        }}>
+                        1
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+                <Pressable
+                  style={{backgroundColor: '#42BB7E', color: 'black'}}
+                  onPress={() => console.log('retake quiz')}>
                   <Text
                     style={{
                       ...styles.buttonText,
-                      color: getAnsTextColor({
-                        question: quizDummyData[currentIndex],
-                        choice,
-                      }),
+                      color: '#42BB7E',
                     }}>
-                    {choice}
+                    إعادة الاإمتحان
                   </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
+                </Pressable>
+              </ScrollView>
+            )}
+          </>
         );
       case 2:
         return <KeywordCard></KeywordCard>;
@@ -557,7 +640,7 @@ export default function LessonScreen(props) {
             <AnimatedCircularProgress
               size={150}
               width={15}
-              fill={((currentIndex + 1) / quizDummyData.length) * 100}
+              fill={((currentIndex + 1) / quizData.length) * 100}
               tintColor="white"
               onAnimationComplete={() => console.log('onAnimationComplete')}
               backgroundColor="#3d5875"
@@ -565,7 +648,7 @@ export default function LessonScreen(props) {
               {fill => (
                 <Text
                   style={{fontSize: 25, fontWeight: 'bold', color: 'white'}}>
-                  {currentIndex + 1 + ' / ' + quizDummyData.length}
+                  {currentIndex + 1 + ' / ' + quizData.length}
                 </Text>
               )}
             </AnimatedCircularProgress>
@@ -628,17 +711,15 @@ export default function LessonScreen(props) {
                         </Text>
                         <Ionicons
                           name={'file-tray-full-outline'}
-                          style={{marginHorizontal: width * 0.01}}
+                          style={{
+                            marginHorizontal: width * 0.01,
+                          }}
                           size={20}
                           color="white"
                         />
                       </View>
                     </TouchableOpacity>
                   </View>
-                  {/* <Text style={styles.cardDefinition}>
-                        {' '}
-                        {props?.definition}
-                      </Text> */}
                 </View>
               </View>
             </ImageBackground>
@@ -697,6 +778,82 @@ export default function LessonScreen(props) {
   );
 }
 const styles = StyleSheet.create({
+  scrollableResults: {
+    display: 'flex',
+    flexDirection: 'column',
+    flexGrow: 1,
+    backgroundColor: '#eeeeee90',
+    width: width,
+  },
+  quizResults: {
+    paddingHorizontal: width * 0.05,
+    paddingVertical: height * 0.02,
+    width: width,
+    // backgroundColor: '#eee',
+    display: 'flex',
+    flexDirection: 'column',
+    flexGrow: 1,
+  },
+  resultsHeader: {
+    display: 'flex',
+    width: width,
+    backgroundColor: '#fff',
+    borderRadius: 5,
+    flexDirection: 'row-reverse',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: width * 0.05,
+  },
+  resultsHeaderTextContainer: {
+    width: (width - width * 0.05 * 2) * 0.7,
+    // paddingHorizontal: width * 0.05,
+  },
+  resultsHeaderIconContainer: {
+    width: (width - width * 0.05 * 2) * 0.3,
+    display: 'flex',
+    flexDirection: 'row-reverse',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  resultsDetailsBox: {
+    backgroundColor: '#fff',
+    padding: width * 0.04,
+    borderRadius: width * 0.02,
+    marginVertical: height * 0.01,
+    display: 'flex',
+    flexDirection: 'row',
+    gap: width * 0.1,
+    justifyContent: 'space-around',
+  },
+  resultsHeaderText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#000',
+  },
+  resultsBodyText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  correctIncorrect: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+  },
+  correctIncorrectText: {
+    color: 'black',
+    fontWeight: 'bold',
+    fontSize: 18,
+  },
+  correctIncorrectNumbers: {
+    fontWeight: 'bold',
+    fontSize: 16,
+    paddingVertical: '1%',
+    paddingHorizontal: '3%',
+    borderRadius: 5,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   container: {
     flex: 1,
     backgroundColor: 'white',
@@ -924,5 +1081,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignContent: 'space-around',
+    alignItems: 'center',
   },
 });

@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderBottomColor: 'white',
-    borderBottomWidth: 1,
+    borderBottomWidth: 2,
     bottom: height * 0.014,
   },
   cardButtonDown: {
