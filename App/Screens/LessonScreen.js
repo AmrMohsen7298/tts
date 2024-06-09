@@ -127,7 +127,7 @@ export default function LessonScreen(props) {
     favorites.some(id => id == props?.route?.params?.lessonId),
   );
   const {state, dispatch: contextDispatch} = useStateValue();
-
+  const dispatch = useDispatch();
   const re = new RegExp('[.,;:\\s?!]+');
   const [timePoints, setTimePoints] = useState([]);
   const sound = useRef();
