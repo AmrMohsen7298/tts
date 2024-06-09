@@ -130,16 +130,14 @@ export default function HomeScreen() {
           display: 'flex',
 
           flexDirection: 'row',
-          gap: 7,
+          gap: 10,
           justifyContent: 'flex-end',
 
           borderRadius: '',
           padding: '5%',
-          left: '3%',
+          // left: '3%',
         }}>
-        <Text style={{fontFamily: 'outfit', fontSize: 17, color: 'black'}}>
-          بحث بالمستوي : كل
-        </Text>
+       
         <View style={{paddingRight: width * 0.28}}>
           <TouchableOpacity style={styles.hideButton}>
             <Text
@@ -153,7 +151,11 @@ export default function HomeScreen() {
             </Text>
           </TouchableOpacity>
         </View>
+        <Text style={{fontFamily: 'outfit', fontSize: 17, color: 'black'}}>
+          بحث بالمستوي : كل
+        </Text>
       </View>
+      
       <View style={styles.tabsContainer}>
         <ScrollView
           horizontal
