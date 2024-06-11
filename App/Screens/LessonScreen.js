@@ -123,6 +123,7 @@ export default function LessonScreen(props) {
   const [answerPressed, setAnswerPressed] = useState(false);
   const [score, setScore] = useState(0);
   const [chosenAnswer, setChosenAnswer] = useState(null);
+  const [chosenAnswers, setChosenAnswers] = useState({});
   const [favoriteButton, setfavoriteButton] = useState(
     favorites.some(id => id == props?.route?.params?.lessonId),
   );
@@ -235,6 +236,7 @@ export default function LessonScreen(props) {
   };
 
   const checkAnswer = ({question, answer}) => {
+    setChosenAnswers(prev => ({...prev, [question.code]: answer}));
     setAnswerPressed(true);
     setChosenAnswer(answer);
     if (question.answer === answer) {
@@ -270,6 +272,13 @@ export default function LessonScreen(props) {
     if (chosenAnswer !== question.answer && choice === chosenAnswer)
       return 'white';
     return '#42BB7E';
+  };
+
+  const getResultAnsColor = ({question, chosenAns, currentChoice}) => {
+    if (question.answer === currentChoice) return '#42BB7E';
+    if (question.answer !== chosenAns && chosenAns === currentChoice)
+      return '#FF0000';
+    return 'black';
   };
 
   const renderContent = () => {
@@ -489,15 +498,12 @@ export default function LessonScreen(props) {
                   <View style={styles.resultsHeaderTextContainer}>
                     <Text style={styles.resultsHeaderText}>عمل رائع!</Text>
                     <Text style={styles.resultsBodyText}>
-                      لقد حصلت على ٣ من ٤. إستمر على مستواك!
+                      لقد حصلت على {score} من {quizData.length}. إستمر على
+                      مستواك!
                     </Text>
                   </View>
                   <View style={styles.resultsHeaderIconContainer}>
-                    <Ionicons
-                      name="checkmark-circle-outline"
-                      size={80}
-                      color="#42BB7E"
-                    />
+                    <Ionicons name="trophy" size={80} color="orange" />
                   </View>
                 </View>
                 <View style={styles.quizResults}>
@@ -507,7 +513,7 @@ export default function LessonScreen(props) {
                       <AnimatedCircularProgress
                         size={60}
                         width={6}
-                        fill={(3 / 4) * 100}
+                        fill={(score / quizData.length) * 100}
                         tintColor="#42BB7E"
                         onAnimationComplete={() =>
                           console.log('onAnimationComplete')
@@ -521,14 +527,18 @@ export default function LessonScreen(props) {
                               fontWeight: 'bold',
                               color: 'black',
                             }}>
-                            {((currentIndex + 1) / quizData.length) * 100}%
+                            {(score / quizData.length) * 100}%
                           </Text>
                         )}
                       </AnimatedCircularProgress>
                     </Text>
                     <View style={styles.correctIncorrect}>
-                      <Text style={styles.correctIncorrectText}>Correct</Text>
-                      <Text style={styles.correctIncorrectText}>Incorrect</Text>
+                      <Text style={styles.correctIncorrectText}>
+                        إجابة صحيحة
+                      </Text>
+                      <Text style={styles.correctIncorrectText}>
+                        إجابة غير صحيحة
+                      </Text>
                     </View>
                     <View style={styles.correctIncorrect}>
                       <Text
@@ -537,7 +547,7 @@ export default function LessonScreen(props) {
                           color: '#42BB7E',
                           backgroundColor: '#42BB7E30',
                         }}>
-                        3
+                        {score}
                       </Text>
                       <Text
                         style={{
@@ -545,22 +555,143 @@ export default function LessonScreen(props) {
                           color: '#ff0000',
                           backgroundColor: '#ff000020',
                         }}>
-                        1
+                        {quizData.length - score}
                       </Text>
                     </View>
                   </View>
                 </View>
                 <Pressable
-                  style={{backgroundColor: '#42BB7E', color: 'black'}}
-                  onPress={() => console.log('retake quiz')}>
+                  style={{
+                    ...styles.button,
+                    borderRadius: width * 0.05,
+                    backgroundColor: '#42BB7E',
+                    width: width * 0.9,
+                    alignSelf: 'center',
+                  }}
+                  onPress={() => {
+                    setScore(0);
+                    setCurrentIndex(0);
+                    setAnswerPressed(false);
+                  }}>
                   <Text
                     style={{
                       ...styles.buttonText,
-                      color: '#42BB7E',
+                      color: 'white',
+                      fontWeight: 'bold',
+                      fontSize: 22,
                     }}>
-                    إعادة الاإمتحان
+                    إعادة الإمتحان
                   </Text>
                 </Pressable>
+                <Text
+                  style={{
+                    ...styles.resultsHeaderText,
+                    marginTop: height * 0.03,
+                    marginRight: width * 0.05,
+                  }}>
+                  إجاباتك
+                </Text>
+                <View
+                  style={{
+                    ...styles.quizResults,
+                    marginTop: 0,
+                    gap: height * 0.01,
+                  }}>
+                  {quizData.map(question => (
+                    <View
+                      style={{
+                        ...styles.questionResultsDetailsBox,
+                        marginTop: 0,
+                      }}>
+                      <View
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row-reverse',
+                          alignItems: 'center',
+                          gap: width * 0.02,
+                          paddingHorizontal: width * 0.02,
+                          width: '100%',
+                        }}>
+                        <Text
+                          style={{
+                            color: 'black',
+                            width: '80%',
+                            textAlign: 'right',
+                            fontSize: 17,
+                            fontWeight: 'bold',
+                          }}>
+                          {question.text}
+                        </Text>
+                        <View
+                          style={{
+                            color: 'black',
+                            width: '20%',
+                            textAlign: 'right',
+                          }}>
+                          <Ionicons
+                            name={
+                              question.answer === chosenAnswers[question.code]
+                                ? 'checkmark-circle'
+                                : 'close-circle'
+                            }
+                            size={width * 0.07}
+                            color={
+                              question.answer === chosenAnswers[question.code]
+                                ? '#42BB7E'
+                                : '#ff0000'
+                            }
+                          />
+                        </View>
+                      </View>
+                      {question.choices.split(',').map(choice => (
+                        <>
+                          <View
+                            style={{
+                              ...styles.hairlineLeft,
+                              marginTop: height * 0.02,
+                              marginBottom: height * 0.01,
+                            }}></View>
+                          <Text
+                            style={{
+                              color: getResultAnsColor({
+                                question,
+                                chosenAns: chosenAnswers[question.code],
+                                currentChoice: choice,
+                              }),
+                              textAlign: 'right',
+                              fontWeight: 'bold',
+                              fontSize: 15,
+                            }}>
+                            {choice}
+                          </Text>
+                        </>
+                      ))}
+                    </View>
+                  ))}
+                  <Pressable
+                    style={{
+                      ...styles.button,
+                      borderRadius: width * 0.05,
+                      backgroundColor: '#42BB7E',
+                      width: width * 0.9,
+                      alignSelf: 'center',
+                    }}
+                    onPress={() => {
+                      setScore(0);
+                      setCurrentIndex(0);
+                      setAnswerPressed(false);
+                    }}>
+                    <Text
+                      style={{
+                        ...styles.buttonText,
+                        color: 'white',
+                        fontWeight: 'bold',
+                        fontSize: 22,
+                      }}>
+                      إعادة الإمتحان
+                    </Text>
+                  </Pressable>
+                </View>
               </ScrollView>
             )}
           </>
@@ -648,7 +779,11 @@ export default function LessonScreen(props) {
               {fill => (
                 <Text
                   style={{fontSize: 25, fontWeight: 'bold', color: 'white'}}>
-                  {currentIndex + 1 + ' / ' + quizData.length}
+                  {currentIndex + 1 > quizData.length ? (
+                    <Ionicons name="checkmark" size={80} color="white" />
+                  ) : (
+                    currentIndex + 1 + ' / ' + quizData.length
+                  )}
                 </Text>
               )}
             </AnimatedCircularProgress>
@@ -818,11 +953,18 @@ const styles = StyleSheet.create({
   resultsDetailsBox: {
     backgroundColor: '#fff',
     padding: width * 0.04,
-    borderRadius: width * 0.02,
+    borderRadius: width * 0.03,
     marginVertical: height * 0.01,
     display: 'flex',
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     gap: width * 0.1,
+    justifyContent: 'space-around',
+  },
+  questionResultsDetailsBox: {
+    backgroundColor: '#fff',
+    padding: width * 0.04,
+    borderRadius: width * 0.03,
+    marginVertical: height * 0.01,
     justifyContent: 'space-around',
   },
   resultsHeaderText: {

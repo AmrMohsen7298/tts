@@ -19,7 +19,7 @@ import {useNavigation} from '@react-navigation/native';
 import StackNavigation from '../Navigations/StackNavigation';
 import {getAllLessons, getLessonById} from '../Services/LessonServices';
 import {levels} from '../Utils/constants';
-import { useStateValue } from '../store/contextStore/StateContext';
+import {useStateValue} from '../store/contextStore/StateContext';
 
 const {width, height} = Dimensions.get('window');
 
@@ -28,7 +28,6 @@ export default function HomeScreen() {
   const [lessons, setLessons] = useState([]);
   const [activeTab, setActiveTab] = useState(0);
   const {state, dispatch: contextDispatch} = useStateValue();
-
 
   const tabs = [
     levels.A1,
@@ -137,7 +136,6 @@ export default function HomeScreen() {
           padding: '5%',
           // left: '3%',
         }}>
-       
         <View style={{paddingRight: width * 0.28}}>
           <TouchableOpacity style={styles.hideButton}>
             <Text
@@ -155,7 +153,7 @@ export default function HomeScreen() {
           بحث بالمستوي : كل
         </Text>
       </View>
-      
+
       <View style={styles.tabsContainer}>
         <ScrollView
           horizontal
