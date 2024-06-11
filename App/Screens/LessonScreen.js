@@ -37,7 +37,9 @@ import {connect, useDispatch, useSelector} from 'react-redux';
 import CustomAudioPlayer from '../Components/AudioPlayer/CustomAudioPlayer';
 import {
   addFavorite,
+  addToLearned,
   removeFavorite,
+  removeFromLearned,
   setAudioPlaying,
 } from '../Actions/StoryActions';
 import Sound from 'react-native-sound';
@@ -82,11 +84,26 @@ const quizData = [
   },
 ];
 
-const DoneLearning = () => {
+const DoneLearning = ({lessonId}) => {
+  const learned = useSelector(state => state.storyReducer.learned);
+  const dispatch = useDispatch();
+
   return (
     <View style={styles.buttonWrapper}>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.touchable}>
+      <View
+        style={{
+          ...styles.buttonContainer,
+          backgroundColor: learned.some(id => id == lessonId)
+            ? '#42BB7E'
+            : '#333',
+        }}>
+        <TouchableOpacity
+          style={styles.touchable}
+          onPress={() => {
+            !learned.some(id => id == lessonId)
+              ? dispatch(addToLearned(lessonId))
+              : dispatch(removeFromLearned(lessonId));
+          }}>
           <Text style={styles.touchableText}>
             <Ionicons name="checkmark-outline" size={20} color="white" /> تم
             التعلم
@@ -224,7 +241,7 @@ export default function LessonScreen(props) {
     );
     setPlayPressed(false);
   };
-  setFavorites = (flag, lessonId) => {
+  const setFavorites = (flag, lessonId) => {
     if (flag) {
       dispatch(addFavorite(lessonId));
     } else {
@@ -281,7 +298,7 @@ export default function LessonScreen(props) {
     return 'black';
   };
 
-  const renderContent = () => {
+  const renderContent = lessonId => {
     switch (activeTab) {
       case 0:
         return (
@@ -704,7 +721,7 @@ export default function LessonScreen(props) {
         return null;
     }
   };
-  renderphoto = () => {
+  renderphoto = lessonId => {
     switch (activeTab) {
       case 0:
         return (
@@ -714,7 +731,7 @@ export default function LessonScreen(props) {
               source={{uri: props?.route?.params?.image}}
               resizeMode="cover">
               <View style={styles.outerContainer}>
-                <DoneLearning />
+                <DoneLearning lessonId={props?.route?.params?.lessonId} />
 
                 <View style={styles.textContainer}>
                   {selectedWord && SelectedWordTranslation && (
@@ -796,7 +813,7 @@ export default function LessonScreen(props) {
               style={styles.photo}
               source={{uri: props?.route?.params?.image}}
               resizeMode="cover">
-              <DoneLearning />
+              <DoneLearning lessonId={props?.route?.params?.lessonId} />
               <View>
                 <View
                   style={{
@@ -867,7 +884,7 @@ export default function LessonScreen(props) {
               style={styles.photo}
               source={{uri: props?.route?.params?.image}}
               resizeMode="cover">
-              <DoneLearning />
+              <DoneLearning lessonId={props?.route?.params?.lessonId} />
             </ImageBackground>
           </View>
         );

@@ -198,7 +198,7 @@
 //   },
 // });
 
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
   View,
   Text,
@@ -207,6 +207,7 @@ import {
   StyleSheet,
   Dimensions,
   SafeAreaView,
+  Pressable,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import user from './../../assets/Images/profile.jpg';
@@ -215,10 +216,17 @@ import login from './../../assets/eye.png';
 import Colors from './../Utils/Colors';
 import fire from './../../assets/fire.png';
 import {ScrollView} from 'react-native-gesture-handler';
+import {useStateValue} from '../store/contextStore/StateContext';
 
 const {width, height} = Dimensions.get('window');
 
 const ProfileScreen = () => {
+  const {state, dispatch} = useStateValue();
+
+  useEffect(() => {
+    dispatch({type: 'SHOW_NAVBAR', payload: false});
+  }, []);
+
   const LearningProgressCard = ({title, storiesCount, wordsCount}) => {
     return (
       <View style={styles.card}>
@@ -282,7 +290,6 @@ const ProfileScreen = () => {
     <SafeAreaView style={styles.mainContainer}>
       <ScrollView>
         <View style={styles.headerContainer}>
-       
           <Text style={styles.accountText}>الحساب</Text>
         </View>
         <View style={styles.profileContainer}>
@@ -304,17 +311,25 @@ const ProfileScreen = () => {
         <View style={styles.cardContainer}>
           <ReaderTrakerCard title="تتبع القراءة" storiesCount={0} />
         </View>
-        <View style={styles.loginButtonContainer}>
-          <TouchableOpacity style={styles.button} onPress={handleLoginPress}>
-            <Text style={styles.buttonText}>تسجيل دخول</Text>
-          </TouchableOpacity>
-        </View>
       </ScrollView>
+      <View style={styles.hairlineLeft}></View>
+      <View style={styles.loginButtonContainer}>
+        <Pressable style={styles.button} onPress={handleLoginPress}>
+          <Text style={styles.buttonText}>تسجيل دخول</Text>
+        </Pressable>
+      </View>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  hairlineLeft: {
+    borderBlockColor: '#ddd',
+    borderColor: '#ddd',
+    borderWidth: 1,
+    width: '100%',
+    bottom: 'auto',
+  },
   mainContainer: {
     flex: 1,
     display: 'flex',
@@ -337,7 +352,7 @@ const styles = StyleSheet.create({
     color: Colors.black,
     fontSize: width * 0.06,
     fontFamily: 'outfit',
-    paddingLeft:width*0.04
+    paddingLeft: width * 0.04,
   },
   profileContainer: {
     flexDirection: 'row',
@@ -348,16 +363,17 @@ const styles = StyleSheet.create({
   accountTypeContainer: {
     backgroundColor: '#42BB7E',
     padding: height * 0.015,
-    borderRadius: 6,
+    borderRadius: width * 0.02,
   },
   accountTypeText: {
     fontSize: width * 0.04,
     fontWeight: 'bold',
+    color: 'white',
   },
   profileImage: {
     width: width * 0.1,
     height: width * 0.1,
-    borderRadius: width * 0.075,
+    borderRadius: width * 0.005,
   },
   cardContainer: {
     marginTop: height * 0.015,
@@ -372,7 +388,7 @@ const styles = StyleSheet.create({
     // shadowOffset: {width: 0, height: 2},
     // shadowOpacity: 0.25,
     // shadowRadius: 3.84,
-    margin: `${height * 0.015} ${width * 0.1}`
+    margin: `${height * 0.015} ${width * 0.1}`,
   },
   header: {
     fontSize: width * 0.075,
@@ -422,7 +438,7 @@ const styles = StyleSheet.create({
     fontSize: width * 0.045,
     fontWeight: 'bold',
     textAlign: 'center',
-    width: '100%'
+    width: '100%',
   },
   icon: {
     width: 30,
@@ -434,7 +450,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: height * 0.02,
+    marginTop: height * 0.015,
   },
 });
 

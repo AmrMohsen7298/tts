@@ -63,7 +63,10 @@ function StackNavigation() {
                 marginTop: height * 0.026,
               }}
               color="black"
-              onPress={() => navigation.goBack(HomeScreen)}
+              onPress={() => {
+                navigation.goBack(HomeScreen);
+                dispatch({type: 'SHOW_NAVBAR', payload: true});
+              }}
             />
           ),
         })}
