@@ -54,6 +54,34 @@ export const getStoryById = async(lessonId)=>{
     }
     )
 }
+export const getquestionbyId = async(lessonId)=>{
+    console.log("getquestionbyId", lessonId)
+    return await axios.get(`https://tts.eliteacademyeg.com/api/v1/quiz/tutorial/${lessonId}`)
+    .then(resp=> resp.data)
+    .catch(error=>{
+        console.log("error",error)
+    }
+    )
+}
+export const getkeywordsbyId = async(lessonId)=>{
+    console.log("getkeywordsbyId", lessonId)
+    return await axios.get(`https://tts.eliteacademyeg.com/keywords/getByTutorial/${lessonId}`)
+    .then(resp=> resp.data)
+    .catch(error=>{
+        console.log("error",error)
+    }
+    )
+}
+
+export const getgrammerByid = async(lessonId)=>{
+    console.log("getgrammerByid", lessonId)
+    return await axios.get(`https://tts.eliteacademyeg.com/api/grammars/getTutorial/${lessonId}`)
+    .then(resp=> resp.data)
+    .catch(error=>{
+        console.log("error",error)
+    }
+    )
+}
 export const getWordByText = async(word, tutorialId) =>{
     return await  axios.get(`https://tts.eliteacademyeg.com/keywords/text`,{params:{
         word,
