@@ -71,7 +71,9 @@ export default function Library() {
             size={25}
             color={'#42BB7E'}></FontAwesomeIcon>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.mediumButton}>
+        <TouchableOpacity style={styles.mediumButton}  onPress={() => {
+            navigator.navigate('الدروس المتعلمه');
+          }}>
           <FontAwesomeIcon
             icon="angle-left"
             style={styles.mediumText}></FontAwesomeIcon>
