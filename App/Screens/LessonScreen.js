@@ -421,23 +421,23 @@ export default function LessonScreen(props) {
                             overflow: 'hidden',
                             // borderRadius: storyAudioPlaying && (index == highlightIndex[highlightIndex.length-1] || index == highlightIndex[0]) ? 5: 0,
                             borderTopRightRadius:
-                              storyAudioPlaying && index == highlightIndex?.[0]
+                              (storyAudioPlaying && index == highlightIndex?.[0]) || (!storyAudioPlaying && selectedWord)
                                 ? 5
                                 : 0,
                             borderBottomRightRadius:
-                              storyAudioPlaying && index == highlightIndex?.[0]
+                              (storyAudioPlaying && index == highlightIndex?.[0])|| (!storyAudioPlaying && selectedWord)
                                 ? 5
                                 : 0,
                             borderTopLeftRadius:
-                              storyAudioPlaying &&
+                              (storyAudioPlaying &&
                               index ==
-                                highlightIndex?.[highlightIndex?.length - 1]
+                                highlightIndex?.[highlightIndex?.length - 1])|| (!storyAudioPlaying && selectedWord)
                                 ? 5
                                 : 0,
                             borderBottomLeftRadius:
-                              storyAudioPlaying &&
+                              (storyAudioPlaying &&
                               index ==
-                                highlightIndex?.[highlightIndex?.length - 1]
+                                highlightIndex?.[highlightIndex?.length - 1])|| (!storyAudioPlaying && selectedWord)
                                 ? 5
                                 : 0,
                             backgroundColor:
