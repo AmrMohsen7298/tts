@@ -7,23 +7,64 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import user from './../../../assets/Images/userProfile.jpg';
 import Colors from '../../Utils/Colors';
 import {TouchableHighlight} from 'react-native-gesture-handler';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import { text } from '@fortawesome/fontawesome-svg-core';
+import Sound from 'react-native-sound';
+import RNFetchBlob from 'rn-fetch-blob';
+import { useDispatch } from 'react-redux';
+import { setAudioPlaying } from '../../Actions/StoryActions';
 const {width, height} = Dimensions.get('window');
 export default function KeywordCard(props) {
   const [playPressed, setPlayPressed] = useState(false);
   const [trainingPressed, setTrainingPressed] = useState(false);
+  const {type,description,translation,audio,text,level} = props
+  const sound = useRef();
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    if (playPressed) {
-      setTimeout(() => {
-        setPlayPressed(false);
-      }, 5000);
+    const filePath = `${RNFetchBlob.fs.dirs.CacheDir}/audio-keyword${text}.mp3`;
+
+    async function saveAudioToFileSystem() {
+      try {
+        // Save the audio Blob to the file system
+        await RNFetchBlob.fs.writeFile(filePath, audio, 'base64');
+        console.log(filePath);
+        sound.current = new Sound(filePath, '', error => {
+          if (error) {
+            console.log('failed to load the sound', error);
+            return;
+          }
+          console.log(
+            'duration in seconds: ' +
+              sound.current.getDuration() +
+              'number of channels: ' +
+              sound.current.getNumberOfChannels(),
+          );
+        });
+      } catch (error) {
+        console.error('Error while saving audio to file system:', error);
+      }
     }
-  }, [playPressed]);
+
+    if (audio) {
+      saveAudioToFileSystem();
+    }
+    const playSound = async () => {
+      dispatch(setAudioPlaying(false))
+      sound.current.play(success => {
+        if (success) {
+          setPlayPressed(false);
+        }
+      });
+    };
+    if (playPressed) {
+      playSound();
+    }
+  }, [playPressed, audio]);
   return (
     <View style={styles.cardContainer}>
       <View>
@@ -36,7 +77,7 @@ export default function KeywordCard(props) {
                 left: width * 0.4,
                 color: 'black',
               }}>
-              كَتَّبَ: (فعل)
+              {`${text}: (${type})`}
             </Text>
             <Text
               style={{
@@ -46,7 +87,7 @@ export default function KeywordCard(props) {
                 color: 'black',
                 maxWidth: width * 0.5,
               }}>
-              كتَّبَ يكتِّب ، تَكْتِيبًا ، فهو مُكتِّب ، والمفعول مُكتَّب
+              {description}
             </Text>
           </View>
           <Text style={styles.cardDefinition}> {props?.definition}</Text>

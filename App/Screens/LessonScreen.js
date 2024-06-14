@@ -26,6 +26,9 @@ import Card from '../Components/Card';
 import {LessonTabs} from '../Utils/constants';
 import {
   getAudioTimePoints,
+  getGrammerByTutorialId,
+  getKeywordsbyTutorialId,
+  getQuizByTutorialId,
   getStoryAudio,
   getStoryById,
   getWordByText,
@@ -49,40 +52,41 @@ import {useStateValue} from '../store/contextStore/StateContext';
 
 const {width, height} = Dimensions.get('window');
 
-const quizData = [
-  {
-    question_ID: 1,
-    quiz_id: 1,
-    code: 'vcr4', // Assuming there's no code associated with these questions
-    text: 'عدم اهتمام ___ مجالات البحث العلميّ في استخدام اللّغة العربيّة للتعلم الكلغةٍ خاصّة في الأبحاث الأكاديميّة والعلميّة',
-    choices: 'مُعظم,بعض,شيئ',
-    answer: 'مُعظم', // No answer provided in the data
-  },
-  {
-    question_ID: 2,
-    quiz_id: 1,
-    code: 'cdw2',
-    text: 'تُعدّ ___ من أهمّ العواملِ المؤثّرةِ على نموّ الشركاتِ الناشئةِ في الدولِ الناميةِ.',
-    choices: 'التمويل,الابتكار,المواردُ البشريّةُ',
-    answer: 'التمويل',
-  },
-  {
-    question_ID: 3,
-    quiz_id: 1,
-    code: 'ncd7',
-    text: 'يواجهُ ___ من الطلاب صعوباتٍ في فهمِ مفاهيمِ الرياضياتِ، خاصّةً في المراحلِ الثانويّةِ.',
-    choices: 'معظم,بعض,عددٌ قليلٌ',
-    answer: 'معظم',
-  },
-  {
-    question_ID: 4,
-    quiz_id: 1,
-    code: 'fn37',
-    text: 'يُؤدّي ___ من التغيّراتِ المناخيّةِ إلى تفاقمِ ظاهرةِ الجفافِ في مختلفِ أنحاءِ العالمِ.',
-    choices: 'ارتفاعُ درجاتِ الحرارة,تغيّرُ أنماطِ الهطول,زيادةُ ظاهرةِ التصحر',
-    answer: 'ارتفاعُ درجاتِ الحرارة',
-  },
-];
+// const quizData = [
+//   {
+//     question_ID: 1,
+//     quiz_id: 1,
+//     code: 'vcr4', // Assuming there's no code associated with these questions
+//     text: 'عدم اهتمام ___ مجالات البحث العلميّ في استخدام اللّغة العربيّة للتعلم الكلغةٍ خاصّة في الأبحاث الأكاديميّة والعلميّة',
+//     choices: 'مُعظم,بعض,شيئ',
+//     answer: 'مُعظم', // No answer provided in the data
+//   },
+//   {
+//     question_ID: 2,
+//     quiz_id: 1,
+//     code: 'cdw2',
+//     text: 'تُعدّ ___ من أهمّ العواملِ المؤثّرةِ على نموّ الشركاتِ الناشئةِ في الدولِ الناميةِ.',
+//     choices: 'التمويل,الابتكار,المواردُ البشريّةُ',
+//     answer: 'التمويل',
+//   },
+//   {
+//     question_ID: 3,
+//     quiz_id: 1,
+//     code: 'ncd7',
+//     text: 'يواجهُ ___ من الطلاب صعوباتٍ في فهمِ مفاهيمِ الرياضياتِ، خاصّةً في المراحلِ الثانويّةِ.',
+//     choices: 'معظم,بعض,عددٌ قليلٌ',
+//     answer: 'معظم',
+//   },
+//   {
+//     question_ID: 4,
+//     quiz_id: 1,
+//     code: 'fn37',
+//     text: 'يُؤدّي ___ من التغيّراتِ المناخيّةِ إلى تفاقمِ ظاهرةِ الجفافِ في مختلفِ أنحاءِ العالمِ.',
+//     choices: 'ارتفاعُ درجاتِ الحرارة,تغيّرُ أنماطِ الهطول,زيادةُ ظاهرةِ التصحر',
+//     answer: 'ارتفاعُ درجاتِ الحرارة',
+//   },
+// ];
+
 
 const DoneLearning = ({lessonId}) => {
   const learned = useSelector(state => state.storyReducer.learned);
@@ -93,14 +97,14 @@ const DoneLearning = ({lessonId}) => {
       <View
         style={{
           ...styles.buttonContainer,
-          backgroundColor: learned.some(id => id == lessonId)
+          backgroundColor: learned?.some(id => id == lessonId)
             ? '#42BB7E'
             : '#333',
         }}>
         <TouchableOpacity
           style={styles.touchable}
           onPress={() => {
-            !learned.some(id => id == lessonId)
+            !learned?.some(id => id == lessonId)
               ? dispatch(addToLearned(lessonId))
               : dispatch(removeFromLearned(lessonId));
           }}>
@@ -138,6 +142,9 @@ export default function LessonScreen(props) {
   const [translateButton, setTranslateButton] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answerPressed, setAnswerPressed] = useState(false);
+  const [quizData,setQuizData] = useState()
+  const [keyWords, setKeyWords] = useState();
+  const [grammar, setGrammar] = useState();
   const [score, setScore] = useState(0);
   const [chosenAnswer, setChosenAnswer] = useState(null);
   const [chosenAnswers, setChosenAnswers] = useState({});
@@ -156,6 +163,17 @@ export default function LessonScreen(props) {
   useEffect(() => {
     contextDispatch({type: 'SHOW_NAVBAR', payload: false});
     console.log('props', props?.route?.params?.lessonId);
+    getQuizByTutorialId(props?.route?.params?.lessonId).then(res=>{
+      setQuizData(res?.questions)
+      console.log("QUIZDATA", res?.questions)
+    })
+    getKeywordsbyTutorialId(props?.route?.params?.lessonId).then(res=>{
+      setKeyWords(res)
+      console.log("KEYWORDS", res)
+    })
+    getGrammerByTutorialId(props?.route?.params?.lessonId).then(res=>{
+      setGrammar(res)
+    })
     getStoryById(props?.route?.params?.lessonId).then(resp => {
       setStoryParagraph(resp?.paragraph);
       setTranslation(resp?.translation);
@@ -183,6 +201,7 @@ export default function LessonScreen(props) {
       console.log('sentences', storyParagraph.split(['.']));
     }
   }, [storyParagraph]);
+
 
   useEffect(() => {
     const filePath = `${RNFetchBlob.fs.dirs.CacheDir}/audio-wordAudio.mp3`;
@@ -261,7 +280,7 @@ export default function LessonScreen(props) {
     }
     setTimeout(() => {
       setCurrentIndex(prev => prev + 1);
-      if (currentIndex + 1 < quizData.length) {
+      if (currentIndex + 1 < quizData?.length) {
         setAnswerPressed(false);
       }
     }, 2000);
@@ -452,7 +471,7 @@ export default function LessonScreen(props) {
       case 1:
         return (
           <>
-            {currentIndex < quizData.length ? (
+            {currentIndex < quizData?.length ? (
               <View
                 style={{
                   flexDirection: 'column',
@@ -475,7 +494,7 @@ export default function LessonScreen(props) {
                   {quizData[currentIndex].text}
                 </Text>
                 <View style={{flexDirection: 'column', gap: 10, marginTop: 10}}>
-                  {quizData[currentIndex].choices.split(',').map(choice => (
+                  {quizData[currentIndex].choices.map(choice => (
                     <TouchableOpacity
                       disabled={answerPressed}
                       style={{
@@ -515,7 +534,7 @@ export default function LessonScreen(props) {
                   <View style={styles.resultsHeaderTextContainer}>
                     <Text style={styles.resultsHeaderText}>عمل رائع!</Text>
                     <Text style={styles.resultsBodyText}>
-                      لقد حصلت على {score} من {quizData.length}. إستمر على
+                      لقد حصلت على {score} من {quizData?.length}. إستمر على
                       مستواك!
                     </Text>
                   </View>
@@ -530,7 +549,7 @@ export default function LessonScreen(props) {
                       <AnimatedCircularProgress
                         size={60}
                         width={6}
-                        fill={(score / quizData.length) * 100}
+                        fill={(score / quizData?.length) * 100}
                         tintColor="#42BB7E"
                         onAnimationComplete={() =>
                           console.log('onAnimationComplete')
@@ -544,7 +563,7 @@ export default function LessonScreen(props) {
                               fontWeight: 'bold',
                               color: 'black',
                             }}>
-                            {(score / quizData.length) * 100}%
+                            {(score / quizData?.length) * 100}%
                           </Text>
                         )}
                       </AnimatedCircularProgress>
@@ -572,7 +591,7 @@ export default function LessonScreen(props) {
                           color: '#ff0000',
                           backgroundColor: '#ff000020',
                         }}>
-                        {quizData.length - score}
+                        {quizData?.length - score}
                       </Text>
                     </View>
                   </View>
@@ -614,7 +633,7 @@ export default function LessonScreen(props) {
                     marginTop: 0,
                     gap: height * 0.01,
                   }}>
-                  {quizData.map(question => (
+                  {quizData?.map(question => (
                     <View
                       style={{
                         ...styles.questionResultsDetailsBox,
@@ -660,7 +679,7 @@ export default function LessonScreen(props) {
                           />
                         </View>
                       </View>
-                      {question.choices.split(',').map(choice => (
+                      {question.choices.map(choice => (
                         <>
                           <View
                             style={{
@@ -714,9 +733,13 @@ export default function LessonScreen(props) {
           </>
         );
       case 2:
-        return <KeywordCard></KeywordCard>;
+        return (<>{keyWords?.map((keyword,index)=>{
+        return <KeywordCard key={index} {...keyword}></KeywordCard>
+      })}</>)
       case 3:
-        return <Card></Card>;
+        return (<>{grammar?.map((g, index)=>{
+        return <Card key={index} {...g}></Card>
+      })}</>);
       default:
         return null;
     }
@@ -788,7 +811,7 @@ export default function LessonScreen(props) {
             <AnimatedCircularProgress
               size={150}
               width={15}
-              fill={((currentIndex + 1) / quizData.length) * 100}
+              fill={((currentIndex + 1) / quizData?.length) * 100}
               tintColor="white"
               onAnimationComplete={() => console.log('onAnimationComplete')}
               backgroundColor="#3d5875"
@@ -796,10 +819,10 @@ export default function LessonScreen(props) {
               {fill => (
                 <Text
                   style={{fontSize: 25, fontWeight: 'bold', color: 'white'}}>
-                  {currentIndex + 1 > quizData.length ? (
+                  {currentIndex + 1 > quizData?.length ? (
                     <Ionicons name="checkmark" size={80} color="white" />
                   ) : (
-                    currentIndex + 1 + ' / ' + quizData.length
+                    currentIndex + 1 + ' / ' + quizData?.length
                   )}
                 </Text>
               )}

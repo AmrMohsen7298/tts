@@ -13,7 +13,8 @@ import {ScrollView} from 'react-native-gesture-handler';
 
 const {width, height} = Dimensions.get('window');
 
-export default function App() {
+export default function App(props) {
+  const {topic, header, example, description} = props
   return (
     <ScrollView>
       <View style={styles.container}>
@@ -27,17 +28,16 @@ export default function App() {
               padding: '5%',
               color: 'white',
             }}>
-            تعريف النكرة{' '}
+            {topic}
           </Text>
 
           <View style={styles.text_container}>
             <Text style={styles.example_title}>مثال</Text>
-            <Text style={styles.card_desc}>رجل، جبل، مدينة، كتاب.</Text>
+            <Text style={styles.card_desc}>{example}</Text>
             <View style={styles.hairlineLeft}></View>
             <Text style={styles.example_title}>الوصف</Text>
             <Text style={styles.card_title}>
-              اسم يدل على شئ غير معين أو محدد، سواء كان إنسانًا أو حيوانًا أو
-              غيرهما
+              {description}
             </Text>
             <View style={styles.innerBox}>
               <Text style={styles.card_desc}>
