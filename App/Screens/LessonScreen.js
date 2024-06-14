@@ -43,7 +43,9 @@ import {
   addToLearned,
   removeFavorite,
   removeFromLearned,
+  removeWordTraining,
   setAudioPlaying,
+  setWordTraining,
 } from '../Actions/StoryActions';
 import Sound from 'react-native-sound';
 import RNFetchBlob from 'rn-fetch-blob';
@@ -87,7 +89,6 @@ const {width, height} = Dimensions.get('window');
 //   },
 // ];
 
-
 const DoneLearning = ({lessonId}) => {
   const learned = useSelector(state => state.storyReducer.learned);
   const dispatch = useDispatch();
@@ -120,6 +121,8 @@ const DoneLearning = ({lessonId}) => {
 
 export default function LessonScreen(props) {
   const favorites = useSelector(state => state.storyReducer.favorites);
+  const keywords = useSelector(state => state.storyReducer.keywords);
+
   const [activeTab, setActiveTab] = useState(0);
   const [playPressed, setPlayPressed] = useState(false);
   const [trainingPressed, setTrainingPressed] = useState(false);
@@ -142,7 +145,7 @@ export default function LessonScreen(props) {
   const [translateButton, setTranslateButton] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answerPressed, setAnswerPressed] = useState(false);
-  const [quizData,setQuizData] = useState()
+  const [quizData, setQuizData] = useState();
   const [keyWords, setKeyWords] = useState();
   const [grammar, setGrammar] = useState();
   const [score, setScore] = useState(0);
@@ -163,17 +166,17 @@ export default function LessonScreen(props) {
   useEffect(() => {
     contextDispatch({type: 'SHOW_NAVBAR', payload: false});
     console.log('props', props?.route?.params?.lessonId);
-    getQuizByTutorialId(props?.route?.params?.lessonId).then(res=>{
-      setQuizData(res?.questions)
-      console.log("QUIZDATA", res?.questions)
-    })
-    getKeywordsbyTutorialId(props?.route?.params?.lessonId).then(res=>{
-      setKeyWords(res)
-      console.log("KEYWORDS", res)
-    })
-    getGrammerByTutorialId(props?.route?.params?.lessonId).then(res=>{
-      setGrammar(res)
-    })
+    getQuizByTutorialId(props?.route?.params?.lessonId).then(res => {
+      setQuizData(res?.questions);
+      console.log('QUIZDATA', res?.questions);
+    });
+    getKeywordsbyTutorialId(props?.route?.params?.lessonId).then(res => {
+      setKeyWords(res);
+      console.log('KEYWORDS', res);
+    });
+    getGrammerByTutorialId(props?.route?.params?.lessonId).then(res => {
+      setGrammar(res);
+    });
     getStoryById(props?.route?.params?.lessonId).then(resp => {
       setStoryParagraph(resp?.paragraph);
       setTranslation(resp?.translation);
@@ -201,7 +204,6 @@ export default function LessonScreen(props) {
       console.log('sentences', storyParagraph.split(['.']));
     }
   }, [storyParagraph]);
-
 
   useEffect(() => {
     const filePath = `${RNFetchBlob.fs.dirs.CacheDir}/audio-wordAudio.mp3`;
@@ -421,23 +423,33 @@ export default function LessonScreen(props) {
                             overflow: 'hidden',
                             // borderRadius: storyAudioPlaying && (index == highlightIndex[highlightIndex.length-1] || index == highlightIndex[0]) ? 5: 0,
                             borderTopRightRadius:
-                              (storyAudioPlaying && index == highlightIndex?.[0]) || (!storyAudioPlaying && selectedWord)
+                              (storyAudioPlaying &&
+                                index == highlightIndex?.[0]) ||
+                              (!storyAudioPlaying && selectedWord)
                                 ? 5
                                 : 0,
                             borderBottomRightRadius:
-                              (storyAudioPlaying && index == highlightIndex?.[0])|| (!storyAudioPlaying && selectedWord)
+                              (storyAudioPlaying &&
+                                index == highlightIndex?.[0]) ||
+                              (!storyAudioPlaying && selectedWord)
                                 ? 5
                                 : 0,
                             borderTopLeftRadius:
                               (storyAudioPlaying &&
-                              index ==
-                                highlightIndex?.[highlightIndex?.length - 1])|| (!storyAudioPlaying && selectedWord)
+                                index ==
+                                  highlightIndex?.[
+                                    highlightIndex?.length - 1
+                                  ]) ||
+                              (!storyAudioPlaying && selectedWord)
                                 ? 5
                                 : 0,
                             borderBottomLeftRadius:
                               (storyAudioPlaying &&
-                              index ==
-                                highlightIndex?.[highlightIndex?.length - 1])|| (!storyAudioPlaying && selectedWord)
+                                index ==
+                                  highlightIndex?.[
+                                    highlightIndex?.length - 1
+                                  ]) ||
+                              (!storyAudioPlaying && selectedWord)
                                 ? 5
                                 : 0,
                             backgroundColor:
@@ -733,13 +745,21 @@ export default function LessonScreen(props) {
           </>
         );
       case 2:
-        return (<>{keyWords?.map((keyword,index)=>{
-        return <KeywordCard key={index} {...keyword}></KeywordCard>
-      })}</>)
+        return (
+          <>
+            {keyWords?.map((keyword, index) => {
+              return <KeywordCard key={index} {...keyword}></KeywordCard>;
+            })}
+          </>
+        );
       case 3:
-        return (<>{grammar?.map((g, index)=>{
-        return <Card key={index} {...g}></Card>
-      })}</>);
+        return (
+          <>
+            {grammar?.map((g, index) => {
+              return <Card key={index} {...g}></Card>;
+            })}
+          </>
+        );
       default:
         return null;
     }
@@ -773,14 +793,28 @@ export default function LessonScreen(props) {
                       <View style={styles.cardButtons}>
                         <Pressable
                           style={
-                            trainingPressed
-                              ? styles.cardButtonUpPressed
+                            keywords.filter(({word}) => word === selectedWord)
+                              .length > 0
+                              ? // trainingPressed
+                                styles.cardButtonUpPressed
                               : styles.cardButtonUp
                           }
                           onPress={() => {
-                            trainingPressed
-                              ? setTrainingPressed(false)
-                              : setTrainingPressed(true);
+                            keywords.filter(({word}) => word === selectedWord)
+                              .length > 0
+                              ? //setTrainingPressed(false)
+                                dispatch(
+                                  removeWordTraining({
+                                    word: selectedWord,
+                                  }),
+                                )
+                              : dispatch(
+                                  setWordTraining({
+                                    word: selectedWord,
+                                    translation: SelectedWordTranslation,
+                                    type: 'new',
+                                  }),
+                                );
                           }}>
                           <FontAwesomeIcon icon="dumbbell" />
                         </Pressable>

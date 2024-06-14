@@ -5,6 +5,8 @@ import {
   SHOW_NAVBAR,
   ADD_TO_LEARNED,
   REMOVE_FROM_LEARNED,
+  SET_KEYWORDS,
+  REMOVE_KEYWORDS,
 } from '../Actions/StoryActions';
 import {combineReducers, createStore} from 'redux';
 import storage from 'redux-persist/lib/storage';
@@ -16,6 +18,7 @@ const initialState = {
   favorites: [],
   showNavbar: true,
   learned: [],
+  keywords: [{word: 'عقاب', translation: 'punishment', type: 'new'}],
   // Define your initial state properties here
 };
 const persistConfig = {
@@ -61,8 +64,26 @@ const reducer = (state = initialState, action) => {
         ...state,
         learned: state.learned.filter(id => id !== payload),
       };
+    case SET_KEYWORDS:
+      return {
+        ...state,
+        keywords: [
+          ...state.keywords.filter(({word}) => word !== payload.word),
+          {
+            word: payload.word,
+            type: payload.type,
+            translation: payload.translation,
+          },
+        ],
+      };
+    case REMOVE_KEYWORDS:
+      return {
+        ...state,
+        keywords: [...state.keywords.filter(({word}) => word !== payload.word)],
+      };
+    default:
+      return state;
   }
-  return state;
   // Handle different action types and update the state accordingly
 };
 const rootReducer = combineReducers({
