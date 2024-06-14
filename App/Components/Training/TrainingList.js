@@ -1,7 +1,7 @@
 import {faDumbbell} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {useNavigation} from '@react-navigation/native';
-import React, {Component, useEffect} from 'react';
+import {useEffect} from 'react';
 import {View, Text, Pressable, StyleSheet, Dimensions} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
 import Ionicons from 'react-native-vector-icons/Ionicons'; // Import Ionicons from the correct package

@@ -754,11 +754,11 @@ export default function LessonScreen(props) {
         );
       case 3:
         return (
-          <>
+          <ScrollView>
             {grammar?.map((g, index) => {
               return <Card key={index} {...g}></Card>;
             })}
-          </>
+          </ScrollView>
         );
       default:
         return null;

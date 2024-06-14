@@ -14,54 +14,50 @@ import {ScrollView} from 'react-native-gesture-handler';
 const {width, height} = Dimensions.get('window');
 
 export default function App(props) {
-  const {topic, header, example, description} = props
+  const {topic, header, example, description} = props;
   return (
-    <ScrollView>
-      <View style={styles.container}>
-        <View style={styles.card_template}>
-          <Text
-            style={{
-              fontFamily: 'outfitBold',
-              fontSize: 26,
-              fontWeight: 'bold',
-              textAlign: 'right',
-              padding: '5%',
-              color: 'white',
-            }}>
-            {topic}
-          </Text>
+    <View style={styles.container}>
+      <View style={styles.card_template}>
+        <Text
+          style={{
+            fontFamily: 'outfitBold',
+            fontSize: 26,
+            fontWeight: 'bold',
+            textAlign: 'right',
+            padding: '5%',
+            color: 'white',
+          }}>
+          {topic}
+        </Text>
 
-          <View style={styles.text_container}>
-            <Text style={styles.example_title}>مثال</Text>
-            <Text style={styles.card_desc}>{example}</Text>
-            <View style={styles.hairlineLeft}></View>
-            <Text style={styles.example_title}>الوصف</Text>
-            <Text style={styles.card_title}>
-              {description}
+        <View style={styles.text_container}>
+          <Text style={styles.example_title}>مثال</Text>
+          <Text style={styles.card_desc}>{example}</Text>
+          <View style={styles.hairlineLeft}></View>
+          <Text style={styles.example_title}>الوصف</Text>
+          <Text style={styles.card_title}>{description}</Text>
+          <View style={styles.innerBox}>
+            <Text style={styles.card_desc}>
+              مثال: الرجل، الجبل، المدينة، الكتاب
             </Text>
-            <View style={styles.innerBox}>
-              <Text style={styles.card_desc}>
-                مثال: الرجل، الجبل، المدينة، الكتاب
-              </Text>
-              <View style={styles.hairlineLeft2}></View>
-              <Text style={styles.card_desc}>
-                مثال: الرجل، الجبل، المدينة، الكتاب
-              </Text>
-            </View>
-            <View style={styles.innerBox}>
-              <Text style={styles.card_desc}>
-                مثال: الرجل، الجبل، المدينة، الكتاب
-              </Text>
-            </View>
-            <View style={styles.innerBox}>
-              <Text style={styles.card_desc}>
-                مثال: الرجل، الجبل، المدينة، الكتاب
-              </Text>
-            </View>
+            <View style={styles.hairlineLeft2}></View>
+            <Text style={styles.card_desc}>
+              مثال: الرجل، الجبل، المدينة، الكتاب
+            </Text>
+          </View>
+          <View style={styles.innerBox}>
+            <Text style={styles.card_desc}>
+              مثال: الرجل، الجبل، المدينة، الكتاب
+            </Text>
+          </View>
+          <View style={styles.innerBox}>
+            <Text style={styles.card_desc}>
+              مثال: الرجل، الجبل، المدينة، الكتاب
+            </Text>
           </View>
         </View>
       </View>
-    </ScrollView>
+    </View>
   );
 }
 
@@ -69,7 +65,7 @@ const styles = StyleSheet.create({
   innerBox: {
     backgroundColor: '#eee',
     borderRadius: 5,
-    borderWidth: .5,
+    borderWidth: 0.5,
     borderColor: '#42BB7E90',
     padding: 5,
     margin: 5,
