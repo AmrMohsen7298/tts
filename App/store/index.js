@@ -18,7 +18,7 @@ const initialState = {
   favorites: [],
   showNavbar: true,
   learned: [],
-  keywords: [{word: 'عقاب', translation: 'punishment', type: 'new'}],
+  keywords: [],
   // Define your initial state properties here
 };
 const persistConfig = {
@@ -68,18 +68,24 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         keywords: [
-          ...state.keywords.filter(({word}) => word !== payload.word),
+          ...state.keywords.filter(({text}) => text !== payload.text),
           {
-            word: payload.word,
+            keyword_id: payload.keyword_id ?? 0,
+            tutorialId: payload.tutorialId ?? 0,
             type: payload.type,
+            description: payload.description ?? '',
             translation: payload.translation,
+            keyFlag: payload.keyFlag ?? false,
+            audio: payload.audio ?? [],
+            text: payload.text,
+            category: payload.category ?? 'new',
           },
         ],
       };
     case REMOVE_KEYWORDS:
       return {
         ...state,
-        keywords: [...state.keywords.filter(({word}) => word !== payload.word)],
+        keywords: [...state.keywords.filter(({text}) => text !== payload.text)],
       };
     default:
       return state;

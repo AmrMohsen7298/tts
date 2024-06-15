@@ -82,7 +82,7 @@ export default function Header() {
           onPress={() => navigation.navigate('TrainingList')}>
           <Text style={styles.keywordType}>سهل</Text>
           <Text style={styles.easyText}>
-            {keywords.filter(item => item.type === 'easy').length} كلمات
+            {keywords.filter(item => item.category === 'easy').length} كلمات
           </Text>
           <FontAwesomeIcon
             icon={faAngleLeft}
@@ -92,7 +92,7 @@ export default function Header() {
         onPress={() => navigation.navigate('medium')}>
           <Text style={styles.keywordType}>متوسط</Text>
           <Text style={styles.mediumText}>
-            {keywords.filter(item => item.type === 'medium').length} كلمات
+            {keywords.filter(item => item.category === 'medium').length} كلمات
           </Text>
           <FontAwesomeIcon
             icon={faAngleLeft}
@@ -102,7 +102,7 @@ export default function Header() {
         onPress={() => navigation.navigate('hard')}>
           <Text style={styles.keywordType}>صعب</Text>
           <Text style={styles.hardText}>
-            {keywords.filter(item => item.type === 'hard').length} كلمات
+            {keywords.filter(item => item.category === 'hard').length} كلمات
           </Text>
           <FontAwesomeIcon
             icon={faAngleLeft}
@@ -121,7 +121,7 @@ export default function Header() {
             <FontAwesomeIcon icon={faCalendar}></FontAwesomeIcon>
             <Text style={styles.keywordType}>جديد</Text>
             <Text style={styles.easyText}>
-              {keywords.filter(item => item.type === 'new').length}
+              {keywords.filter(item => item.category === 'new').length}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.newButton}
@@ -129,7 +129,7 @@ export default function Header() {
             <FontAwesomeIcon icon={faCheck}></FontAwesomeIcon>
             <Text style={styles.keywordType}>تم</Text>
             <Text style={styles.easyText}>
-              {keywords.filter(item => item.type === 'done').length}
+              {keywords.filter(item => item.category === 'done').length}
             </Text>
           </TouchableOpacity>
         </View>

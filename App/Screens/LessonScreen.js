@@ -746,11 +746,14 @@ export default function LessonScreen(props) {
         );
       case 2:
         return (
-          <>
+          <ScrollView
+            style={{
+              paddingTop: '3%',
+            }}>
             {keyWords?.map((keyword, index) => {
               return <KeywordCard key={index} {...keyword}></KeywordCard>;
             })}
-          </>
+          </ScrollView>
         );
       case 3:
         return (
@@ -793,14 +796,14 @@ export default function LessonScreen(props) {
                       <View style={styles.cardButtons}>
                         <Pressable
                           style={
-                            keywords.filter(({word}) => word === selectedWord)
+                            keywords.filter(({text}) => text === selectedWord)
                               .length > 0
                               ? // trainingPressed
                                 styles.cardButtonUpPressed
                               : styles.cardButtonUp
                           }
                           onPress={() => {
-                            keywords.filter(({word}) => word === selectedWord)
+                            keywords.filter(({text}) => text === selectedWord)
                               .length > 0
                               ? //setTrainingPressed(false)
                                 dispatch(
@@ -810,9 +813,9 @@ export default function LessonScreen(props) {
                                 )
                               : dispatch(
                                   setWordTraining({
-                                    word: selectedWord,
+                                    text: selectedWord,
                                     translation: SelectedWordTranslation,
-                                    type: 'new',
+                                    category: 'new',
                                   }),
                                 );
                           }}>

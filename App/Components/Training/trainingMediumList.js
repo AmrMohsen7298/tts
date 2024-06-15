@@ -98,7 +98,7 @@ const ListMedium = () => {
                 paddingVertical: '15%',
                 borderTopRightRadius: 10,
               }}
-              onPress={() => dispatch(removeWordTraining({word: item.word}))}>
+              onPress={() => dispatch(removeWordTraining({text: item.word}))}>
               <FontAwesomeIcon
                 icon={faDumbbell}
                 size={width * 0.053}

@@ -23,7 +23,7 @@ export default function TrainingKeywords(props) {
   const navigation = useNavigation();
 
   const newKeywords = useSelector(state => state.storyReducer.keywords).filter(
-    item => item.type === 'new',
+    item => item.category === 'new',
   );
 
   const [translate, setTranslate] = useState(false);
@@ -54,7 +54,7 @@ export default function TrainingKeywords(props) {
       <View style={{gap: 20}}>
         <View style={styles.centerContainer}>
           <Text style={styles.keywordText}>
-            {translate ? newKeywords?.[0]?.translation : newKeywords?.[0]?.word}
+            {translate ? newKeywords?.[0]?.translation : newKeywords?.[0]?.text}
           </Text>
           {/* <View
             style={{
@@ -130,7 +130,7 @@ export default function TrainingKeywords(props) {
             <Text style={styles.keywordText}>
               {!translate
                 ? newKeywords?.[0]?.translation
-                : newKeywords?.[0]?.word}
+                : newKeywords?.[0]?.text}
             </Text>
           )}
           {/* <View
@@ -179,7 +179,10 @@ export default function TrainingKeywords(props) {
               height: height * 0.1,
             }}
             onPress={() =>
-              dispatch(setWordTraining({...newKeywords?.[0], type: 'hard'}),setShowAns(false))
+              dispatch(
+                setWordTraining({...newKeywords?.[0], category: 'hard'}),
+                setShowAns(false),
+              )
             }>
             <Text style={{color: '#333', fontWeight: 'bold', fontSize: 20}}>
               صعب
@@ -199,7 +202,10 @@ export default function TrainingKeywords(props) {
               height: height * 0.1,
             }}
             onPress={() =>
-              dispatch(setWordTraining({...newKeywords?.[0], type: 'medium'}),setShowAns(false))
+              dispatch(
+                setWordTraining({...newKeywords?.[0], category: 'medium'}),
+                setShowAns(false),
+              )
             }>
             <Text style={{color: '#333', fontWeight: 'bold', fontSize: 20}}>
               متوسط
@@ -219,7 +225,10 @@ export default function TrainingKeywords(props) {
               height: height * 0.1,
             }}
             onPress={() =>
-              dispatch(setWordTraining({...newKeywords?.[0], type: 'easy'}),setShowAns(false))
+              dispatch(
+                setWordTraining({...newKeywords?.[0], category: 'easy'}),
+                setShowAns(false),
+              )
             }>
             <Text style={{color: '#333', fontWeight: 'bold', fontSize: 20}}>
               سهل
@@ -240,7 +249,10 @@ export default function TrainingKeywords(props) {
               height: height * 0.1,
             }}
             onPress={() =>
-              dispatch(setWordTraining({...newKeywords?.[0], type: 'done'}),setShowAns(false))
+              dispatch(
+                setWordTraining({...newKeywords?.[0], category: 'done'}),
+                setShowAns(false),
+              )
             }>
             <Text style={{color: 'white', fontWeight: 'bold', fontSize: 20}}>
               تم

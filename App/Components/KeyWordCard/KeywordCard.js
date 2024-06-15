@@ -12,18 +12,28 @@ import user from './../../../assets/Images/userProfile.jpg';
 import Colors from '../../Utils/Colors';
 import {TouchableHighlight} from 'react-native-gesture-handler';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import { text } from '@fortawesome/fontawesome-svg-core';
+import {text} from '@fortawesome/fontawesome-svg-core';
 import Sound from 'react-native-sound';
 import RNFetchBlob from 'rn-fetch-blob';
-import { useDispatch } from 'react-redux';
-import { setAudioPlaying } from '../../Actions/StoryActions';
+import {useDispatch, useSelector} from 'react-redux';
+import {
+  removeWordTraining,
+  setAudioPlaying,
+  setWordTraining,
+} from '../../Actions/StoryActions';
+import {faDumbbell} from '@fortawesome/free-solid-svg-icons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
 const {width, height} = Dimensions.get('window');
 export default function KeywordCard(props) {
   const [playPressed, setPlayPressed] = useState(false);
   const [trainingPressed, setTrainingPressed] = useState(false);
-  const {type,description,translation,audio,text,level} = props
+  const {type, description, translation, audio, text, level} = props;
   const sound = useRef();
   const dispatch = useDispatch();
+  const keywords = useSelector(state => state.storyReducer.keywords);
+
+  console.log({keywords});
 
   useEffect(() => {
     const filePath = `${RNFetchBlob.fs.dirs.CacheDir}/audio-keyword${text}.mp3`;
@@ -54,7 +64,7 @@ export default function KeywordCard(props) {
       saveAudioToFileSystem();
     }
     const playSound = async () => {
-      dispatch(setAudioPlaying(false))
+      dispatch(setAudioPlaying(false));
       sound.current.play(success => {
         if (success) {
           setPlayPressed(false);
@@ -65,56 +75,189 @@ export default function KeywordCard(props) {
       playSound();
     }
   }, [playPressed, audio]);
+
   return (
-    <View style={styles.cardContainer}>
-      <View>
-        <View style={{width: width * 0.8}}>
-          <View style={styles.cardHead}>
+    <View
+      key={text}
+      style={{
+        margin: '2%',
+        backgroundColor: 'white',
+        alignItems: 'center',
+        display: 'flex',
+        flexDirection: 'row',
+        borderRadius: 10,
+        maxHeight: height * 0.15,
+      }}
+      // onPress={() => alertItemName(item)}
+    >
+      <View
+        style={{
+          width: '80%',
+          height: '100%',
+          backgroundColor: '#eee',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'flex-start',
+          paddingVertical: '2%',
+          paddingHorizontal: '3%',
+          borderTopLeftRadius: 10,
+          borderBottomLeftRadius: 10,
+          maxHeight: height * 0.15,
+        }}>
+        <View
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: height * 0.01,
+          }}>
+          {level ? (
             <Text
               style={{
-                fontSize: 22,
-                top: height * 0.05,
-                left: width * 0.4,
-                color: 'black',
+                backgroundColor: '#c8e8c9',
+                color: '#333',
+                paddingVertical: width * 0.01,
+                paddingHorizontal: width * 0.015,
+                borderRadius: width * 0.015,
               }}>
-              {`${text}: (${type})`}
+              {level}
             </Text>
-            <Text
-              style={{
-                fontSize: 18,
-                top: height * 0.1,
-                right: width * 0.1,
-                color: 'black',
-                maxWidth: width * 0.5,
-              }}>
-              {description}
-            </Text>
-          </View>
-          <Text style={styles.cardDefinition}> {props?.definition}</Text>
+          ) : (
+            ''
+          )}
+          <Text style={{color: '#333', fontSize: 18}}>{text}</Text>
+          <Text style={{color: '#aaa', fontSize: 18}}>
+            - {type ?? 'not specified'}
+          </Text>
         </View>
-        <View style={styles.cardButtons}>
-          <Pressable
-            style={
-              trainingPressed ? styles.cardButtonUpPressed : styles.cardButtonUp
-            }
-            onPress={() => {
-              trainingPressed
-                ? setTrainingPressed(false)
-                : setTrainingPressed(true);
-            }}>
-            <FontAwesomeIcon icon="dumbbell"></FontAwesomeIcon>
-          </Pressable>
-          <Pressable
-            style={
-              playPressed ? styles.cardButtonDownPressed : styles.cardButtonDown
-            }
-            onPress={() => setPlayPressed(true)}>
-            <FontAwesomeIcon icon="play"></FontAwesomeIcon>
-          </Pressable>
+        <View
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: height * 0.01,
+          }}>
+          <Text style={{color: '#aaa', fontSize: 15}}>
+            {description ?? 'no definition specified'}
+          </Text>
         </View>
+      </View>
+      <View
+        style={{
+          width: '20%',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+        }}>
+        <Pressable
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor:
+              keywords.filter(item => item.text === text).length > 0
+                ? '#42BB7E'
+                : '#ddd',
+            paddingVertical: '15%',
+            borderTopRightRadius: 10,
+            borderBottomWidth: 1,
+            borderBottomColor: 'white',
+          }}
+          onPress={() =>
+            keywords.filter(item => item.text === text).length > 0
+              ? dispatch(removeWordTraining({text}))
+              : dispatch(
+                  setWordTraining({
+                    text,
+                    type,
+                    level,
+                    description,
+                    audio,
+                    translation,
+                  }),
+                )
+          }>
+          <FontAwesomeIcon
+            icon={faDumbbell}
+            size={width * 0.053}
+            color={
+              keywords.filter(item => item.text === text).length > 0
+                ? 'white'
+                : '#33333370'
+            }
+          />
+        </Pressable>
+        <Pressable
+          onPress={() => setPlayPressed(true)}
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: playPressed ? '#42BB7E' : '#ddd',
+            paddingVertical: '15%',
+            borderBottomRightRadius: 10,
+          }}>
+          <Ionicons
+            name="play"
+            size={20}
+            color={playPressed ? 'white' : '#33333370'}
+          />
+        </Pressable>
       </View>
     </View>
   );
+
+  // return (
+  //   <View style={styles.cardContainer}>
+  //     <View>
+  //       <View style={{width: width * 0.8}}>
+  //         <View style={styles.cardHead}>
+  //           <Text
+  //             style={{
+  //               fontSize: 22,
+  //               top: height * 0.05,
+  //               left: width * 0.4,
+  //               color: 'black',
+  //             }}>
+  //             {`${text}: (${type})`}
+  //           </Text>
+  //           <Text
+  //             style={{
+  //               fontSize: 18,
+  //               top: height * 0.1,
+  //               right: width * 0.1,
+  //               color: 'black',
+  //               maxWidth: width * 0.5,
+  //             }}>
+  //             {description}
+  //           </Text>
+  //         </View>
+  //         <Text style={styles.cardDefinition}> {props?.definition}</Text>
+  //       </View>
+  //       <View style={styles.cardButtons}>
+  //         <Pressable
+  //           style={
+  //             trainingPressed ? styles.cardButtonUpPressed : styles.cardButtonUp
+  //           }
+  //           onPress={() => {
+  //             trainingPressed
+  //               ? setTrainingPressed(false)
+  //               : setTrainingPressed(true);
+  //           }}>
+  //           <FontAwesomeIcon icon="dumbbell"></FontAwesomeIcon>
+  //         </Pressable>
+  //         <Pressable
+  //           style={
+  //             playPressed ? styles.cardButtonDownPressed : styles.cardButtonDown
+  //           }
+  //           onPress={() => setPlayPressed(true)}>
+  //           <FontAwesomeIcon icon="play"></FontAwesomeIcon>
+  //         </Pressable>
+  //       </View>
+  //     </View>
+  //   </View>
+  // );
 }
 const styles = StyleSheet.create({
   cardContainer: {
