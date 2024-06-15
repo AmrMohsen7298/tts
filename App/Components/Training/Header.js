@@ -88,7 +88,8 @@ export default function Header() {
             icon={faAngleLeft}
             style={styles.easyText}></FontAwesomeIcon>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.mediumButton}>
+        <TouchableOpacity style={styles.mediumButton}
+        onPress={() => navigation.navigate('medium')}>
           <Text style={styles.keywordType}>متوسط</Text>
           <Text style={styles.mediumText}>
             {keywords.filter(item => item.type === 'medium').length} كلمات
@@ -97,7 +98,8 @@ export default function Header() {
             icon={faAngleLeft}
             style={styles.mediumText}></FontAwesomeIcon>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.hardButton}>
+        <TouchableOpacity style={styles.hardButton}
+        onPress={() => navigation.navigate('hard')}>
           <Text style={styles.keywordType}>صعب</Text>
           <Text style={styles.hardText}>
             {keywords.filter(item => item.type === 'hard').length} كلمات
@@ -122,7 +124,8 @@ export default function Header() {
               {keywords.filter(item => item.type === 'new').length}
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.newButton}>
+          <TouchableOpacity style={styles.newButton}
+          onPress={() => navigation.navigate('done')}>
             <FontAwesomeIcon icon={faCheck}></FontAwesomeIcon>
             <Text style={styles.keywordType}>تم</Text>
             <Text style={styles.easyText}>
