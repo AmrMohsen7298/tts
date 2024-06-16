@@ -815,6 +815,7 @@ export default function LessonScreen(props) {
                                   setWordTraining({
                                     text: selectedWord,
                                     translation: SelectedWordTranslation,
+                                    audio:selectedWordAudio,
                                     category: 'new',
                                   }),
                                 );
