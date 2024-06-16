@@ -79,7 +79,12 @@ export default function Header() {
         }}>
         <TouchableOpacity
           style={styles.easyButton}
-          onPress={() => navigation.navigate('TrainingList')}>
+          onPress={() =>
+            navigation.navigate('TrainingList', {
+              // Pass the filtered hard keywords as a state parameter named 'hardKeywords'
+              category: 'easy',
+            })
+          }>
           <Text style={styles.keywordType}>سهل</Text>
           <Text style={styles.easyText}>
             {keywords.filter(item => item.category === 'easy').length} كلمات
@@ -88,8 +93,14 @@ export default function Header() {
             icon={faAngleLeft}
             style={styles.easyText}></FontAwesomeIcon>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.mediumButton}
-        onPress={() => navigation.navigate('medium')}>
+        <TouchableOpacity
+          style={styles.mediumButton}
+          onPress={() =>
+            navigation.navigate('TrainingList', {
+              // Pass the filtered hard keywords as a state parameter named 'hardKeywords'
+              category: 'medium',
+            })
+          }>
           <Text style={styles.keywordType}>متوسط</Text>
           <Text style={styles.mediumText}>
             {keywords.filter(item => item.category === 'medium').length} كلمات
@@ -98,8 +109,14 @@ export default function Header() {
             icon={faAngleLeft}
             style={styles.mediumText}></FontAwesomeIcon>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.hardButton}
-        onPress={() => navigation.navigate('hard')}>
+        <TouchableOpacity
+          style={styles.hardButton}
+          onPress={() =>
+            navigation.navigate('TrainingList', {
+              // Pass the filtered hard keywords as a state parameter named 'hardKeywords'
+              category: 'hard',
+            })
+          }>
           <Text style={styles.keywordType}>صعب</Text>
           <Text style={styles.hardText}>
             {keywords.filter(item => item.category === 'hard').length} كلمات
@@ -124,8 +141,14 @@ export default function Header() {
               {keywords.filter(item => item.category === 'new').length}
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.newButton}
-          onPress={() => navigation.navigate('done')}>
+          <TouchableOpacity
+            style={styles.newButton}
+            onPress={() =>
+              navigation.navigate('TrainingList', {
+                // Pass the filtered hard keywords as a state parameter named 'hardKeywords'
+                category: 'done',
+              })
+            }>
             <FontAwesomeIcon icon={faCheck}></FontAwesomeIcon>
             <Text style={styles.keywordType}>تم</Text>
             <Text style={styles.easyText}>
