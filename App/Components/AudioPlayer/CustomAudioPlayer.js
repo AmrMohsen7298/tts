@@ -7,11 +7,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { setAudioPlaying } from "../../Actions/StoryActions";
 import RNFetchBlob from 'rn-fetch-blob';
 const {width, height} = Dimensions.get('window');
-const CustomAudioPlayer = ({ audioUrl, setHighlightIndex, selectedSentence, timePoints, storyParagraph }) => {
+const CustomAudioPlayer = ({ audioUrl, setHighlightIndex, selectedSentence, timePoints, storyParagraph, setTranslationHighlightIndex }) => {
   const sound = useRef();
   const [isPlaying, setIsPlaying] = useState(false);
   const dispatch = useDispatch();
   const [onRepeat, setOnRepeat] = useState(false);
+  const [onRepeatHighlight, setOnRepeatHighlight] = useState();
   const storyAudioPlaying = useSelector(state=>state.storyReducer.storyAudioPlaying)
   let timeouts = []
   useFocusEffect(
@@ -45,10 +46,11 @@ const CustomAudioPlayer = ({ audioUrl, setHighlightIndex, selectedSentence, time
           }
           if(sentenceIndex == 0){
             setHighlightIndex([...wordIndexes])
+            setTranslationHighlightIndex([sentenceIndex])
           }else{
           delay =timePoints[sentenceIndex - 1] * 1000; 
           console.log("timePoints", timePoints)
-           timeouts.push(  ZOBREMANGA(delay, wordIndexes)); 
+           timeouts.push(ZOBREMANGA(delay, wordIndexes, sentenceIndex)); 
           }// Await ZOBREMANGA function
 //           if (sentenceIndex !== 0) {
 // // Update delay
@@ -64,11 +66,12 @@ const CustomAudioPlayer = ({ audioUrl, setHighlightIndex, selectedSentence, time
         timeouts =[] // Clear all timeouts
       };
     }
-  }, [timePoints, storyParagraph, isPlaying]);
+  }, [timePoints, storyParagraph, isPlaying, onRepeatHighlight]);
   
-  const ZOBREMANGA = (delay, wordIndexes) => {
+  const ZOBREMANGA = (delay, wordIndexes, sentenceIndex) => {
       return setTimeout(() => {
         setHighlightIndex([...wordIndexes]);
+        setTranslationHighlightIndex([sentenceIndex])
  // Resolve the promise after setting highlight index
       }, delay);
   };
@@ -147,6 +150,7 @@ const CustomAudioPlayer = ({ audioUrl, setHighlightIndex, selectedSentence, time
                 setIsPlaying(false);
                 dispatch(setAudioPlaying(false));
                 setHighlightIndex([]);
+                setTranslationHighlightIndex([])
             }
           }));
           setIsPlaying(true);
@@ -159,16 +163,30 @@ const CustomAudioPlayer = ({ audioUrl, setHighlightIndex, selectedSentence, time
       setIsPlaying(false);
       dispatch(setAudioPlaying(false));
       setHighlightIndex([]);
+      setTranslationHighlightIndex([])
       timeouts.forEach(timeout => clearTimeout(timeout));
       timeouts =[]
     }
   };
   
   const repeatSound = () =>{
+    let timeout;
     if(!onRepeat){
         sound.current.setNumberOfLoops(-1)
+        timeout = setTimeout(()=>{
+          if(onRepeat){
+              sound.current.getCurrentTime((sec)=>{
+              if(sec >= sound.current.getDuration()){
+              console.log("sec la", sec)
+              setHighlightIndex([])
+              setOnRepeatHighlight(true)
+              }
+          })
+        }
+        },1000)
     }else{
         sound.current.setNumberOfLoops(0)
+        timeout = null;
     }
     setOnRepeat(!onRepeat)
   }

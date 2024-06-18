@@ -20,6 +20,7 @@ import StackNavigation from '../Navigations/StackNavigation';
 import {getAllLessons, getLessonById} from '../Services/LessonServices';
 import {levels} from '../Utils/constants';
 import {useStateValue} from '../store/contextStore/StateContext';
+import { useSelector } from 'react-redux';
 
 const {width, height} = Dimensions.get('window');
 
@@ -28,7 +29,8 @@ export default function HomeScreen() {
   const [lessons, setLessons] = useState([]);
   const [activeTab, setActiveTab] = useState(0);
   const {state, dispatch: contextDispatch} = useStateValue();
-
+  const [hideLearned, setHideLearned] = useState(false);
+  const learnedLessons= useSelector(state=> state.storyReducer.learned)
   const tabs = [
     levels.A1,
     levels.A2,
@@ -47,6 +49,11 @@ export default function HomeScreen() {
   useEffect(() => {
     getAllLessons().then(resp => setLessons(resp));
   }, []);
+  // useEffect(()=>{
+  //   if(hideLearned){
+  //     lessons.filter
+  //   }
+  // },[hideLearned])
 
   const handleOnPress = (lessonId, lessonImage) => {
     getLessonById(lessonId).then(resp => {
@@ -137,7 +144,8 @@ export default function HomeScreen() {
           // left: '3%',
         }}>
         <View style={{paddingRight: width * 0.28}}>
-          <TouchableOpacity style={styles.hideButton}>
+          <TouchableOpacity style={hideLearned? styles.activeLearned : styles.hideButton}
+          onPress={()=>setHideLearned(!hideLearned)}>
             <Text
               style={{fontFamily: 'outfit', fontSize: 17, color: '#33333395'}}>
               <Ionicons
@@ -179,7 +187,11 @@ export default function HomeScreen() {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{paddingHorizontal: '1%', gap: 5}}>
         {lessons?.length > 0 &&
-          lessons.map(
+          lessons.filter(f=> f.level == tabs?.[activeTab]?.text).filter(f=>{
+            if(hideLearned)
+              return !learnedLessons.some(s=> s == f?.id)
+            return true
+              }).map(
             (lesson, index) =>
               lesson?.paid && (
                 <Pressable
@@ -246,6 +258,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#42BB7E',
     borderColor: 'white',
     borderRadius: 10,
+  },
+  activeLearned: {
+    borderRadius: 15,
+    width: width * 0.3,
+    height: height * 0.04,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#42BB7E',
+    borderColor: 'white',
   },
   tabTextActive: {
     fontSize: 17,

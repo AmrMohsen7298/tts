@@ -99,3 +99,10 @@ export const getQuizByTutorialId = async(lessonId) =>{
         console.log("error", error)
     })
 }
+export const getKeyWordsForTraining =async()=>{
+    return await  axios.get(`https://tts.eliteacademyeg.com/keywords/getForTraining`)
+    .then(res => res.data)
+    .catch(error=>{
+        console.log("error", error)
+    })
+}

@@ -7,6 +7,7 @@ import {
   REMOVE_FROM_LEARNED,
   SET_KEYWORDS,
   REMOVE_KEYWORDS,
+  SET_KEYWORDS_LIST,
 } from '../Actions/StoryActions';
 import {combineReducers, createStore} from 'redux';
 import storage from 'redux-persist/lib/storage';
@@ -87,6 +88,11 @@ const reducer = (state = initialState, action) => {
         ...state,
         keywords: [...state.keywords.filter(({text}) => text !== payload.text)],
       };
+    case SET_KEYWORDS_LIST:
+      return {
+        ...state,
+        keywords: [...state.keywords, ...payload]
+      }
     default:
       return state;
   }

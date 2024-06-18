@@ -11,6 +11,8 @@ import {
   Image,
   ImageBackground,
   Dimensions,
+  findNodeHandle,
+  measureLayout
 } from 'react-native';
 import TextHighlighter from './../Components/TextHighlighter';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
@@ -46,10 +48,12 @@ import {
   removeWordTraining,
   setAudioPlaying,
   setWordTraining,
+  setWordsTrainingList,
 } from '../Actions/StoryActions';
 import Sound from 'react-native-sound';
 import RNFetchBlob from 'rn-fetch-blob';
 import {useStateValue} from '../store/contextStore/StateContext';
+import { text } from '@fortawesome/fontawesome-svg-core';
 // import CustomAudioPlayer from "../Components/AudioPlayer/CustomAudioPlayer";
 
 const {width, height} = Dimensions.get('window');
@@ -146,7 +150,7 @@ export default function LessonScreen(props) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answerPressed, setAnswerPressed] = useState(false);
   const [quizData, setQuizData] = useState();
-  const [keyWords, setKeyWords] = useState();
+  const [lessonKeyWords, setLessonKeyWords] = useState();
   const [grammar, setGrammar] = useState();
   const [score, setScore] = useState(0);
   const [chosenAnswer, setChosenAnswer] = useState(null);
@@ -162,6 +166,9 @@ export default function LessonScreen(props) {
   const storyAudioPlaying = useSelector(
     state => state.storyReducer.storyAudioPlaying,
   );
+  const [translationHighlightIndex, setTranslationHighlightIndex] = useState();
+  const scrollStory = useRef();
+  const textRef = useRef();
 
   useEffect(() => {
     contextDispatch({type: 'SHOW_NAVBAR', payload: false});
@@ -171,7 +178,11 @@ export default function LessonScreen(props) {
       console.log('QUIZDATA', res?.questions);
     });
     getKeywordsbyTutorialId(props?.route?.params?.lessonId).then(res => {
-      setKeyWords(res);
+      res?.map((key)=>{
+        dispatch(setWordTraining(key))
+      })
+
+      setLessonKeyWords(res)
       console.log('KEYWORDS', res);
     });
     getGrammerByTutorialId(props?.route?.params?.lessonId).then(res => {
@@ -204,6 +215,35 @@ export default function LessonScreen(props) {
       console.log('sentences', storyParagraph.split(['.']));
     }
   }, [storyParagraph]);
+  // useEffect(()=>{
+  //   // console.log("TEXTREF", textRef.current)
+  //   console.log("Texttref", textRef.key)
+  //   if(highlightIndex?.some(s=> s ==textRef.current.key)){
+  //     console.log("Texttref", textRef.current.key)
+  //     scrollStory.current.scrollToEnd()
+  //     textRef.current.measure((width, height, px, py, fx, fy) => {
+  //       const location = {
+  //         fx: fx,
+  //         fy: fy,
+  //         px: px,
+  //         py: py,
+  //         width: width,
+  //         height: height,
+  //       };
+  //       console.log('location', location);
+
+  //       textRef.current.focus()
+  //     });
+
+
+  //     // textRef.current.measureLayout(
+  //     //   findNodeHandle(scrollStory),
+  //     //   (x, y) => {
+  //     //     scrollStory.current.scrollTo({x: x, y: y, animated: true});
+  //     //   }
+  //     // )
+  //   }
+  // },[highlightIndex])
 
   useEffect(() => {
     const filePath = `${RNFetchBlob.fs.dirs.CacheDir}/audio-wordAudio.mp3`;
@@ -324,6 +364,7 @@ export default function LessonScreen(props) {
       case 0:
         return (
           <ScrollView
+          ref={scrollStory}
             style={{bottom: 'auto', backgroundColor: 'white'}}
             horizontal={false}
             showsHorizontalScrollIndicator={true}
@@ -379,21 +420,53 @@ export default function LessonScreen(props) {
                   paddingTop: height * 0.06,
                 }}>
                 {translateButton
-                  ? translation?.split(' ').map((word, index) => {
+                  ? storyParagraph?.split(".").map((word, index) => {
                       return (
-                        <Pressable
+                        <View
                           key={index}
-                          onPress={() => onPressWord(word, index)}
                           style={{
                             flex: 0,
                             textAlign: 'center',
                             justifyContent: 'center',
                             overflow: 'hidden',
-                            borderRadius: 5,
+                            // borderRadius: storyAudioPlaying && (index == highlightIndex[highlightIndex.length-1] || index == highlightIndex[0]) ? 5: 0,
+                            borderTopRightRadius:
+                              (storyAudioPlaying &&
+                                index == translationHighlightIndex?.[0]) ||
+                              (!storyAudioPlaying && selectedWord)
+                                ? 5
+                                : 0,
+                            borderBottomRightRadius:
+                              (storyAudioPlaying &&
+                                index == translationHighlightIndex?.[0]) ||
+                              (!storyAudioPlaying && selectedWord)
+                                ? 5
+                                : 0,
+                            borderTopLeftRadius:
+                              (storyAudioPlaying &&
+                                index ==
+                                  translationHighlightIndex?.[
+                                    translationHighlightIndex?.length - 1
+                                  ]) ||
+                              (!storyAudioPlaying && selectedWord)
+                                ? 5
+                                : 0,
+                            borderBottomLeftRadius:
+                              (storyAudioPlaying &&
+                                index ==
+                                  translationHighlightIndex?.[
+                                    translationHighlightIndex?.length - 1
+                                  ]) ||
+                              (!storyAudioPlaying && selectedWord)
+                                ? 5
+                                : 0,
                             backgroundColor:
-                              index == highlightIndex
+                              translationHighlightIndex?.length > 0 &&
+                              translationHighlightIndex?.some(idx => idx == index)
                                 ? '#42BB7E'
                                 : 'transparent',
+                            paddingHorizontal: 3,
+                            marginVertical: height * 0.005,
                           }}>
                           <Text>
                             <Text
@@ -404,16 +477,29 @@ export default function LessonScreen(props) {
                                 fontFamily: 'outfit',
                                 fontSize: 20,
                                 textAlign: 'center',
+
                               }}>
                               {word}
                             </Text>
+                            <Text>{"\n"}</Text>
+                            <Text>{"\n"}</Text>
+                            <Text                               style={{
+                                color:
+                                  index == highlightIndex ? 'white' : 'black',
+                                borderRadius: 20,
+                                fontFamily: 'outfit',
+                                fontSize: 20,
+                                textAlign: 'center'}}>
+                                  {translation?.split(".")?.[index]}</Text>
                           </Text>
-                        </Pressable>
+                        </View>
                       );
                     })
                   : storyParagraph?.split(/[\s.]+/).map((word, index) => {
                       return (
                         <Pressable
+                          ref={textRef}
+                          focusable={true}
                           key={index}
                           onPress={() => onPressWord(word, index)}
                           style={{
@@ -750,7 +836,7 @@ export default function LessonScreen(props) {
             style={{
               paddingTop: '3%',
             }}>
-            {keyWords?.map((keyword, index) => {
+            {lessonKeyWords?.map((keyword, index) => {
               return <KeywordCard key={index} {...keyword}></KeywordCard>;
             })}
           </ScrollView>
@@ -984,6 +1070,7 @@ export default function LessonScreen(props) {
       <CustomAudioPlayer
         audioUrl={audioSrc}
         setHighlightIndex={setHighlightIndex}
+        setTranslationHighlightIndex={setTranslationHighlightIndex}
         timePoints={timePoints}
         storyParagraph={storyParagraph}
       />

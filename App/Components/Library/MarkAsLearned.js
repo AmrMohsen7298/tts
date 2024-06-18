@@ -15,7 +15,7 @@ export default function MarkAsLearned() {
   const [activeTab, setActiveTab] = useState(0);
   const isFocused = useIsFocused();
 
-  const favorites = useSelector(state => state.storyReducer.favorites);
+  const favorites = useSelector(state => state.storyReducer.learned);
   const [favoritesLocal, setFavoritesLocal] = useState([])
   const tabs = [
     levels.A1, levels.A2, levels.A3, levels.A4, levels.A5, levels.A6, 
@@ -116,7 +116,6 @@ export default function MarkAsLearned() {
                  
                  }}>
                 <Text style={styles.date}>1 ابريل 2024</Text>
-                <MaterialIcons name="favorite" size={22} color="red" />
                </View>
                </View>
               </View>

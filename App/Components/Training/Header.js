@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -19,13 +19,58 @@ import {
   faCheck,
 } from '@fortawesome/free-solid-svg-icons';
 import {useNavigation} from '@react-navigation/native';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
+import { getKeyWordsForTraining } from '../../Services/LessonServices';
+import { setWordTraining, setWordsTrainingList } from '../../Actions/StoryActions';
 
 export default function Header() {
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
 
   const keywords = useSelector(state => state.storyReducer.keywords);
+  const dispatch = useDispatch();
+
+  const handleNewPress =() =>{
+    if(keywords.filter(item => item.category === 'new')?.length == 0 ){
+      getKeyWordsForTraining().then(res=>{
+        res?.map((key)=>{
+          if(!keywords.filter((item)=> item?.text !== key?.text))
+            dispatch(setWordTraining(key))
+        })
+         navigation.navigate('TrainingKeywords')
+      }
+        )
+    }else{
+      navigation.navigate('TrainingKeywords')
+    }
+  }
+
+
+
+  useEffect(()=>{
+    if(keywords.filter(item => item.category === 'new')?.length == 0){
+      getKeyWordsForTraining().then(res=>{
+        res?.map((key)=>{
+          if(!keywords.filter((item)=> item?.text !== key?.text))
+            dispatch(setWordTraining(key))
+        })
+
+        console.log("keywords", keywords)
+     }
+       )
+    }
+  },[])
+  useEffect(()=>{
+    if(keywords.filter(item => item.category === 'new')?.length == 0){
+      getKeyWordsForTraining().then(res=>{
+        res?.map((key)=>{
+          if(!keywords.filter((item)=> item?.text !== key?.text))
+            dispatch(setWordTraining(key))
+        })
+     }
+       )
+    }
+  },[keywords])
 
   return (
     <View style={{padding: '10%', direction: 'rtl'}}>
@@ -134,7 +179,7 @@ export default function Header() {
           }}>
           <TouchableOpacity
             style={styles.newButton}
-            onPress={() => navigation.navigate('TrainingKeywords')}>
+            onPress={() =>handleNewPress() }>
             <FontAwesomeIcon icon={faCalendar}></FontAwesomeIcon>
             <Text style={styles.keywordType}>جديد</Text>
             <Text style={styles.easyText}>
