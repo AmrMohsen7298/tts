@@ -167,8 +167,18 @@ export default function LessonScreen(props) {
     state => state.storyReducer.storyAudioPlaying,
   );
   const [translationHighlightIndex, setTranslationHighlightIndex] = useState();
+  const [layoutIds, setLayoutIds] = useState([])
   const scrollStory = useRef();
   const textRef = useRef();
+  let scrollView
+
+ const  scrollTo =(index)=>{
+  // console.log("layout", layoutIds)
+  // console.log("highlightindex",index)
+  // if(layoutIds?.[highlightIndex?.length-1] < highlightIndex?.[highlightIndex?.length-1])
+  //   scrollStory.current.scrollTo({x:x, y: layoutIds?.[highlightIndex?.length-1], animated: true})
+  scrollStory.current.scrollToEnd()
+  }
 
   useEffect(() => {
     contextDispatch({type: 'SHOW_NAVBAR', payload: false});
@@ -216,17 +226,16 @@ export default function LessonScreen(props) {
     }
   }, [storyParagraph]);
   // useEffect(()=>{
-  //   // console.log("TEXTREF", textRef.current)
-  //   console.log("Texttref", textRef.key)
-  //   if(highlightIndex?.some(s=> s ==textRef.current.key)){
-  //     console.log("Texttref", textRef.current.key)
-  //     scrollStory.current.scrollToEnd()
-  //     textRef.current.measure((width, height, px, py, fx, fy) => {
+  //   console.log("TEXTREF", textRef.current)
+  //   if(textRef.current){
+  //   // console.log("Texttref", textRef.current)
+  //   // if(highlightIndex?.some(s=> s ==textRef.current.key)){
+  //     console.log("Texttref", textRef.current.rowGap)
+  //   //   scrollStory.current.scrollToEnd()
+  //     textRef.current.measure((x,y,width,height) => {
   //       const location = {
-  //         fx: fx,
-  //         fy: fy,
-  //         px: px,
-  //         py: py,
+  //         px: x,
+  //         py: y,
   //         width: width,
   //         height: height,
   //       };
@@ -234,6 +243,7 @@ export default function LessonScreen(props) {
 
   //       textRef.current.focus()
   //     });
+  //   // }
 
 
   //     // textRef.current.measureLayout(
@@ -498,7 +508,6 @@ export default function LessonScreen(props) {
                   : storyParagraph?.split(/[\s.]+/).map((word, index) => {
                       return (
                         <Pressable
-                          ref={textRef}
                           focusable={true}
                           key={index}
                           onPress={() => onPressWord(word, index)}
@@ -546,8 +555,18 @@ export default function LessonScreen(props) {
                             paddingHorizontal: 3,
                             marginVertical: height * 0.005,
                           }}>
-                          <Text>
+                          <Text
+                            // onLayout={(event)=> {
+                            //     // console.log("event", event.nativeEvent)
+                            //     const {x, y, height, width} = event.nativeEvent.layout;
+                            //     setLayoutIds([...layoutIds, y ])
+                            //   }
+                            // }>
+                            >
                             <Text
+                              ref={textRef}
+                              collapsable={false}
+                              samaga={index}
                               style={{
                                 color: highlightIndex?.some(idx => idx == index)
                                   ? 'white'
@@ -1073,6 +1092,8 @@ export default function LessonScreen(props) {
         setTranslationHighlightIndex={setTranslationHighlightIndex}
         timePoints={timePoints}
         storyParagraph={storyParagraph}
+        textRef={textRef}
+        scrollTo={scrollTo}
       />
     </View>
   );

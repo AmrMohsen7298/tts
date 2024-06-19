@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setAudioPlaying } from "../../Actions/StoryActions";
 import RNFetchBlob from 'rn-fetch-blob';
 const {width, height} = Dimensions.get('window');
-const CustomAudioPlayer = ({ audioUrl, setHighlightIndex, selectedSentence, timePoints, storyParagraph, setTranslationHighlightIndex }) => {
+const CustomAudioPlayer = ({ audioUrl, setHighlightIndex, selectedSentence, timePoints, storyParagraph, setTranslationHighlightIndex, scrollTo }) => {
   const sound = useRef();
   const [isPlaying, setIsPlaying] = useState(false);
   const dispatch = useDispatch();
@@ -72,6 +72,8 @@ const CustomAudioPlayer = ({ audioUrl, setHighlightIndex, selectedSentence, time
       return setTimeout(() => {
         setHighlightIndex([...wordIndexes]);
         setTranslationHighlightIndex([sentenceIndex])
+        scrollTo([...wordIndexes])
+
  // Resolve the promise after setting highlight index
       }, delay);
   };
