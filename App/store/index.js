@@ -8,6 +8,8 @@ import {
   SET_KEYWORDS,
   REMOVE_KEYWORDS,
   SET_KEYWORDS_LIST,
+  SET_USER_KEYWORDS,
+  REMOVE_USER_KEYWORDS,
 } from '../Actions/StoryActions';
 import {combineReducers, createStore} from 'redux';
 import storage from 'redux-persist/lib/storage';
@@ -20,6 +22,7 @@ const initialState = {
   showNavbar: true,
   learned: [],
   keywords: [],
+  userKeywords: [],
   // Define your initial state properties here
 };
 const persistConfig = {
@@ -76,14 +79,39 @@ const reducer = (state = initialState, action) => {
             type: payload.type,
             description: payload.description ?? '',
             translation: payload.translation,
-            keyFlag: payload.keyFlag ?? false,
+            keyFlag: payload.keyFlag,
             audio: payload.audio ?? [],
             text: payload.text,
             category: payload.category ?? 'new',
           },
         ],
       };
+      case SET_USER_KEYWORDS:
+        console.log("SETUSERWORDS", state)
+        return {
+          ...state,
+          userKeywords: [
+            ...state.userKeywords?.filter(({text}) => text !== payload.text),
+            {
+              keyword_id: payload.keyword_id ?? 0,
+              tutorialId: payload.tutorialId ?? 0,
+              type: payload.type,
+              description: payload.description ?? '',
+              translation: payload.translation,
+              keyFlag: payload.keyFlag,
+              audio: payload.audio ?? [],
+              text: payload.text,
+              category: payload.category ?? 'new',
+            },
+          ],
+        };
+      case REMOVE_USER_KEYWORDS:
+        return {
+          ...state,
+          userKeywords: [...state.userKeywords?.filter(({text}) => text !== payload.text)],
+        };
     case REMOVE_KEYWORDS:
+      console.log("STATE", state.keywords)
       return {
         ...state,
         keywords: [...state.keywords.filter(({text}) => text !== payload.text)],

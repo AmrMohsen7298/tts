@@ -7,6 +7,8 @@ export const REMOVE_FROM_LEARNED = 'REMOVE_FROM_LEARNED';
 export const SET_KEYWORDS = 'SET_KEYWORDS';
 export const REMOVE_KEYWORDS = 'REMOVE_KEYWORDS';
 export const SET_KEYWORDS_LIST = 'SET_KEYWORDS_LIST';
+export const SET_USER_KEYWORDS= 'SET_USER_WORDS'
+export const REMOVE_USER_KEYWORDS = 'REMOVE_USER_WORDS'
 export const setAudioPlaying = playingFlag => {
   return {
     type: SET_AUDIO_PLAYING,
@@ -65,3 +67,16 @@ export const setWordsTrainingList = payload =>{
     payload,
   }
 }
+export const setUserWords = payload => {
+  return {
+    type: SET_USER_KEYWORDS,
+    payload,
+  };
+};
+
+export const removeUserWords = payload => {
+  return {
+    type: REMOVE_USER_KEYWORDS,
+    payload,
+  };
+};

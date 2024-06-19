@@ -15,7 +15,7 @@ const {height, width} = Dimensions.get('screen');
 const List = ({route}) => {
 
   const {category} = route.params;
-  const keywords = useSelector(state => state.storyReducer.keywords);
+  const keywords = useSelector(state => state.storyReducer.userKeywords);
   const state = keywords.filter(item => item.category === category);
 
 

@@ -45,8 +45,10 @@ import {
   addToLearned,
   removeFavorite,
   removeFromLearned,
+  removeUserWords,
   removeWordTraining,
   setAudioPlaying,
+  setUserWords,
   setWordTraining,
   setWordsTrainingList,
 } from '../Actions/StoryActions';
@@ -125,7 +127,7 @@ const DoneLearning = ({lessonId}) => {
 
 export default function LessonScreen(props) {
   const favorites = useSelector(state => state.storyReducer.favorites);
-  const keywords = useSelector(state => state.storyReducer.keywords);
+  const userKeywords = useSelector(state => state.storyReducer.userKeywords);
 
   const [activeTab, setActiveTab] = useState(0);
   const [playPressed, setPlayPressed] = useState(false);
@@ -901,23 +903,23 @@ export default function LessonScreen(props) {
                       <View style={styles.cardButtons}>
                         <Pressable
                           style={
-                            keywords.filter(({text}) => text === selectedWord)
+                            userKeywords.filter(({text}) => text === selectedWord)
                               .length > 0
                               ? // trainingPressed
                                 styles.cardButtonUpPressed
                               : styles.cardButtonUp
                           }
                           onPress={() => {
-                            keywords.filter(({text}) => text === selectedWord)
+                            userKeywords.filter(({text}) => text === selectedWord)
                               .length > 0
                               ? //setTrainingPressed(false)
                                 dispatch(
-                                  removeWordTraining({
+                                  removeUserWords({
                                     word: selectedWord,
                                   }),
                                 )
                               : dispatch(
-                                  setWordTraining({
+                                  setUserWords({
                                     text: selectedWord,
                                     translation: SelectedWordTranslation,
                                     audio:selectedWordAudio,

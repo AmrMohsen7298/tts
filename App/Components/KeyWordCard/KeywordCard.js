@@ -17,8 +17,10 @@ import Sound from 'react-native-sound';
 import RNFetchBlob from 'rn-fetch-blob';
 import {useDispatch, useSelector} from 'react-redux';
 import {
+  removeUserWords,
   removeWordTraining,
   setAudioPlaying,
+  setUserWords,
   setWordTraining,
 } from '../../Actions/StoryActions';
 import {faDumbbell} from '@fortawesome/free-solid-svg-icons';
@@ -31,9 +33,7 @@ export default function KeywordCard(props) {
   const {type, description, translation, audio, text, level} = props;
   const sound = useRef();
   const dispatch = useDispatch();
-  const keywords = useSelector(state => state.storyReducer.keywords);
-
-  console.log({keywords});
+  const userKeywords = useSelector(state => state.storyReducer.userKeywords);
 
   useEffect(() => {
     const filePath = `${RNFetchBlob.fs.dirs.CacheDir}/audio-keyword${text}.mp3`;
@@ -156,7 +156,7 @@ export default function KeywordCard(props) {
             justifyContent: 'center',
             alignItems: 'center',
             backgroundColor:
-              keywords.filter(item => item.text === text).length > 0
+              userKeywords?.some(item => item.text == text)
                 ? '#42BB7E'
                 : '#ddd',
             paddingVertical: '15%',
@@ -165,16 +165,16 @@ export default function KeywordCard(props) {
             borderBottomColor: 'white',
           }}
           onPress={() =>
-            keywords.filter(item => item.text === text).length > 0
-              ? dispatch(removeWordTraining({text}))
+            userKeywords?.filter(item => item.text == text).length > 0
+              ? dispatch(removeUserWords({text:text}))
               : dispatch(
-                  setWordTraining({
-                    text,
-                    type,
-                    level,
-                    description,
-                    audio,
-                    translation,
+                  setUserWords({
+                    text: text,
+                    type: type,
+                    level : level,
+                    description: description,
+                    audio: audio,
+                    translation: translation,
                   }),
                 )
           }>
@@ -182,7 +182,7 @@ export default function KeywordCard(props) {
             icon={faDumbbell}
             size={width * 0.053}
             color={
-              keywords.filter(item => item.text === text).length > 0
+              userKeywords?.filter(item => item.text === text).length > 0
                 ? 'white'
                 : '#33333370'
             }

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   View,
   Text,
@@ -13,21 +13,25 @@ import Ionicons from 'react-native-vector-icons/Ionicons'; // Import Ionicons fr
 import user from './../../../assets/Images/userProfile.jpg';
 import Colors from '../../Utils/Colors';
 import {useDispatch, useSelector} from 'react-redux';
-import {setWordTraining} from '../../Actions/StoryActions';
+import {setUserWords, setWordTraining} from '../../Actions/StoryActions';
 import {useNavigation} from '@react-navigation/native';
+import RNFetchBlob from 'rn-fetch-blob';
+import Sound from "react-native-sound";
 
 const {width, height} = Dimensions.get('screen');
 
 export default function TrainingKeywords(props) {
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  const sound = useRef();
 
-  const newKeywords = useSelector(state => state.storyReducer.keywords).filter(
+  const newKeywords = useSelector(state => state.storyReducer.userKeywords).filter(
     item => item.category === 'new',
   );
 
   const [translate, setTranslate] = useState(false);
   const [showAns, setShowAns] = useState(false);
+  const [playPressed, setPlayPressed] = useState(false)
 
   const handleLoginPress = () => {
     setShowAns(prev => !prev);
@@ -36,9 +40,50 @@ export default function TrainingKeywords(props) {
   };
 
   useEffect(() => {
+    const filePath = `${RNFetchBlob.fs.dirs.CacheDir}/audio-keyword${newKeywords?.[0]?.text}.mp3`;
+
+    async function saveAudioToFileSystem() {
+      try {
+        // Save the audio Blob to the file system
+        await RNFetchBlob.fs.writeFile(filePath, newKeywords?.[0]?.audio, 'base64');
+        console.log(filePath);
+        sound.current = new Sound(filePath, '', error => {
+          if (error) {
+            console.log('failed to load the sound', error);
+            return;
+          }
+          console.log(
+            'duration in seconds: ' +
+              sound.current.getDuration() +
+              'number of channels: ' +
+              sound.current.getNumberOfChannels(),
+          );
+        });
+      } catch (error) {
+        console.error('Error while saving audio to file system:', error);
+      }
+    }
+
+    if (newKeywords?.[0]?.audio) {
+      saveAudioToFileSystem();
+    }
+    const playSound = async () => {
+      sound.current.play(success => {
+        if (success) {
+          setPlayPressed(false);
+        }
+      });
+    };
+    if (playPressed) {
+      playSound();
+    }
+  }, [playPressed, newKeywords]);
+
+  useEffect(() => {
     if (newKeywords.length < 1) {
       navigation.navigate('TrainingScreen');
     }
+
   }, [newKeywords]);
 
   return (
@@ -91,7 +136,8 @@ export default function TrainingKeywords(props) {
               padding: width * 0.01,
               borderRadius: width * 0.02,
             }}>
-            <TouchableOpacity>
+            <TouchableOpacity
+            onPress={()=>setPlayPressed(true)}>
               <Ionicons name="volume-high-outline" size={25} color="black" />
             </TouchableOpacity>
           </View>
@@ -180,7 +226,7 @@ export default function TrainingKeywords(props) {
             }}
             onPress={() =>
               dispatch(
-                setWordTraining({...newKeywords?.[0], category: 'hard'}),
+                setUserWords({...newKeywords?.[0], category: 'hard'}),
                 setShowAns(false),
               )
             }>
@@ -203,7 +249,7 @@ export default function TrainingKeywords(props) {
             }}
             onPress={() =>
               dispatch(
-                setWordTraining({...newKeywords?.[0], category: 'medium'}),
+                setUserWords({...newKeywords?.[0], category: 'medium'}),
                 setShowAns(false),
               )
             }>
@@ -226,7 +272,7 @@ export default function TrainingKeywords(props) {
             }}
             onPress={() =>
               dispatch(
-                setWordTraining({...newKeywords?.[0], category: 'easy'}),
+                setUserWords({...newKeywords?.[0], category: 'easy'}),
                 setShowAns(false),
               )
             }>
@@ -250,7 +296,7 @@ export default function TrainingKeywords(props) {
             }}
             onPress={() =>
               dispatch(
-                setWordTraining({...newKeywords?.[0], category: 'done'}),
+                setUserWords({...newKeywords?.[0], category: 'done'}),
                 setShowAns(false),
               )
             }>

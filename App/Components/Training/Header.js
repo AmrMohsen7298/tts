@@ -21,21 +21,21 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import {useDispatch, useSelector} from 'react-redux';
 import { getKeyWordsForTraining } from '../../Services/LessonServices';
-import { setWordTraining, setWordsTrainingList } from '../../Actions/StoryActions';
+import { setUserWords, setWordTraining, setWordsTrainingList } from '../../Actions/StoryActions';
 
 export default function Header() {
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
 
-  const keywords = useSelector(state => state.storyReducer.keywords);
+  const keywords = useSelector(state => state.storyReducer.userKeywords);
   const dispatch = useDispatch();
 
   const handleNewPress =() =>{
     if(keywords.filter(item => item.category === 'new')?.length == 0 ){
       getKeyWordsForTraining().then(res=>{
         res?.map((key)=>{
-          if(!keywords.filter((item)=> item?.text !== key?.text))
-            dispatch(setWordTraining(key))
+          if(!keywords.some((item)=> item?.text == key?.text))
+            dispatch(setUserWords(key))
         })
          navigation.navigate('TrainingKeywords')
       }
@@ -52,7 +52,7 @@ export default function Header() {
       getKeyWordsForTraining().then(res=>{
         res?.map((key)=>{
           if(!keywords.filter((item)=> item?.text !== key?.text))
-            dispatch(setWordTraining(key))
+            dispatch(setUserWords(key))
         })
 
         console.log("keywords", keywords)
