@@ -8,6 +8,7 @@ import {
   Dimensions,
   Pressable,
   FlatList,
+  ActivityIndicator 
 } from 'react-native';
 import Header from '../Components/HomeScreen/Header';
 import StoriesCard from '../Components/HomeScreen/storiesCard';
@@ -16,7 +17,7 @@ import LevelsCard from '../Components/HomeScreen/levelsCard';
 import Ionicons from 'react-native-vector-icons/Ionicons'; // Correct import
 
 import {useNavigation} from '@react-navigation/native';
-import StackNavigation from '../Navigations/StackNavigation';
+// import StackNavigation from '../Navigations/StackNavigation';
 import {getAllLessons, getLessonById} from '../Services/LessonServices';
 import {levels} from '../Utils/constants';
 import {useStateValue} from '../store/contextStore/StateContext';
@@ -25,12 +26,13 @@ import { useSelector } from 'react-redux';
 const {width, height} = Dimensions.get('window');
 
 export default function HomeScreen() {
-  const navigation = useNavigation(StackNavigation);
+  const navigation = useNavigation();
   const [lessons, setLessons] = useState([]);
   const [activeTab, setActiveTab] = useState(0);
   const {state, dispatch: contextDispatch} = useStateValue();
   const [hideLearned, setHideLearned] = useState(false);
   const learnedLessons= useSelector(state=> state.storyReducer.learned)
+  const [loading, setLoading] = useState(true);
   const tabs = [
     levels.A1,
     levels.A2,
@@ -47,8 +49,14 @@ export default function HomeScreen() {
   ];
 
   useEffect(() => {
-    getAllLessons().then(resp => setLessons(resp));
-  }, []);
+   
+    getAllLessons().then(resp => setLessons(resp),
+    
+    setLoading(false)
+
+  );
+  }
+  , []);
   // useEffect(()=>{
   //   if(hideLearned){
   //     lessons.filter
@@ -63,6 +71,7 @@ export default function HomeScreen() {
 
   const HorizontalFlatList = ({lessons}) => {
     return (
+     
       <FlatList
         horizontal
         data={lessons}
@@ -92,12 +101,35 @@ export default function HomeScreen() {
         }
       />
     );
+    
   };
   return (
+   
+       
+    
     <ScrollView style={styles.mainStyles}>
+    
       <Header />
-      <Text style={{padding: 10, color: 'black', fontFamily: 'outfit'}}></Text>
-      <View
+      { loading? (
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center',paddingBottom:height*0.2,width:width,height:height}} >
+
+      <ActivityIndicator  size="large" color="#42BB7E" style={{
+
+      flex: 1,
+
+      justifyContent: 'center',
+
+      alignItems: 'center',
+
+      transform: [{ scale: 2 }] // increase the size
+
+        }}  />
+      </View>
+
+      ):(
+        <View>
+        <Text style={{padding: 10, color: 'black', fontFamily: 'outfit'}}></Text>
+        <View
         style={{
           display: 'flex',
           flexDirection: 'row',
@@ -189,7 +221,13 @@ export default function HomeScreen() {
         {lessons?.length > 0 &&
           lessons.filter(f=> f.level == tabs?.[activeTab]?.text).filter(f=>{
             if(hideLearned)
-              return !learnedLessons.some(s=> s == f?.id)
+              if(!learnedLessons){
+                learnedLessons=[]
+              }
+              else{
+
+                return !learnedLessons.some(s=> s == f?.id)
+              }
             return true
               }).map(
             (lesson, index) =>
@@ -220,7 +258,10 @@ export default function HomeScreen() {
               ),
           )}
       </ScrollView>
+      </View>
+    )}
     </ScrollView>
+    
   );
 }
 

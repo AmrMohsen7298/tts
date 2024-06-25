@@ -1,20 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image,ActivityIndicator ,Dimensions  } from "react-native";
 import Entypo from "react-native-vector-icons/Entypo";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { useNavigation } from "@react-navigation/native";
 import { getAllLessons, getLessonById } from "../../Services/LessonServices";
 import { useSelector } from "react-redux";
-import LibraryStack from "../../Navigations/LibraryStack";
+
 import Colors from "../../Utils/Colors";
 import { levels } from "../../Utils/constants";
 import { useIsFocused } from "@react-navigation/native";
+const {width, height} = Dimensions.get('window');
 export default function MarkAsLearned() {
-  const navigation = useNavigation(LibraryStack);
+  const navigation = useNavigation();
   const [lessons, setLessons] = useState([]);
   const [activeTab, setActiveTab] = useState(0);
   const isFocused = useIsFocused();
-
+  const [loading, setLoading] = useState(true);
   const favorites = useSelector(state => state.storyReducer.learned);
   const [favoritesLocal, setFavoritesLocal] = useState([])
   const tabs = [
@@ -30,6 +31,7 @@ export default function MarkAsLearned() {
       console.log("ID", id);
       getLessonById(id).then(lesson => {
         setLessons(prevLessons => [...prevLessons, lesson]);
+        setLoading(false);
       });
       if(favoritesLocal.some((idx)=>idx == id) && favorites.some((idx)=>idx == id)){
         setLessons(lessons.filter((idx)=> idx !== id))
@@ -55,7 +57,23 @@ export default function MarkAsLearned() {
     
    <View style={{display:"flex",flex: 1,
    justifyContent: 'flex-start',marginTop:"10%"}}>
-    
+     {loading? (
+      <View style={{paddingTop:height*0.37}}>
+
+<ActivityIndicator size="large" color="#42BB7E"   style={{
+
+flex: 1,
+
+justifyContent: 'center',
+
+alignItems: 'center',
+
+transform: [{ scale: 2 }] // increase the size
+
+}}  />
+</View>
+) :(
+  <View>
     <View style={{
         display: "flex",
           
@@ -124,6 +142,8 @@ export default function MarkAsLearned() {
         ))}
       </ScrollView>
     </View>
+    </View>
+    )}
    </View>
   );
 }

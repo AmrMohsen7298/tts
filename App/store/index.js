@@ -11,9 +11,12 @@ import {
   SET_USER_KEYWORDS,
   REMOVE_USER_KEYWORDS,
 } from '../Actions/StoryActions';
-import {combineReducers, createStore} from 'redux';
-import storage from 'redux-persist/lib/storage';
-import {persistStore, persistReducer} from 'redux-persist';
+
+
+import {createStore, combineReducers } from 'redux';
+
+import { persistStore, persistReducer } from 'redux-persist';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const initialState = {
@@ -28,6 +31,8 @@ const initialState = {
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
+
+  whitelist: ['storyReducer'],
 };
 const reducer = (state = initialState, action) => {
   const type = action && action.type;
@@ -130,6 +135,8 @@ const rootReducer = combineReducers({
   storyReducer: reducer,
 });
 const persistedReducer = persistReducer(persistConfig, rootReducer);
+
 const store = createStore(persistedReducer);
+
 const persistor = persistStore(store);
 export {store, persistor};

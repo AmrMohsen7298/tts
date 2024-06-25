@@ -214,7 +214,7 @@ const CustomAudioPlayer = ({ audioUrl, setHighlightIndex, selectedSentence, time
 
   return (
     <>
-      <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 5 }}>
+      <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 5 ,paddingBottom:height*0.02}}>
         <View
           style={{
             flexDirection: "row",
@@ -222,7 +222,7 @@ const CustomAudioPlayer = ({ audioUrl, setHighlightIndex, selectedSentence, time
             justifyContent: "center",
             backgroundColor: "rgba(0,0,0,0.08)",
            
-            paddingVertical:height*0.033,
+            paddingVertical:height*0.03,
             width: width * 0.4,
             borderRadius: 50,
             height: height * 0.06,

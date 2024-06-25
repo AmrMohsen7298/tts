@@ -15,7 +15,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
-import {store, persistor} from './App/store'; // Import the configured store and persistor
+import {store, persistor} from './App/store/index'; // Import the configured store and persistor
 import {StateProvider} from './App/store/contextStore/StateContext';
 
 // Add FontAwesome icons to the library

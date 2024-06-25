@@ -12,7 +12,8 @@ import {
   ImageBackground,
   Dimensions,
   findNodeHandle,
-  measureLayout
+  measureLayout,
+  ActivityIndicator 
 } from 'react-native';
 import TextHighlighter from './../Components/TextHighlighter';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
@@ -98,6 +99,10 @@ const {width, height} = Dimensions.get('window');
 const DoneLearning = ({lessonId}) => {
   const learned = useSelector(state => state.storyReducer.learned);
   const dispatch = useDispatch();
+if(!learned){
+  learned=[]
+}
+else{
 
   return (
     <View style={styles.buttonWrapper}>
@@ -123,6 +128,7 @@ const DoneLearning = ({lessonId}) => {
       </View>
     </View>
   );
+}
 };
 
 export default function LessonScreen(props) {
@@ -172,6 +178,7 @@ export default function LessonScreen(props) {
   const [layoutIds, setLayoutIds] = useState([])
   const scrollStory = useRef();
   const textRef = useRef();
+  const [loading, setLoading] = useState(false);
   let scrollView
 
  const  scrollTo =(index)=>{
@@ -179,10 +186,12 @@ export default function LessonScreen(props) {
   // console.log("highlightindex",index)
   // if(layoutIds?.[highlightIndex?.length-1] < highlightIndex?.[highlightIndex?.length-1])
   //   scrollStory.current.scrollTo({x:x, y: layoutIds?.[highlightIndex?.length-1], animated: true})
+  if (scrollStory.current)
   scrollStory.current.scrollToEnd()
   }
 
   useEffect(() => {
+    setLoading(true);
     contextDispatch({type: 'SHOW_NAVBAR', payload: false});
     console.log('props', props?.route?.params?.lessonId);
     getQuizByTutorialId(props?.route?.params?.lessonId).then(res => {
@@ -201,6 +210,7 @@ export default function LessonScreen(props) {
       setGrammar(res);
     });
     getStoryById(props?.route?.params?.lessonId).then(resp => {
+     
       setStoryParagraph(resp?.paragraph);
       setTranslation(resp?.translation);
       setName(resp?.name);
@@ -216,7 +226,9 @@ export default function LessonScreen(props) {
           setTimePoints(prevTimePoints => [
             ...prevTimePoints,
             time?.['timeSeconds_'],
+           
           ]);
+          setLoading(false);
         });
       });
     });
@@ -315,14 +327,20 @@ export default function LessonScreen(props) {
     setPlayPressed(false);
   };
   const setFavorites = (flag, lessonId) => {
-    if (flag) {
-      dispatch(addFavorite(lessonId));
-    } else {
-      dispatch(removeFavorite(lessonId));
-    }
-    console.log('FAVORITEBUTTON', favoriteButton);
+   if(!favorites){
+    favorites = []
+   }
+   else{
 
-    setfavoriteButton(!favoriteButton);
+     if (flag) {
+       dispatch(addFavorite(lessonId));
+     } else {
+       dispatch(removeFavorite(lessonId));
+     }
+     console.log('FAVORITEBUTTON', favoriteButton);
+ 
+     setfavoriteButton(!favoriteButton);
+   }
   };
 
   const checkAnswer = ({question, answer}) => {
@@ -440,7 +458,7 @@ export default function LessonScreen(props) {
                             flex: 0,
                             textAlign: 'center',
                             justifyContent: 'center',
-                            overflow: 'hidden',
+                            // overflow: 'hidden',
                             // borderRadius: storyAudioPlaying && (index == highlightIndex[highlightIndex.length-1] || index == highlightIndex[0]) ? 5: 0,
                             borderTopRightRadius:
                               (storyAudioPlaying &&
@@ -484,7 +502,7 @@ export default function LessonScreen(props) {
                             <Text
                               style={{
                                 color:
-                                  index == highlightIndex ? 'white' : 'black',
+                                   'black',
                                 borderRadius: 20,
                                 fontFamily: 'outfit',
                                 fontSize: 20,
@@ -497,7 +515,7 @@ export default function LessonScreen(props) {
                             <Text>{"\n"}</Text>
                             <Text                               style={{
                                 color:
-                                  index == highlightIndex ? 'white' : 'black',
+                                   'black',
                                 borderRadius: 20,
                                 fontFamily: 'outfit',
                                 fontSize: 20,
@@ -597,12 +615,15 @@ export default function LessonScreen(props) {
                   gap: 40,
                   alignItems: 'center',
                 }}>
-                <AntDesign
+                {/* <AntDesign
                   name="sound"
                   size={25}
                   color="#42BB7E"
                   style={{marginTop: height * 0.02}}
-                />
+                /> */}
+                <View style={{marginTop: height * 0.02}}>
+
+                </View>
                 <Text
                   style={{
                     fontFamily: 'outfit',
@@ -997,7 +1018,7 @@ export default function LessonScreen(props) {
                       justifyContent: 'center',
                       alignItems: 'center',
                     }}>
-                    <TouchableOpacity
+                    {/* <TouchableOpacity
                       style={{
                         backgroundColor: '#42BB7E',
 
@@ -1038,7 +1059,7 @@ export default function LessonScreen(props) {
                           color="white"
                         />
                       </View>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                   </View>
                 </View>
               </View>
@@ -1061,6 +1082,7 @@ export default function LessonScreen(props) {
   return (
     <View style={styles.container}>
       {this.renderphoto()}
+      
 
       <View style={styles.tabsContainer}>
         <ScrollView
@@ -1084,11 +1106,31 @@ export default function LessonScreen(props) {
       </View>
 
       {/* Content */}
+      { loading? (
+<View style={styles.contentContainer}>
+
+<ActivityIndicator  size="large" color="#42BB7E" style={{
+
+flex: 1,
+
+justifyContent: 'center',
+
+alignItems: 'center',
+
+transform: [{ scale: 2 }] // increase the size
+
+}}  />
+</View>
+
+      ):(
       <View style={styles.contentContainer}>
-        <View style={styles.hairlineLeft}></View>
+
+      <View style={styles.hairlineLeft}></View>
         {renderContent()}
       </View>
+      )}
       <CustomAudioPlayer
+     
         audioUrl={audioSrc}
         setHighlightIndex={setHighlightIndex}
         setTranslationHighlightIndex={setTranslationHighlightIndex}
@@ -1097,9 +1139,10 @@ export default function LessonScreen(props) {
         textRef={textRef}
         scrollTo={scrollTo}
       />
+     
     </View>
   );
-}
+};
 const styles = StyleSheet.create({
   scrollableResults: {
     display: 'flex',
@@ -1237,6 +1280,7 @@ const styles = StyleSheet.create({
     margin: 0,
     paddingLeft: '3%',
     paddingRight: '3%',
+    paddingBottom: '3%',
   },
   card_level: {
     color: Colors.black,

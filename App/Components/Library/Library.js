@@ -14,10 +14,10 @@ import React, {useState} from 'react';
 import Colors from '../../Utils/Colors';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {useNavigation} from '@react-navigation/native';
-import LibraryStack from '../../Navigations/LibraryStack';
+
 import {useSelector} from 'react-redux';
 export default function Library() {
-  const navigator = useNavigation(LibraryStack);
+  const navigator = useNavigation();
   const {favorites, learned} = useSelector(state => state.storyReducer);
   const {width, height} = Dimensions.get('screen');
   return (

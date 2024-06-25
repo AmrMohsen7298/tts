@@ -3,10 +3,10 @@ import React from 'react';
 import user from './../../../assets/Images/profile.jpg';
 import Colors from '../../Utils/Colors';
 import { useNavigation } from "@react-navigation/native";
-import StackNavigation from "./../../Navigations/StackNavigation";
+
 
 export default function Header() {
-  const navigation = useNavigation(StackNavigation);
+  const navigation = useNavigation();
   
   const onPress = () => {
     navigation.navigate("ProfileScreen");
