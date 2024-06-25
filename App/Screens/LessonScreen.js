@@ -1297,7 +1297,7 @@ const styles = StyleSheet.create({
     borderColor: '#42BB7E',
     borderWidth: 1,
     width: 200,
-    height: 50,
+    minHeight: 50,
     alignItems: 'center',
   },
   buttonText: {
