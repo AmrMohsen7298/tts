@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState,useCallback } from 'react';
 // import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from "expo-av";
 import {AnimatedCircularProgress} from 'react-native-circular-progress';
 import {
@@ -180,15 +180,54 @@ export default function LessonScreen(props) {
   const textRef = useRef();
   const [loading, setLoading] = useState(false);
   let scrollView
+  const [sentenceHeights, setSentenceHeights] = useState([]);
+ 
 
- const  scrollTo =(index)=>{
-  // console.log("layout", layoutIds)
-  // console.log("highlightindex",index)
-  // if(layoutIds?.[highlightIndex?.length-1] < highlightIndex?.[highlightIndex?.length-1])
-  //   scrollStory.current.scrollTo({x:x, y: layoutIds?.[highlightIndex?.length-1], animated: true})
-  if (scrollStory.current)
-  scrollStory.current.scrollToEnd()
+  const handleSentenceLayout = useCallback((index, event) => {
+
+  const { height } = event.nativeEvent.layout;
+
+
+  setSentenceHeights((prevHeights) => {
+
+    const newHeights = [...prevHeights];
+
+    newHeights[index] = height;
+
+    return newHeights;
+
+  });
+
+}, [sentenceHeights]); 
+
+
+const scrollTo = (index) => {
+
+  console.log("Scrolling to index", index);
+
+  console.log("Time points", timePoints);
+
+  console.log("Sentence heights", sentenceHeights);
+
+
+  let cumulativeHeight = 0;
+
+  for (let i = 0; i <= index; i++) {
+
+    cumulativeHeight += sentenceHeights[i];
+
   }
+
+
+  if (scrollStory.current) {
+
+    scrollStory.current.scrollTo({ y: cumulativeHeight, animated: true });
+
+  }
+
+};
+
+
 
   useEffect(() => {
     setLoading(true);
@@ -395,7 +434,7 @@ export default function LessonScreen(props) {
         return (
           <ScrollView
           ref={scrollStory}
-            style={{bottom: 'auto', backgroundColor: 'white'}}
+            style={{bottom: 'auto', backgroundColor: 'white',overflow: 'croll'}}
             horizontal={false}
             showsHorizontalScrollIndicator={true}
             contentContainerStyle={{paddingHorizontal: 'auto'}}>
@@ -497,8 +536,10 @@ export default function LessonScreen(props) {
                                 : 'transparent',
                             paddingHorizontal: 3,
                             marginVertical: height * 0.005,
-                          }}>
-                          <Text>
+                          }}
+                          onLayout={(event) => handleSentenceLayout(index, event)}
+                          >
+                          <Text >
                             <Text
                               style={{
                                 color:
@@ -508,7 +549,7 @@ export default function LessonScreen(props) {
                                 fontSize: 20,
                                 textAlign: 'center',
 
-                              }}>
+                              }} >
                               {word}
                             </Text>
                             <Text>{"\n"}</Text>
@@ -574,7 +615,9 @@ export default function LessonScreen(props) {
                                 : 'transparent',
                             paddingHorizontal: 3,
                             marginVertical: height * 0.005,
-                          }}>
+                          }}
+                          onTextLayout={(event) => handleSentenceLayout(index, event)}
+                          >
                           <Text
                             // onLayout={(event)=> {
                             //     // console.log("event", event.nativeEvent)
@@ -582,6 +625,7 @@ export default function LessonScreen(props) {
                             //     setLayoutIds([...layoutIds, y ])
                             //   }
                             // }>
+                           
                             >
                             <Text
                               ref={textRef}
@@ -594,7 +638,7 @@ export default function LessonScreen(props) {
                                 fontFamily: 'outfit',
                                 fontSize: 20,
                                 textAlign: 'center',
-                              }}>
+                              }} >
                               {word}
                             </Text>
                           </Text>
