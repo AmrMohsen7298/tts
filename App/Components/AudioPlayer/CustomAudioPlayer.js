@@ -209,7 +209,17 @@ const CustomAudioPlayer = ({ audioUrl, setHighlightIndex, selectedSentence, time
 
   const repeatSound = () =>{
     setOnRepeat(!onRepeat) ;
-
+if(onRepeat == true ){
+  if (sound.current) {
+    sound.current.stop();
+    setIsPlaying(false);
+    dispatch(setAudioPlaying(false));
+    setHighlightIndex([]);
+    setTranslationHighlightIndex([])
+    timeouts.forEach(timeout => clearTimeout(timeout));
+    timeouts =[]
+  }
+}
   }
  
 

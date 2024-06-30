@@ -201,6 +201,34 @@ export default function LessonScreen(props) {
 }, [sentenceHeights]); 
 
 
+// const scrollTo = (index) => {
+
+//   console.log("Scrolling to index", index);
+
+//   console.log("Time points", timePoints);
+
+//   console.log("Sentence heights", sentenceHeights);
+
+
+//   let cumulativeHeight = 0;
+
+//   for (let i = 0; i <= index; i++) {
+
+//     cumulativeHeight += sentenceHeights[i];
+
+//   }
+
+
+//   if (scrollStory.current) {
+
+//     scrollStory.current.scrollTo({ y: cumulativeHeight, animated: true });
+
+//   }
+
+// };
+
+
+
 const scrollTo = (index) => {
 
   console.log("Scrolling to index", index);
@@ -211,6 +239,7 @@ const scrollTo = (index) => {
 
 
   let cumulativeHeight = 0;
+
 
   for (let i = 0; i <= index; i++) {
 
@@ -225,8 +254,37 @@ const scrollTo = (index) => {
 
   }
 
-};
+  console.log("Checking if index is last element:", index, sentenceHeights.length - 1);
+  index++
 
+ 
+  if (index === sentenceHeights.length - 1) {
+
+    console.log("Reached the last element, setting timer for last timepoint");
+    console.log("Time points", timePoints[0]*1000);
+    setTimeout(() => {
+
+      console.log("Timer expired, incrementing index and scrolling back to top");
+
+       // Reset the index to 0
+
+       if (scrollStory.current) {
+
+        scrollStory.current.scrollTo({ y: 0, animated: true });
+    
+      }
+
+    }, timePoints[0]*1000);
+
+  } else {
+
+    console.log("Not the last element, incrementing index");
+  
+    
+
+  }
+
+};
 
 
   useEffect(() => {
@@ -567,7 +625,9 @@ const scrollTo = (index) => {
                       );
                     })
                   : storyParagraph?.split(/[\s.]+/).map((word, index) => {
+                  
                       return (
+                      
                         <Pressable
                           focusable={true}
                           key={index}
@@ -593,18 +653,14 @@ const scrollTo = (index) => {
                             borderTopLeftRadius:
                               (storyAudioPlaying &&
                                 index ==
-                                  highlightIndex?.[
-                                    highlightIndex?.length - 1
-                                  ]) ||
+                                highlightIndex?.filter(x => x !== undefined).pop() ) ||
                               (!storyAudioPlaying && selectedWord)
                                 ? 5
                                 : 0,
                             borderBottomLeftRadius:
                               (storyAudioPlaying &&
                                 index ==
-                                  highlightIndex?.[
-                                    highlightIndex?.length - 1
-                                  ]) ||
+                                highlightIndex?.filter(x => x !== undefined).pop() ) ||
                               (!storyAudioPlaying && selectedWord)
                                 ? 5
                                 : 0,
