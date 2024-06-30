@@ -145,14 +145,26 @@ const CustomAudioPlayer = ({ audioUrl, setHighlightIndex, selectedSentence, time
         console.error('Error transcribing audio:', error);
       }
     };
-
+    
   const playSound = async () => {
+    if (!sound.current) {
+
+      return;
+  
+    }
+  
+    sound.current.stop(); // Cancel previous callbacks
           sound.current.play(((success)=>{
             if(success){
                 setIsPlaying(false);
                 dispatch(setAudioPlaying(false));
                 setHighlightIndex([]);
                 setTranslationHighlightIndex([])
+                if (onRepeat) {
+
+                  playSound(); // Call playSound again if onRepeat is true
+          
+                }
             }
           }));
           setIsPlaying(true);
@@ -171,28 +183,38 @@ const CustomAudioPlayer = ({ audioUrl, setHighlightIndex, selectedSentence, time
     }
   };
   
-  const repeatSound = () =>{
-    let timeout;
-    if(!onRepeat){
-        sound.current.setNumberOfLoops(-1)
-        timeout = setTimeout(()=>{
-          if(onRepeat){
-              sound.current.getCurrentTime((sec)=>{
-              if(sec >= sound.current.getDuration()){
-              console.log("sec la", sec)
-              setHighlightIndex([])
-              setOnRepeatHighlight(true)
-              }
-          })
-        }
-        },1000)
-    }else{
-        sound.current.setNumberOfLoops(0)
-        timeout = null;
-    }
-    setOnRepeat(!onRepeat)
-  }
+  // const repeatSound = () =>{
+  //   let timeout;
+  //   if(!onRepeat){
+  //       sound.current.setNumberOfLoops(-1)
+  //       timeout = setTimeout(()=>{
+  //         if(onRepeat){
+  //             sound.current.getCurrentTime((sec)=>{
+  //             if(sec >= sound.current.getDuration()){
+  //             console.log("sec la", sec)
+  //             setHighlightIndex([])
+  //             setOnRepeatHighlight(true)
+  //             }
+  //         })
+  //       }
+  //       },1000)
+  //   }else{
+  //       sound.current.setNumberOfLoops(0)
+  //       timeout = null;
+  //   }
+  //   setOnRepeat(!onRepeat)
+  // }
+  let timeoutId = null;
 
+
+  const repeatSound = () =>{
+    setOnRepeat(!onRepeat) ;
+
+  }
+ 
+
+
+ 
   const RoundedButton = ({ onPress, disabled, iconName, width, height }) => (
     <TouchableOpacity
       onPress={onPress}
