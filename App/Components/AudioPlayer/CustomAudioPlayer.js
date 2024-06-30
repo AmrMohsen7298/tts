@@ -72,7 +72,7 @@ const CustomAudioPlayer = ({ audioUrl, setHighlightIndex, selectedSentence, time
       return setTimeout(() => {
         setHighlightIndex([...wordIndexes]);
         setTranslationHighlightIndex([sentenceIndex])
-        scrollTo([sentenceIndex])
+        scrollTo([sentenceIndex], wordIndexes)
 
  // Resolve the promise after setting highlight index
       }, delay);

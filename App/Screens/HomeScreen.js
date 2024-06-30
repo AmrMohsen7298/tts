@@ -17,12 +17,13 @@ import LevelsCard from '../Components/HomeScreen/levelsCard';
 
 import Ionicons from 'react-native-vector-icons/Ionicons'; // Correct import
 
-import {useNavigation} from '@react-navigation/native';
+import {StackActions, useNavigation} from '@react-navigation/native';
 // import StackNavigation from '../Navigations/StackNavigation';
 import {getAllLessons, getLessonById} from '../Services/LessonServices';
 import {levels} from '../Utils/constants';
 import {useStateValue} from '../store/contextStore/StateContext';
 import {useSelector} from 'react-redux';
+import StackNavigation from '../Navigations/StackNavigation';
 
 const {width, height} = Dimensions.get('window');
 

@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState,useCallback } from 'react';
+import React, {useEffect, useRef, useState,useCallback, useLayoutEffect } from 'react';
 // import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from "expo-av";
 import {AnimatedCircularProgress} from 'react-native-circular-progress';
 import {
@@ -13,7 +13,8 @@ import {
   Dimensions,
   findNodeHandle,
   measureLayout,
-  ActivityIndicator 
+  ActivityIndicator ,
+  measure
 } from 'react-native';
 import TextHighlighter from './../Components/TextHighlighter';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
@@ -57,6 +58,7 @@ import Sound from 'react-native-sound';
 import RNFetchBlob from 'rn-fetch-blob';
 import {useStateValue} from '../store/contextStore/StateContext';
 import { text } from '@fortawesome/fontawesome-svg-core';
+import { FlatList } from 'react-native-gesture-handler';
 // import CustomAudioPlayer from "../Components/AudioPlayer/CustomAudioPlayer";
 
 const {width, height} = Dimensions.get('window');
@@ -180,24 +182,65 @@ export default function LessonScreen(props) {
   const textRef = useRef();
   const [loading, setLoading] = useState(false);
   let scrollView
-  const [sentenceHeights, setSentenceHeights] = useState([]);
+  // const [sentenceHeights, setSentenceHeights] = useState([]);
+  const [wordHeights, setWordHeights] = useState([]);
+  const translationRef = useRef({});
+  const wordsRef = useRef({})
+  const pressableRefs = useRef({})
+  const sentenceHeights = useRef([])
+
+  // useLayoutEffect(()=>{
+  //   setWordHeights(pressablePositions)
+  // },[])
+  // useEffect(()=>{
+  //   setWordHeights(pressablePositions)
+  // },[pressablePositions])
+  useEffect(()=>{
+    if(wordHeights.length == storyParagraph?.split(" ")?.length){
+      setLoading(false)
+    }
+  },[wordHeights])
+  const handleWordLayout = useCallback((index, event)=>{
+    const { y } = event.nativeEvent.layout;
+    if(!wordsRef.current[index]){
+    setWordHeights((prevHeights) => {
+        wordsRef.current[index] = true
+        console.log("prevHeights",prevHeights)
+        const newHeights = [...prevHeights];
+    
+        newHeights[index] = y;
+        return newHeights;
+      })
+    }
+  },[wordHeights])
+  // useEffect(()=>{
+  //   const pressables = Object.values(pressableRefs.current);
+  //   const heights = {};
+
+  //   pressables.forEach((pressableRef) => {
+  //     const rect = pressableRef.current.getBoundingClientRect();
+  //     heights[pressableRef.key] = rect.top;
+
+  //   });
+  //   setWordHeights(heights)
+  // },[pressableRefs])
  
 
   const handleSentenceLayout = useCallback((index, event) => {
+  const { y } = event.nativeEvent.layout;
+  if(!translationRef.current[index]){
+    console.log("sentence", event.nativeEvent.layout)
+    sentenceHeights.current[index] = y
+  // setSentenceHeights((prevHeights) => {
+  //   translationRef.current[index] = true
+  //   console.log("prevHeights",prevHeights)
+  //   const newHeights = [...prevHeights];
 
-  const { height } = event.nativeEvent.layout;
+  //   newHeights[index] = y;
 
-
-  setSentenceHeights((prevHeights) => {
-
-    const newHeights = [...prevHeights];
-
-    newHeights[index] = height;
-
-    return newHeights;
-
-  });
-
+  //   return newHeights;
+  // })
+}
 }, [sentenceHeights]); 
 
 
@@ -229,36 +272,32 @@ export default function LessonScreen(props) {
 
 
 
-const scrollTo = (index) => {
-
-  console.log("Scrolling to index", index);
-
-  console.log("Time points", timePoints);
-
-  console.log("Sentence heights", sentenceHeights);
+const scrollTo = (sentenceIndex, wordIndexes) => {
 
 
-  let cumulativeHeight = 0;
+
+  // let cumulativeHeight = 0;
 
 
-  for (let i = 0; i <= index; i++) {
+  // for (let i = 0; i <= index; i++) {
 
-    cumulativeHeight += sentenceHeights[i];
+  //   cumulativeHeight += sentenceHeights[i];
 
-  }
+  // }
 
 
   if (scrollStory.current) {
 
-    scrollStory.current.scrollTo({ y: cumulativeHeight, animated: true });
+    scrollStory.current.scrollTo({ x:0, y: translateButton? sentenceHeights.current[sentenceIndex] : wordHeights?.[wordIndexes?.pop()], animated: true });
 
   }
-
-  console.log("Checking if index is last element:", index, sentenceHeights.length - 1);
-  index++
+  console.log("SENTENCEHEIGHTS", sentenceHeights.current[sentenceIndex])
+  console.log("Checking if index is last element:", sentenceIndex, sentenceHeights.current.length - 1); 
+  console.log("PRESABLE", wordHeights)
+  sentenceIndex++
 
  
-  if (index === sentenceHeights.length - 1) {
+  if ( wordIndexes[wordIndexes.length-1] == wordHeights.length -1) {
 
     console.log("Reached the last element, setting timer for last timepoint");
     console.log("Time points", timePoints[0]*1000);
@@ -270,11 +309,11 @@ const scrollTo = (index) => {
 
        if (scrollStory.current) {
 
-        scrollStory.current.scrollTo({ y: 0, animated: true });
+        scrollStory.current.scrollTo({y: translateButton? sentenceHeights[sentenceIndex]: wordHeights[wordIndexes.length-1], animated: true });
     
       }
 
-    }, timePoints[0]*1000);
+    }, (timePoints[sentenceIndex] - timePoints[sentenceIndex-1])*1000);
 
   } else {
 
@@ -325,7 +364,7 @@ const scrollTo = (index) => {
             time?.['timeSeconds_'],
            
           ]);
-          setLoading(false);
+
         });
       });
     });
@@ -631,6 +670,11 @@ const scrollTo = (index) => {
                         <Pressable
                           focusable={true}
                           key={index}
+                          ref={(ref) => {
+
+                            pressableRefs.current[index] = ref;
+              
+                          }}
                           onPress={() => onPressWord(word, index)}
                           style={{
                             flex: 0,
@@ -672,7 +716,14 @@ const scrollTo = (index) => {
                             paddingHorizontal: 3,
                             marginVertical: height * 0.005,
                           }}
-                          onTextLayout={(event) => handleSentenceLayout(index, event)}
+                          onLayout={(event) => handleWordLayout(index, event)}
+                          // onLayout={(event) => {
+
+                          //     const {y} = event.nativeEvent.layout
+              
+                          //     pressablePositions[index] = y;
+              
+                          //   }}
                           >
                           <Text
                             // onLayout={(event)=> {
@@ -1206,10 +1257,11 @@ const scrollTo = (index) => {
       </View>
 
       {/* Content */}
-      { loading? (
-<View style={styles.contentContainer}>
+      {(
+      <View style={styles.contentContainer}>
+        {loading && (<View style={styles.loadingContainer}>
 
-<ActivityIndicator  size="large" color="#42BB7E" style={{
+<       ActivityIndicator  size="large" color="#42BB7E" style={{
 
 flex: 1,
 
@@ -1220,10 +1272,7 @@ alignItems: 'center',
 transform: [{ scale: 2 }] // increase the size
 
 }}  />
-</View>
-
-      ):(
-      <View style={styles.contentContainer}>
+</View>)}
 
       <View style={styles.hairlineLeft}></View>
         {renderContent()}
@@ -1244,6 +1293,10 @@ transform: [{ scale: 2 }] // increase the size
   );
 };
 const styles = StyleSheet.create({
+  loadingContainer: {
+    width: "100%",
+    height: "100%"
+  },
   scrollableResults: {
     display: 'flex',
     flexDirection: 'column',
