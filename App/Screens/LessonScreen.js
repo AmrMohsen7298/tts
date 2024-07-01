@@ -292,15 +292,15 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
 
   }
   console.log("SENTENCEHEIGHTS", sentenceHeights.current[sentenceIndex])
-  console.log("Checking if index is last element:", sentenceIndex, sentenceHeights.current.length - 1); 
+  console.log("Checking if index is last element:",wordIndexes, sentenceIndex, sentenceHeights.current.length - 1,wordHeights.length -1); 
   console.log("PRESABLE", wordHeights)
   sentenceIndex++
 
  
-  if ( wordIndexes[wordIndexes.length-1] == wordHeights.length -1) {
+  if (sentenceIndex ==sentenceHeights.current.length - 1|| wordIndexes[wordIndexes.length-1] == wordHeights.length -1) {
 
     console.log("Reached the last element, setting timer for last timepoint");
-    console.log("Time points", timePoints[0]*1000);
+    console.log("Time points", timePoints);
     setTimeout(() => {
 
       console.log("Timer expired, incrementing index and scrolling back to top");
@@ -309,11 +309,11 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
 
        if (scrollStory.current) {
 
-        scrollStory.current.scrollTo({y: translateButton? sentenceHeights[sentenceIndex]: wordHeights[wordIndexes.length-1], animated: true });
+        scrollStory.current.scrollTo({y: 0, animated: true });
     
       }
 
-    }, (timePoints[sentenceIndex] - timePoints[sentenceIndex-1])*1000);
+    }, (timePoints[0])*1000);
 
   } else {
 

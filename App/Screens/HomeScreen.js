@@ -23,7 +23,7 @@ import {getAllLessons, getLessonById} from '../Services/LessonServices';
 import {levels} from '../Utils/constants';
 import {useStateValue} from '../store/contextStore/StateContext';
 import {useSelector} from 'react-redux';
-import StackNavigation from '../Navigations/StackNavigation';
+
 
 const {width, height} = Dimensions.get('window');
 
