@@ -296,8 +296,8 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
   console.log("PRESABLE", wordHeights)
   sentenceIndex++
 
- 
-  if (sentenceIndex ==sentenceHeights.current.length - 1|| wordIndexes[wordIndexes.length-1] == wordHeights.length -1) {
+ console.log("last word index :value",wordIndexes.filter(x => x !== undefined).pop())
+  if (sentenceIndex ==sentenceHeights.current.length - 1|| ((wordIndexes.filter(x => x !== undefined).pop())+1) == wordHeights.length -1) {
 
     console.log("Reached the last element, setting timer for last timepoint");
     console.log("Time points", timePoints);
