@@ -37,7 +37,7 @@ function StackNavigation() {
               style={{paddingHorizontal: width * 0.05}}
               color="white"
               onPress={() => {
-                navigation.goBack(HomeScreen);
+                navigation.goBack("HomeScreen");
                 dispatch({type: 'SHOW_NAVBAR', payload: true});
               }}
             />

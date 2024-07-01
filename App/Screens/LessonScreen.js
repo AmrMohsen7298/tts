@@ -196,11 +196,12 @@ export default function LessonScreen(props) {
   //   setWordHeights(pressablePositions)
   // },[pressablePositions])
   useEffect(()=>{
-    if(wordHeights.length == storyParagraph?.split(" ")?.length){
+    if(wordHeights.length-1 == storyParagraph?.split(/[\s.,!?؛؟«»؟،٫]+/).filter(sentence => sentence.trim() !== '')?.length-1){
       setLoading(false)
     }
   },[wordHeights])
   const handleWordLayout = useCallback((index, event)=>{
+    console.log("word index",index)
     const { y } = event.nativeEvent.layout;
     if(!wordsRef.current[index]){
     setWordHeights((prevHeights) => {
@@ -329,10 +330,10 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
   useEffect(() => {
     setLoading(true);
     contextDispatch({type: 'SHOW_NAVBAR', payload: false});
-    console.log('props', props?.route?.params?.lessonId);
+   
     getQuizByTutorialId(props?.route?.params?.lessonId).then(res => {
       setQuizData(res?.questions);
-      console.log('QUIZDATA', res?.questions);
+     
     });
     getKeywordsbyTutorialId(props?.route?.params?.lessonId).then(res => {
       res?.map((key)=>{
@@ -340,7 +341,7 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
       })
 
       setLessonKeyWords(res)
-      console.log('KEYWORDS', res);
+    
     });
     getGrammerByTutorialId(props?.route?.params?.lessonId).then(res => {
       setGrammar(res);
@@ -372,7 +373,7 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
   useEffect(() => {
     if (storyParagraph) {
       setStorySentences(storyParagraph.split(['.']));
-      console.log('sentences', storyParagraph.split(['.']));
+      
     }
   }, [storyParagraph]);
   // useEffect(()=>{
@@ -473,7 +474,7 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
      } else {
        dispatch(removeFavorite(lessonId));
      }
-     console.log('FAVORITEBUTTON', favoriteButton);
+  
  
      setfavoriteButton(!favoriteButton);
    }
@@ -663,7 +664,7 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
                         </View>
                       );
                     })
-                  : storyParagraph?.split(/[\s.]+/).map((word, index) => {
+                  : storyParagraph?.split(/[\s.,!?؛؟«»؟،٫]+/).filter(sentence => sentence.trim() !== '').map((word, index) => {
                   
                       return (
                       

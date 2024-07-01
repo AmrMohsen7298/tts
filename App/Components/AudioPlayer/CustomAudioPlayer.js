@@ -31,16 +31,18 @@ const CustomAudioPlayer = ({ audioUrl, setHighlightIndex, selectedSentence, time
     if (timePoints && storyParagraph && isPlaying) {
       setHighlightIndex([]); // Reset highlight index array
       const sentences = storyParagraph.split('.').filter(sentence => sentence.trim() !== '');
+      console.log("sentences in audio player", sentences);
       let delay = 0; // Initialize delay for setTimeout
-      const words = storyParagraph.split(/[\s.]+/).map((word, index) => index);
+      const words = storyParagraph.split(/[\s.,!?؛؟«»؟،٫]+/).map((word, index) => index);
       let sentenceIndex = 0;
   
       const highlightWordsRecursive = async () => {
         if (sentenceIndex < sentences.length) {
           let wordIndexes = [];
           const sentence = sentences[sentenceIndex];
-          console.log("SENTENCES",sentence)
-          const sentenceWords = sentence.split(" ");
+         
+          const sentenceWords = sentence.split(/[\s.,!?؛؟«»؟،٫]+/).filter(sentence => sentence.trim() !== '');
+          console.log("sentencewords in audio player", sentenceWords);
           for (let i = 0; i < sentenceWords.length; i++) {
             wordIndexes.push(words.shift()); // Collect word indexes for the current sentence
           }
@@ -49,7 +51,7 @@ const CustomAudioPlayer = ({ audioUrl, setHighlightIndex, selectedSentence, time
             setTranslationHighlightIndex([sentenceIndex])
           }else{
           delay =timePoints[sentenceIndex - 1] * 1000; 
-          console.log("timePoints", timePoints)
+          
            timeouts.push(ZOBREMANGA(delay, wordIndexes, sentenceIndex)); 
           }// Await ZOBREMANGA function
 //           if (sentenceIndex !== 0) {

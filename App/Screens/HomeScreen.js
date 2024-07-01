@@ -35,6 +35,7 @@ export default function HomeScreen() {
   const [hideLearned, setHideLearned] = useState(false);
   const learnedLessons = useSelector(state => state.storyReducer.learned);
   const [loading, setLoading] = useState(true);
+ 
   const tabs = [
     levels.A1,
     levels.A2,
@@ -53,7 +54,7 @@ export default function HomeScreen() {
   useEffect(() => {
     getAllLessons().then(
       resp => setLessons(resp),
-
+      
       setLoading(false),
     );
   }, []);
