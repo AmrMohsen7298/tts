@@ -82,7 +82,7 @@
 //         </View>
 //       </View>
 //       <View style={{display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'flex-end',gap:150,marginTop:50}}>
-//       <View style={{backgroundColor:"#42BB7E", display: "flex",
+//       <View style={{backgroundColor:"#eaaa00", display: "flex",
 
 //           flexDirection: "row",
 //           gap: 7,
@@ -183,7 +183,7 @@
 //     color:"black"
 //   },
 //   button: {
-//     backgroundColor: '#42BB7E',
+//     backgroundColor: '#eaaa00',
 //     paddingVertical: '5%',
 
 //     paddingHorizontal: '35%',
@@ -361,7 +361,7 @@ const styles = StyleSheet.create({
     marginTop: height * 0.03,
   },
   accountTypeContainer: {
-    backgroundColor: '#42BB7E',
+    backgroundColor: '#eaaa00',
     padding: height * 0.015,
     borderRadius: width * 0.02,
   },
@@ -428,7 +428,7 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   button: {
-    backgroundColor: '#42BB7E',
+    backgroundColor: '#eaaa00',
     paddingVertical: height * 0.01,
     width: width * 0.8,
     borderRadius: 10,

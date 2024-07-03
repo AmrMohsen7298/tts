@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#eee',
     borderRadius: 5,
     borderWidth: 0.5,
-    borderColor: '#42BB7E90',
+    borderColor: '#eaaa0090',
     padding: 5,
     margin: 5,
     justifyContent: 'center',
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     width: 350,
     height: 'fit-content',
     boxShadow: '10px 10px 17px -12px rgba(0,0,0,0.75)',
-    backgroundColor: '#42BB7E',
+    backgroundColor: '#eaaa00',
     borderRadius: 10,
   },
   card_image: {
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
-    borderColor: '#42BB7E',
+    borderColor: '#eaaa00',
     borderWidth: 1,
   },
   card_title: {
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     bottom: 'auto',
   },
   example_title: {
-    color: '#42BB7E',
+    color: '#eaaa00',
     fontFamily: 'outfitSemi',
     fontSize: 22,
     fontWeight: 'bold',

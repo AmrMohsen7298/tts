@@ -98,7 +98,7 @@ const List = ({route}) => {
         //         alignItems: 'center',
         //         backgroundColor:
         //           keywords.filter(({text}) => text === item.text).length > 0
-        //             ? '#42BB7E'
+        //             ? '#eaaa00'
         //             : '#ddd',
         //         paddingVertical: '15%',
         //         borderTopRightRadius: 10,
@@ -120,7 +120,7 @@ const List = ({route}) => {
         //         display: 'flex',
         //         justifyContent: 'center',
         //         alignItems: 'center',
-        //         backgroundColor: playPressed ? '#42BB7E' : '#ddd',
+        //         backgroundColor: playPressed ? '#eaaa00' : '#ddd',
         //         paddingVertical: '15%',
         //         borderBottomRightRadius: 10,
         //       }}>

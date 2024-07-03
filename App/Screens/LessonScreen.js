@@ -112,7 +112,7 @@ else{
         style={{
           ...styles.buttonContainer,
           backgroundColor: learned?.some(id => id == lessonId)
-            ? '#42BB7E'
+            ? '#eaaa00'
             : '#333',
         }}>
         <TouchableOpacity
@@ -497,30 +497,30 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
 
   const getAnsBgColor = ({question, choice}) => {
     if (!answerPressed) return 'white';
-    if (choice === question.answer) return '#42BB7E';
+    if (choice === question.answer) return '#eaaa00';
     if (chosenAnswer !== question.answer && choice === chosenAnswer)
       return '#FF3333';
     return 'white';
   };
 
   const getAnsBorderColor = ({question, choice}) => {
-    if (!answerPressed) return '#42BB7E';
-    if (choice === question.answer) return '#42BB7E';
+    if (!answerPressed) return '#eaaa00';
+    if (choice === question.answer) return '#eaaa00';
     if (chosenAnswer !== question.answer && choice === chosenAnswer)
       return '#FF3333';
-    return '#42BB7E';
+    return '#eaaa00';
   };
 
   const getAnsTextColor = ({question, choice}) => {
-    if (!answerPressed) return '#42BB7E';
+    if (!answerPressed) return '#eaaa00';
     if (choice === question.answer) return 'white';
     if (chosenAnswer !== question.answer && choice === chosenAnswer)
       return 'white';
-    return '#42BB7E';
+    return '#eaaa00';
   };
 
   const getResultAnsColor = ({question, chosenAns, currentChoice}) => {
-    if (question.answer === currentChoice) return '#42BB7E';
+    if (question.answer === currentChoice) return '#eaaa00';
     if (question.answer !== chosenAns && chosenAns === currentChoice)
       return '#FF0000';
     return 'black';
@@ -563,7 +563,7 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
                 <MaterialIcons
                   name="translate"
                   size={22}
-                  color={translateButton ? 'green' : 'rgba(0, 0, 0, 0.2)'}
+                  color={translateButton ? '#eaaa00' : 'rgba(0, 0, 0, 0.2)'}
                   onPress={() => setTranslateButton(!translateButton)}
                 />
                 <MaterialIcons
@@ -630,7 +630,7 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
                             backgroundColor:
                               translationHighlightIndex?.length > 0 &&
                               translationHighlightIndex?.some(idx => idx == index)
-                                ? '#42BB7E'
+                                ? '#eaaa00'
                                 : 'transparent',
                             paddingHorizontal: 3,
                             marginVertical: height * 0.005,
@@ -712,7 +712,7 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
                             backgroundColor:
                               highlightIndex?.length > 0 &&
                               highlightIndex?.some(idx => idx == index)
-                                ? '#42BB7E'
+                                ? '#eaaa00'
                                 : 'transparent',
                             paddingHorizontal: 3,
                             marginVertical: height * 0.005,
@@ -770,7 +770,7 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
                 {/* <AntDesign
                   name="sound"
                   size={25}
-                  color="#42BB7E"
+                  color="#eaaa00"
                   style={{marginTop: height * 0.02}}
                 /> */}
                 <View style={{marginTop: height * 0.02}}>
@@ -842,7 +842,7 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
                         size={60}
                         width={6}
                         fill={(score / quizData?.length) * 100}
-                        tintColor="#42BB7E"
+                        tintColor="#eaaa00"
                         onAnimationComplete={() =>
                           console.log('onAnimationComplete')
                         }
@@ -872,8 +872,8 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
                       <Text
                         style={{
                           ...styles.correctIncorrectNumbers,
-                          color: '#42BB7E',
-                          backgroundColor: '#42BB7E30',
+                          color: '#eaaa00',
+                          backgroundColor: '#eaaa0030',
                         }}>
                         {score}
                       </Text>
@@ -892,7 +892,7 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
                   style={{
                     ...styles.button,
                     borderRadius: width * 0.05,
-                    backgroundColor: '#42BB7E',
+                    backgroundColor: '#eaaa00',
                     width: width * 0.9,
                     alignSelf: 'center',
                   }}
@@ -965,7 +965,7 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
                             size={width * 0.07}
                             color={
                               question.answer === chosenAnswers[question.code]
-                                ? '#42BB7E'
+                                ? '#eaaa00'
                                 : '#ff0000'
                             }
                           />
@@ -1000,7 +1000,7 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
                     style={{
                       ...styles.button,
                       borderRadius: width * 0.05,
-                      backgroundColor: '#42BB7E',
+                      backgroundColor: '#eaaa00',
                       width: width * 0.9,
                       alignSelf: 'center',
                     }}
@@ -1125,7 +1125,7 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
         );
       case 1:
         return (
-          <View style={{...styles.photoContainer, backgroundColor: '#42BB7E'}}>
+          <View style={{...styles.photoContainer, backgroundColor: '#eaaa00'}}>
             <AnimatedCircularProgress
               size={150}
               width={15}
@@ -1172,7 +1172,7 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
                     }}>
                     {/* <TouchableOpacity
                       style={{
-                        backgroundColor: '#42BB7E',
+                        backgroundColor: '#eaaa00',
 
                         borderRadius: 10, // Adjust this value to control the roundness of the button
                         width: width * 0.4, // Adjust this value to control the width of the button
@@ -1262,7 +1262,7 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
       <View style={styles.contentContainer}>
         {loading && (<View style={styles.loadingContainer}>
 
-<       ActivityIndicator  size="large" color="#42BB7E" style={{
+<       ActivityIndicator  size="large" color="#eaaa00" style={{
 
 flex: 1,
 
@@ -1413,7 +1413,7 @@ const styles = StyleSheet.create({
     marginHorizontal: width * 0.04,
   },
   activeTab: {
-    backgroundColor: '#42BB7E',
+    backgroundColor: '#eaaa00',
     color: 'white',
     borderRadius: 13,
   },
@@ -1448,7 +1448,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 5,
     marginHorizontal: 5,
-    borderColor: '#42BB7E',
+    borderColor: '#eaaa00',
     borderWidth: 1,
     width: 200,
     minHeight: 50,
@@ -1457,7 +1457,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontFamily: 'outfitSemi',
     fontSize: 16,
-    color: '#42BB7E',
+    color: '#eaaa00',
     width: '100%',
     textAlign: 'center',
   },
@@ -1493,7 +1493,7 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   cardButtonUpPressed: {
-    backgroundColor: '#42BB7E',
+    backgroundColor: '#eaaa00',
     borderRadius: 10,
     width: width * 0.15,
     height: height * 0.05,
@@ -1515,7 +1515,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   cardButtonDownPressed: {
-    backgroundColor: '#42BB7E',
+    backgroundColor: '#eaaa00',
     borderRadius: 10,
     width: width * 0.15,
     height: height * 0.05,

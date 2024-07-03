@@ -66,7 +66,7 @@ export default function Favorites() {
      {loading? (
       <View style={{paddingTop:height*0.37}}>
 
-<ActivityIndicator size="large" color="#42BB7E"   style={{
+<ActivityIndicator size="large" color="#eaaa00"   style={{
 
 flex: 1,
 
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     borderColor: "transparent",
   },
   activeTab: {
-    backgroundColor: '#42BB7E',
+    backgroundColor: '#eaaa00',
     borderColor: 'white',
     borderRadius: 20
   },

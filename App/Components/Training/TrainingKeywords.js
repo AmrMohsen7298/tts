@@ -287,7 +287,7 @@ export default function TrainingKeywords(props) {
           <Pressable
             style={{
               width: '25%',
-              backgroundColor: '#42BB7E',
+              backgroundColor: '#eaaa00',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     textAlign: 'center',
     fontWeight: 'bold',
-    backgroundColor: '#ade08b',
+    backgroundColor: '#eaaa00',
     width: '20%',
     height: '100%',
     minHeight: height * 0.05,
@@ -395,7 +395,7 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   button: {
-    backgroundColor: '#42BB7E',
+    backgroundColor: '#eaaa00',
     paddingVertical: 'auto',
     paddingHorizontal: 'auto',
     width: '100%',
@@ -449,7 +449,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   button_: {
-    backgroundColor: '#42BB7E',
+    backgroundColor: '#eaaa00',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',

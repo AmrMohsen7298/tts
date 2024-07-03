@@ -17,7 +17,7 @@ export default function LoginScreen() {
         <Text style={{textAlign:'center',
         fontSize:35,color:Colors.white,fontFamily:'outfitBold',marginTop:30
     }}>E-Learning</Text>
-    <Text style={{textAlign:'center',fontSize:20,marginTop:30,color:'#42BB7E',fontFamily:'outfit'}}>Lorem Ipsum Anything</Text>
+    <Text style={{textAlign:'center',fontSize:20,marginTop:30,color:'#eaaa00',fontFamily:'outfit'}}>Lorem Ipsum Anything</Text>
     <TouchableOpacity style={{backgroundColor:Colors.white,display:'flex',alignItems:'center',flexDirection:'row',gap:10,justifyContent:'center',padding:10,borderRadius:90,marginTop:25}}>
         <Text style={{fontSize:20,color:Colors.primary,fontFamily:'outfit'}}>Sign In</Text>
     </TouchableOpacity>

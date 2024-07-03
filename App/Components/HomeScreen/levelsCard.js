@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     height: width * 0.07,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#42BB7E50',
+    backgroundColor: '#eaaa0050',
     borderRadius: 50,
   },
   card_level: {

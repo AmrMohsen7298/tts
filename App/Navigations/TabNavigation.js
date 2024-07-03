@@ -28,8 +28,8 @@ export default function TabNavigation() {
       <Tab.Navigator
         screenOptions={{
           headerShown: false,
-          tabBarActiveTintColor: '#42BB7E',
-          // tabBarIconStyle: {backgroundColor: '#42BB7E', marginBottom: '5%'},
+          tabBarActiveTintColor: '#eaaa00',
+          // tabBarIconStyle: {backgroundColor: '#eaaa00', marginBottom: '5%'},
           tabBarStyle: {
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,

@@ -232,7 +232,7 @@ if(onRepeat == true ){
       onPress={onPress}
       disabled={disabled}
       style={{
-        backgroundColor: disabled ? "#ccc" : "#42BB7E",
+        backgroundColor: disabled ? "#ccc" : "#eaaa00",
         borderRadius: 25,
         width: width,
         height: height,
@@ -268,7 +268,7 @@ if(onRepeat == true ){
       onPress={repeatSound}
       disabled={false}
       style={{
-        backgroundColor: !onRepeat ? "#ccc" : "#42BB7E",
+        backgroundColor: !onRepeat ? "#ccc" : "#eaaa00",
         borderRadius: 25,
         width: width * 0.1,
         height: height * 0.05,

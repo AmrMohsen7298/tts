@@ -69,7 +69,7 @@ export default function Library() {
           <FontAwesomeIcon
             icon="heart"
             size={25}
-            color={'#42BB7E'}></FontAwesomeIcon>
+            color={'#eaaa00'}></FontAwesomeIcon>
         </TouchableOpacity>
         <TouchableOpacity style={styles.mediumButton}  onPress={() => {
             navigator.navigate('الدروس المتعلمه');
@@ -92,7 +92,7 @@ export default function Library() {
           <FontAwesomeIcon
             icon="circle-check"
             size={25}
-            color={'#42BB7E'}></FontAwesomeIcon>
+            color={'#eaaa00'}></FontAwesomeIcon>
         </TouchableOpacity>
       </View>
     </View>

@@ -93,7 +93,7 @@ const ListMedium = () => {
                 alignItems: 'center',
                 backgroundColor:
                   keywords.filter(({word}) => word === item.word).length > 0
-                    ? '#42BB7E'
+                    ? '#eaaa00'
                     : '#ddd',
                 paddingVertical: '15%',
                 borderTopRightRadius: 10,

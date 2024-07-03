@@ -155,7 +155,7 @@ export default function HomeScreen() {
             }}>
             <ActivityIndicator
               size="large"
-              color="#42BB7E"
+              color="#eaaa00"
               style={{
                 flex: 1,
 
@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
   activeTab: {
     paddingVertical: height * 0.008,
     paddingHorizontal: width * 0.01,
-    backgroundColor: '#42BB7E',
+    backgroundColor: '#eaaa00',
     borderColor: 'white',
     borderRadius: 10,
   },
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
     height: height * 0.04,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#42BB7E',
+    backgroundColor: '#eaaa00',
     borderColor: 'white',
   },
   tabTextActive: {
@@ -413,7 +413,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 5,
     marginHorizontal: 5,
-    borderColor: '#42BB7E',
+    borderColor: '#eaaa00',
     borderWidth: 1,
     width: 200,
     height: 50,
@@ -422,7 +422,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontFamily: 'outfitSemi',
     fontSize: 16,
-    color: '#42BB7E',
+    color: '#eaaa00',
     width: '100%',
     textAlign: 'center',
   },
