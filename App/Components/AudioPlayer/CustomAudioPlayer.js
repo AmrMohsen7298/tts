@@ -30,10 +30,10 @@ const CustomAudioPlayer = ({ audioUrl, setHighlightIndex, selectedSentence, time
   useEffect(() => {
     if (timePoints && storyParagraph && isPlaying) {
       setHighlightIndex([]); // Reset highlight index array
-      const sentences = storyParagraph.split('.').filter(sentence => sentence.trim() !== '');
+      const sentences = storyParagraph.split(/(?<=[.?])\s+/).filter(sentence => sentence.trim() !== '');
       console.log("sentences in audio player", sentences);
       let delay = 0; // Initialize delay for setTimeout
-      const words = storyParagraph.split(/[\s.,!?؛؟«»؟،٫]+/).map((word, index) => index);
+      const words = storyParagraph.split(/(\s+|[.,!?؛؟«»؟،٫:]+)/).map((word, index) => index);
       let sentenceIndex = 0;
   
       const highlightWordsRecursive = async () => {
@@ -41,9 +41,10 @@ const CustomAudioPlayer = ({ audioUrl, setHighlightIndex, selectedSentence, time
           let wordIndexes = [];
           const sentence = sentences[sentenceIndex];
          
-          const sentenceWords = sentence.split(/[\s.,!?؛؟«»؟،٫]+/).filter(sentence => sentence.trim() !== '');
+          const sentenceWords = sentence.split(/(\s+|[.,!?؛؟«»؟،٫:]+)/).filter(sentence => sentence.trim() !== '');
           console.log("sentencewords in audio player", sentenceWords);
           for (let i = 0; i < sentenceWords.length; i++) {
+            console.log("Sentence LEngth", sentenceWords.length)
             wordIndexes.push(words.shift()); // Collect word indexes for the current sentence
           }
           if(sentenceIndex == 0){

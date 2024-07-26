@@ -664,8 +664,58 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
                         </View>
                       );
                     })
-                  : storyParagraph?.split(/[\s.,!?؛؟«»؟،٫]+/).filter(sentence => sentence.trim() !== '').map((word, index) => {
-                  
+                  : storyParagraph?.split(/(\s+|[.,!?؛؟«»؟،٫:]+)/).filter(sentence => sentence.trim() !== '').map((word, index) => {
+                      if(/[.,!?؛؟«»؟،٫:]+/.test(word)) {
+                      // Render punctuation mark
+                      return (
+                        <Text
+                          key={index}
+                            style={{
+                              flex: 0,
+                              marginVertical: height * 0.005,
+                              color: highlightIndex?.some(idx => idx == index)
+                                ? 'white'
+                                : 'black',
+                              fontFamily: 'outfit',
+                              fontSize: 20,
+                              textAlign: 'right',
+                              borderTopRightRadius:
+                              (storyAudioPlaying &&
+                                index == highlightIndex?.[0]) ||
+                              (!storyAudioPlaying && selectedWord)
+                                ? 5
+                                : 0,
+                            borderBottomRightRadius:
+                              (storyAudioPlaying &&
+                                index == highlightIndex?.[0]) ||
+                              (!storyAudioPlaying && selectedWord)
+                                ? 5
+                                : 0,
+                            borderTopLeftRadius:
+                              (storyAudioPlaying &&
+                                index ==
+                                highlightIndex?.filter(x => x !== undefined).pop() ) ||
+                              (!storyAudioPlaying && selectedWord)
+                                ? 5
+                                : 0,
+                            borderBottomLeftRadius:
+                              (storyAudioPlaying &&
+                                index ==
+                                highlightIndex?.filter(x => x !== undefined).pop() ) ||
+                              (!storyAudioPlaying && selectedWord)
+                                ? 5
+                                : 0,
+                            backgroundColor:
+                              highlightIndex?.length > 0 &&
+                              highlightIndex?.some(idx => idx == index)
+                                ? '#eaaa00'
+                                : 'transparent',
+                            }}
+                        >
+                          {word}
+                        </Text>
+                      );
+                    } else {
                       return (
                       
                         <Pressable
@@ -752,6 +802,7 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
                           </Text>
                         </Pressable>
                       );
+                    }
                     })}
               </View>
             </View>
