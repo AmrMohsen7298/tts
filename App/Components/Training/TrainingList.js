@@ -5,7 +5,6 @@ import {useNavigation} from '@react-navigation/native';
 import {useEffect, useState,useRef} from 'react';
 import {View, Text, Pressable, StyleSheet, Dimensions} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
-import Ionicons from 'react-native-vector-icons/Ionicons'; // Import Ionicons from the correct package
 import {useDispatch, useSelector} from 'react-redux';
 import {removeWordTraining,setAudioPlaying} from '../../Actions/StoryActions';
 import Sound from 'react-native-sound';
@@ -16,7 +15,7 @@ const List = ({route}) => {
 
   const {category} = route.params;
   const keywords = useSelector(state => state.storyReducer.userKeywords);
-  const state = keywords.filter(item => item.category === category);
+  const state = keywords?.filter(item => item.category === category);
 
 
   const navigation = useNavigation();

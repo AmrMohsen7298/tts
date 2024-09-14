@@ -4,15 +4,15 @@ import {useNavigation} from '@react-navigation/native';
 import {useEffect} from 'react';
 import {View, Text, Pressable, StyleSheet, Dimensions} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
-import Ionicons from 'react-native-vector-icons/Ionicons'; // Import Ionicons from the correct package
 import {useDispatch, useSelector} from 'react-redux';
 import {removeWordTraining} from '../../Actions/StoryActions';
+import PLAYGREY from '../../../assets/play-grey.png';
 
 const {height, width} = Dimensions.get('screen');
 
 const ListDone = () => {
   const keywords = useSelector(state => state.storyReducer.keywords);
-  const state = keywords.filter(item => item.type === 'done');
+  const state = keywords?.filter(item => item.type === 'done');
 
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -114,7 +114,10 @@ const ListDone = () => {
                 paddingVertical: '15%',
                 borderBottomRightRadius: 10,
               }}>
-              <Ionicons name="play" size={20} color="#33380" />
+              <Image
+                source={PLAYGREY}
+                style={{width: 15, height: 15, opacity: '0.7'}}
+              />
             </Pressable>
           </View>
         </View>

@@ -1,12 +1,13 @@
-import {View, Text, Dimensions} from 'react-native';
+import {View, Text, Dimensions, Image} from 'react-native';
 import React from 'react';
-import Ionicons from 'react-native-vector-icons/Ionicons'; // Correct import
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator, HeaderBackButton} from '@react-navigation/stack';
 import LessonScreen from '../Screens/LessonScreen';
 import HomeScreen from '../Screens/HomeScreen';
 import ProfileScreen from '../Screens/ProfileScreen';
 import {useStateValue} from '../store/contextStore/StateContext';
+import ARROWBACKBLACK from '../../assets/arrow-back-black.png';
+import ARROWBACKWHITE from '../../assets/arrow-back-white.png';
 const {width, height} = Dimensions.get('window');
 const Stack = createStackNavigator();
 
@@ -31,14 +32,16 @@ function StackNavigation() {
           headerBackgroundContainerStyle: {backgroundColor: 'transparent'},
           headerTitleStyle: {color: 'white'},
           headerLeft: () => (
-            <Ionicons
-              name="arrow-back-outline"
-              size={25}
-              style={{paddingHorizontal: width * 0.05}}
-              color="white"
+            <Image
+              source={ARROWBACKWHITE}
               onPress={() => {
-                navigation.goBack("HomeScreen");
+                navigation.goBack('HomeScreen');
                 dispatch({type: 'SHOW_NAVBAR', payload: true});
+              }}
+              style={{
+                width: 25,
+                height: 25,
+                paddingHorizontal: width * 0.05,
               }}
             />
           ),
@@ -55,17 +58,17 @@ function StackNavigation() {
           headerBackgroundContainerStyle: {backgroundColor: 'transparent'},
           headerTitleStyle: {color: 'black'},
           headerLeft: () => (
-            <Ionicons
-              name="arrow-back-outline"
-              size={25}
-              style={{
-                paddingHorizontal: width * 0.05,
-                marginTop: height * 0.026,
-              }}
-              color="black"
+            <Image
+              source={ARROWBACKBLACK}
               onPress={() => {
                 navigation.goBack(HomeScreen);
                 dispatch({type: 'SHOW_NAVBAR', payload: true});
+              }}
+              style={{
+                width: 25,
+                height: 25,
+                paddingHorizontal: width * 0.05,
+                marginTop: height * 0.026,
               }}
             />
           ),

@@ -24,7 +24,8 @@ import {
   setWordTraining,
 } from '../../Actions/StoryActions';
 import {faDumbbell} from '@fortawesome/free-solid-svg-icons';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import PLAY from '../../../assets/play.png';
+import PLAYGREY from '../../../assets/play-grey.png';
 
 const {width, height} = Dimensions.get('window');
 export default function KeywordCard(props) {
@@ -155,10 +156,9 @@ export default function KeywordCard(props) {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            backgroundColor:
-              userKeywords?.some(item => item.text == text)
-                ? '#eaaa00'
-                : '#ddd',
+            backgroundColor: userKeywords?.some(item => item.text == text)
+              ? '#eaaa00'
+              : '#ddd',
             paddingVertical: '15%',
             borderTopRightRadius: 10,
             borderBottomWidth: 1,
@@ -166,12 +166,12 @@ export default function KeywordCard(props) {
           }}
           onPress={() =>
             userKeywords?.filter(item => item.text == text).length > 0
-              ? dispatch(removeUserWords({text:text}))
+              ? dispatch(removeUserWords({text: text}))
               : dispatch(
                   setUserWords({
                     text: text,
                     type: type,
-                    level : level,
+                    level: level,
                     description: description,
                     audio: audio,
                     translation: translation,
@@ -198,11 +198,14 @@ export default function KeywordCard(props) {
             paddingVertical: '15%',
             borderBottomRightRadius: 10,
           }}>
-          <Ionicons
-            name="play"
-            size={20}
-            color={playPressed ? 'white' : '#33333370'}
-          />
+          {playPressed ? (
+            <Image source={PLAY} style={{width: 15, height: 15}} />
+          ) : (
+            <Image
+              source={PLAYGREY}
+              style={{width: 15, height: 15, opacity: 0.5}}
+            />
+          )}
         </Pressable>
       </View>
     </View>

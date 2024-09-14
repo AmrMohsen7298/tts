@@ -8,8 +8,7 @@ import LibraryScreen from '../Screens/LibraryScreen';
 import SettingsScreen from '../Screens/SettingsScreen';
 import StackNavigation from './StackNavigation';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faScroll, faDumbbell} from '@fortawesome/free-solid-svg-icons'; // Import specific icons
-import Ionicons from 'react-native-vector-icons/Ionicons'; // Correct import path for Ionicons
+import {faScroll, faDumbbell, faFileText} from '@fortawesome/free-solid-svg-icons'; // Import specific icons
 import Colors from '../Utils/Colors';
 import LibraryStack from './LibraryStack';
 import {useStateValue} from '../store/contextStore/StateContext';
@@ -64,7 +63,11 @@ export default function TabNavigation() {
           options={{
             tabBarLabelStyle: {marginBottom: '8%'},
             tabBarIcon: ({color, size}) => (
-              <Ionicons name="document-text-sharp" size={size} color={color} />
+              <FontAwesomeIcon
+                icon={faFileText}
+                size={size}
+                color={color}
+              />
             ),
           }}
         />

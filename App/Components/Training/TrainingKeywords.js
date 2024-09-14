@@ -9,14 +9,16 @@ import {
   Dimensions,
   Pressable,
 } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons'; // Import Ionicons from the correct package
 import user from './../../../assets/Images/userProfile.jpg';
 import Colors from '../../Utils/Colors';
 import {useDispatch, useSelector} from 'react-redux';
 import {setUserWords, setWordTraining} from '../../Actions/StoryActions';
 import {useNavigation} from '@react-navigation/native';
 import RNFetchBlob from 'rn-fetch-blob';
-import Sound from "react-native-sound";
+import Sound from 'react-native-sound';
+import FILETRAYFULL from '../../../assets/file-tray-full.png';
+import VOLUMEHIGHOUTLINE from '../../../assets/volume-high-outline.png';
+import REPEAT from '../../../assets/repeat.png';
 
 const {width, height} = Dimensions.get('screen');
 
@@ -25,13 +27,13 @@ export default function TrainingKeywords(props) {
   const navigation = useNavigation();
   const sound = useRef();
 
-  const newKeywords = useSelector(state => state.storyReducer.userKeywords).filter(
-    item => item.category === 'new',
-  );
+  const newKeywords = useSelector(
+    state => state.storyReducer.userKeywords,
+  ).filter(item => item.category === 'new');
 
   const [translate, setTranslate] = useState(false);
   const [showAns, setShowAns] = useState(false);
-  const [playPressed, setPlayPressed] = useState(false)
+  const [playPressed, setPlayPressed] = useState(false);
 
   const handleLoginPress = () => {
     setShowAns(prev => !prev);
@@ -45,7 +47,11 @@ export default function TrainingKeywords(props) {
     async function saveAudioToFileSystem() {
       try {
         // Save the audio Blob to the file system
-        await RNFetchBlob.fs.writeFile(filePath, newKeywords?.[0]?.audio, 'base64');
+        await RNFetchBlob.fs.writeFile(
+          filePath,
+          newKeywords?.[0]?.audio,
+          'base64',
+        );
         console.log(filePath);
         sound.current = new Sound(filePath, '', error => {
           if (error) {
@@ -83,7 +89,6 @@ export default function TrainingKeywords(props) {
     if (newKeywords.length < 1) {
       navigation.navigate('TrainingScreen');
     }
-
   }, [newKeywords]);
 
   return (
@@ -93,7 +98,7 @@ export default function TrainingKeywords(props) {
         <Text style={styles.headerLabelRight}>جديد</Text>
       </View>
       <View style={styles.iconContainer}>
-        <Ionicons name={'file-tray-full-outline'} size={25} color="black" />
+        <Image source={FILETRAYFULL} style={{width: 25, height: 25}} />
         <Text style={styles.iconText}>{newKeywords?.length}</Text>
       </View>
       <View style={{gap: 20}}>
@@ -136,9 +141,11 @@ export default function TrainingKeywords(props) {
               padding: width * 0.01,
               borderRadius: width * 0.02,
             }}>
-            <TouchableOpacity
-            onPress={()=>setPlayPressed(true)}>
-              <Ionicons name="volume-high-outline" size={25} color="black" />
+            <TouchableOpacity onPress={() => setPlayPressed(true)}>
+              <Image
+                source={VOLUMEHIGHOUTLINE}
+                style={{width: 25, height: 25}}
+              />
             </TouchableOpacity>
           </View>
           {/* <View
@@ -161,11 +168,9 @@ export default function TrainingKeywords(props) {
           <View style={styles.hairlineLeft}></View>
           <View style={styles.headerLabelCenterContainer}>
             <TouchableOpacity onPress={() => setTranslate(prev => !prev)}>
-              <Ionicons
-                style={styles.repeatIcon}
-                name={'repeat-outline'}
-                size={25}
-                color="black"
+              <Image
+                source={REPEAT}
+                style={{...styles.repeatIcon, width: 25, height: 25}}
               />
             </TouchableOpacity>
           </View>

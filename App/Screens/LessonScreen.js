@@ -1,4 +1,10 @@
-import React, {useEffect, useRef, useState,useCallback, useLayoutEffect } from 'react';
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  useLayoutEffect,
+} from 'react';
 // import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from "expo-av";
 import {AnimatedCircularProgress} from 'react-native-circular-progress';
 import {
@@ -13,8 +19,8 @@ import {
   Dimensions,
   findNodeHandle,
   measureLayout,
-  ActivityIndicator ,
-  measure
+  ActivityIndicator,
+  measure,
 } from 'react-native';
 import TextHighlighter from './../Components/TextHighlighter';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
@@ -57,8 +63,13 @@ import {
 import Sound from 'react-native-sound';
 import RNFetchBlob from 'rn-fetch-blob';
 import {useStateValue} from '../store/contextStore/StateContext';
-import { text } from '@fortawesome/fontawesome-svg-core';
-import { FlatList } from 'react-native-gesture-handler';
+import {text} from '@fortawesome/fontawesome-svg-core';
+import {FlatList} from 'react-native-gesture-handler';
+import CHECKMARKWHITE from '../../assets/checkmark-white.png';
+import TROPHY from '../../assets/trophy.png';
+import CHECK from '../../assets/check-orange.png';
+import CROSS from '../../assets/check-cross.png';
+import CIRCLECHECK from '../../assets/checkmark-white.png';
 // import CustomAudioPlayer from "../Components/AudioPlayer/CustomAudioPlayer";
 
 const {width, height} = Dimensions.get('window');
@@ -101,36 +112,34 @@ const {width, height} = Dimensions.get('window');
 const DoneLearning = ({lessonId}) => {
   const learned = useSelector(state => state.storyReducer.learned);
   const dispatch = useDispatch();
-if(!learned){
-  learned=[]
-}
-else{
-
-  return (
-    <View style={styles.buttonWrapper}>
-      <View
-        style={{
-          ...styles.buttonContainer,
-          backgroundColor: learned?.some(id => id == lessonId)
-            ? '#eaaa00'
-            : '#333',
-        }}>
-        <TouchableOpacity
-          style={styles.touchable}
-          onPress={() => {
-            !learned?.some(id => id == lessonId)
-              ? dispatch(addToLearned(lessonId))
-              : dispatch(removeFromLearned(lessonId));
+  if (!learned) {
+    learned = [];
+  } else {
+    return (
+      <View style={styles.buttonWrapper}>
+        <View
+          style={{
+            ...styles.buttonContainer,
+            backgroundColor: learned?.some(id => id == lessonId)
+              ? '#eaaa00'
+              : '#333',
           }}>
-          <Text style={styles.touchableText}>
-            <Ionicons name="checkmark-outline" size={20} color="white" /> تم
-            التعلم
-          </Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.touchable}
+            onPress={() => {
+              !learned?.some(id => id == lessonId)
+                ? dispatch(addToLearned(lessonId))
+                : dispatch(removeFromLearned(lessonId));
+            }}>
+            <Text style={styles.touchableText}>
+              تم التعلم{' '}
+              <Image source={CHECKMARKWHITE} style={{width: 20, height: 20}} />
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
-  );
-}
+    );
+  }
 };
 
 export default function LessonScreen(props) {
@@ -177,17 +186,17 @@ export default function LessonScreen(props) {
     state => state.storyReducer.storyAudioPlaying,
   );
   const [translationHighlightIndex, setTranslationHighlightIndex] = useState();
-  const [layoutIds, setLayoutIds] = useState([])
+  const [layoutIds, setLayoutIds] = useState([]);
   const scrollStory = useRef();
   const textRef = useRef();
   const [loading, setLoading] = useState(false);
-  let scrollView
+  let scrollView;
   // const [sentenceHeights, setSentenceHeights] = useState([]);
   const [wordHeights, setWordHeights] = useState([]);
   const translationRef = useRef({});
-  const wordsRef = useRef({})
-  const pressableRefs = useRef({})
-  const sentenceHeights = useRef([])
+  const wordsRef = useRef({});
+  const pressableRefs = useRef({});
+  const sentenceHeights = useRef([]);
 
   // useLayoutEffect(()=>{
   //   setWordHeights(pressablePositions)
@@ -195,25 +204,34 @@ export default function LessonScreen(props) {
   // useEffect(()=>{
   //   setWordHeights(pressablePositions)
   // },[pressablePositions])
-  useEffect(()=>{
-    if(wordHeights.length-1 == storyParagraph?.split(/[\s.,!?؛؟«»؟،٫]+/).filter(sentence => sentence.trim() !== '')?.length-1){
-      setLoading(false)
+  useEffect(() => {
+    if (
+      wordHeights.length - 1 ==
+      storyParagraph
+        ?.split(/[\s.,!?؛؟«»؟،٫]+/)
+        .filter(sentence => sentence.trim() !== '')?.length -
+        1
+    ) {
+      setLoading(false);
     }
-  },[wordHeights])
-  const handleWordLayout = useCallback((index, event)=>{
-    console.log("word index",index)
-    const { y } = event.nativeEvent.layout;
-    if(!wordsRef.current[index]){
-    setWordHeights((prevHeights) => {
-        wordsRef.current[index] = true
-        console.log("prevHeights",prevHeights)
-        const newHeights = [...prevHeights];
-    
-        newHeights[index] = y;
-        return newHeights;
-      })
-    }
-  },[wordHeights])
+  }, [wordHeights]);
+  const handleWordLayout = useCallback(
+    (index, event) => {
+      console.log('word index', index);
+      const {y} = event.nativeEvent.layout;
+      if (!wordsRef.current[index]) {
+        setWordHeights(prevHeights => {
+          wordsRef.current[index] = true;
+          console.log('prevHeights', prevHeights);
+          const newHeights = [...prevHeights];
+
+          newHeights[index] = y;
+          return newHeights;
+        });
+      }
+    },
+    [wordHeights],
+  );
   // useEffect(()=>{
   //   const pressables = Object.values(pressableRefs.current);
   //   const heights = {};
@@ -225,129 +243,125 @@ export default function LessonScreen(props) {
   //   });
   //   setWordHeights(heights)
   // },[pressableRefs])
- 
 
-  const handleSentenceLayout = useCallback((index, event) => {
-  const { y } = event.nativeEvent.layout;
-  if(!translationRef.current[index]){
-    console.log("sentence", event.nativeEvent.layout)
-    sentenceHeights.current[index] = y
-  // setSentenceHeights((prevHeights) => {
-  //   translationRef.current[index] = true
-  //   console.log("prevHeights",prevHeights)
-  //   const newHeights = [...prevHeights];
+  const handleSentenceLayout = useCallback(
+    (index, event) => {
+      const {y} = event.nativeEvent.layout;
+      if (!translationRef.current[index]) {
+        console.log('sentence', event.nativeEvent.layout);
+        sentenceHeights.current[index] = y;
+        // setSentenceHeights((prevHeights) => {
+        //   translationRef.current[index] = true
+        //   console.log("prevHeights",prevHeights)
+        //   const newHeights = [...prevHeights];
 
-  //   newHeights[index] = y;
+        //   newHeights[index] = y;
 
-  //   return newHeights;
-  // })
-}
-}, [sentenceHeights]); 
-
-
-// const scrollTo = (index) => {
-
-//   console.log("Scrolling to index", index);
-
-//   console.log("Time points", timePoints);
-
-//   console.log("Sentence heights", sentenceHeights);
-
-
-//   let cumulativeHeight = 0;
-
-//   for (let i = 0; i <= index; i++) {
-
-//     cumulativeHeight += sentenceHeights[i];
-
-//   }
-
-
-//   if (scrollStory.current) {
-
-//     scrollStory.current.scrollTo({ y: cumulativeHeight, animated: true });
-
-//   }
-
-// };
-
-
-
-const scrollTo = (sentenceIndex, wordIndexes) => {
-
-
-
-  // let cumulativeHeight = 0;
-
-
-  // for (let i = 0; i <= index; i++) {
-
-  //   cumulativeHeight += sentenceHeights[i];
-
-  // }
-
-
-  if (scrollStory.current) {
-
-    scrollStory.current.scrollTo({ x:0, y: translateButton? sentenceHeights.current[sentenceIndex] : wordHeights?.[wordIndexes?.pop()], animated: true });
-
-  }
-  console.log("SENTENCEHEIGHTS", sentenceHeights.current[sentenceIndex])
-  console.log("Checking if index is last element:",wordIndexes, sentenceIndex, sentenceHeights.current.length - 1,wordHeights.length -1); 
-  console.log("PRESABLE", wordHeights)
-  sentenceIndex++
-
- console.log("last word index :value",wordIndexes.filter(x => x !== undefined).pop())
-  if (sentenceIndex ==sentenceHeights.current.length - 1|| ((wordIndexes.filter(x => x !== undefined).pop())+1) == wordHeights.length -1) {
-
-    console.log("Reached the last element, setting timer for last timepoint");
-    console.log("Time points", timePoints);
-    setTimeout(() => {
-
-      console.log("Timer expired, incrementing index and scrolling back to top");
-
-       // Reset the index to 0
-
-       if (scrollStory.current) {
-
-        scrollStory.current.scrollTo({y: 0, animated: true });
-    
+        //   return newHeights;
+        // })
       }
+    },
+    [sentenceHeights],
+  );
 
-    }, (timePoints[0])*1000);
+  // const scrollTo = (index) => {
 
-  } else {
+  //   console.log("Scrolling to index", index);
 
-    console.log("Not the last element, incrementing index");
-  
-    
+  //   console.log("Time points", timePoints);
 
-  }
+  //   console.log("Sentence heights", sentenceHeights);
 
-};
+  //   let cumulativeHeight = 0;
 
+  //   for (let i = 0; i <= index; i++) {
+
+  //     cumulativeHeight += sentenceHeights[i];
+
+  //   }
+
+  //   if (scrollStory.current) {
+
+  //     scrollStory.current.scrollTo({ y: cumulativeHeight, animated: true });
+
+  //   }
+
+  // };
+
+  const scrollTo = (sentenceIndex, wordIndexes) => {
+    // let cumulativeHeight = 0;
+
+    // for (let i = 0; i <= index; i++) {
+
+    //   cumulativeHeight += sentenceHeights[i];
+
+    // }
+
+    if (scrollStory.current) {
+      scrollStory.current.scrollTo({
+        x: 0,
+        y: translateButton
+          ? sentenceHeights.current[sentenceIndex]
+          : wordHeights?.[wordIndexes?.pop()],
+        animated: true,
+      });
+    }
+    console.log('SENTENCEHEIGHTS', sentenceHeights.current[sentenceIndex]);
+    console.log(
+      'Checking if index is last element:',
+      wordIndexes,
+      sentenceIndex,
+      sentenceHeights.current.length - 1,
+      wordHeights.length - 1,
+    );
+    console.log('PRESABLE', wordHeights);
+    sentenceIndex++;
+
+    console.log(
+      'last word index :value',
+      wordIndexes.filter(x => x !== undefined).pop(),
+    );
+    if (
+      sentenceIndex == sentenceHeights.current.length - 1 ||
+      wordIndexes.filter(x => x !== undefined).pop() + 1 ==
+        wordHeights.length - 1
+    ) {
+      console.log('Reached the last element, setting timer for last timepoint');
+      console.log('Time points', timePoints);
+      setTimeout(() => {
+        console.log(
+          'Timer expired, incrementing index and scrolling back to top',
+        );
+
+        // Reset the index to 0
+
+        if (scrollStory.current) {
+          scrollStory.current.scrollTo({y: 0, animated: true});
+        }
+      }, timePoints[0] * 1000);
+    } else {
+      console.log('Not the last element, incrementing index');
+    }
+  };
 
   useEffect(() => {
     setLoading(true);
     contextDispatch({type: 'SHOW_NAVBAR', payload: false});
-   
+
     getQuizByTutorialId(props?.route?.params?.lessonId).then(res => {
       setQuizData(res?.questions);
-     
     });
     getKeywordsbyTutorialId(props?.route?.params?.lessonId).then(res => {
-      res?.map((key)=>{
-        dispatch(setWordTraining(key))
-      })
+      res?.map(key => {
+        dispatch(setWordTraining(key));
+      });
 
-      setLessonKeyWords(res)
-    
+      setLessonKeyWords(res);
     });
     getGrammerByTutorialId(props?.route?.params?.lessonId).then(res => {
       setGrammar(res);
     });
     getStoryById(props?.route?.params?.lessonId).then(resp => {
-     
       setStoryParagraph(resp?.paragraph);
       setTranslation(resp?.translation);
       setName(resp?.name);
@@ -363,9 +377,7 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
           setTimePoints(prevTimePoints => [
             ...prevTimePoints,
             time?.['timeSeconds_'],
-           
           ]);
-
         });
       });
     });
@@ -373,7 +385,6 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
   useEffect(() => {
     if (storyParagraph) {
       setStorySentences(storyParagraph.split(['.']));
-      
     }
   }, [storyParagraph]);
   // useEffect(()=>{
@@ -395,7 +406,6 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
   //       textRef.current.focus()
   //     });
   //   // }
-
 
   //     // textRef.current.measureLayout(
   //     //   findNodeHandle(scrollStory),
@@ -464,20 +474,17 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
     setPlayPressed(false);
   };
   const setFavorites = (flag, lessonId) => {
-   if(!favorites){
-    favorites = []
-   }
-   else{
+    if (!favorites) {
+      favorites = [];
+    } else {
+      if (flag) {
+        dispatch(addFavorite(lessonId));
+      } else {
+        dispatch(removeFavorite(lessonId));
+      }
 
-     if (flag) {
-       dispatch(addFavorite(lessonId));
-     } else {
-       dispatch(removeFavorite(lessonId));
-     }
-  
- 
-     setfavoriteButton(!favoriteButton);
-   }
+      setfavoriteButton(!favoriteButton);
+    }
   };
 
   const checkAnswer = ({question, answer}) => {
@@ -531,8 +538,12 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
       case 0:
         return (
           <ScrollView
-          ref={scrollStory}
-            style={{bottom: 'auto', backgroundColor: 'white',overflow: 'croll'}}
+            ref={scrollStory}
+            style={{
+              bottom: 'auto',
+              backgroundColor: 'white',
+              overflow: 'croll',
+            }}
             horizontal={false}
             showsHorizontalScrollIndicator={true}
             contentContainerStyle={{paddingHorizontal: 'auto'}}>
@@ -587,7 +598,7 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
                   paddingTop: height * 0.06,
                 }}>
                 {translateButton
-                  ? storyParagraph?.split(".").map((word, index) => {
+                  ? storyParagraph?.split('.').map((word, index) => {
                       return (
                         <View
                           key={index}
@@ -629,181 +640,192 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
                                 : 0,
                             backgroundColor:
                               translationHighlightIndex?.length > 0 &&
-                              translationHighlightIndex?.some(idx => idx == index)
+                              translationHighlightIndex?.some(
+                                idx => idx == index,
+                              )
                                 ? '#eaaa00'
                                 : 'transparent',
                             paddingHorizontal: 3,
                             marginVertical: height * 0.005,
                           }}
-                          onLayout={(event) => handleSentenceLayout(index, event)}
-                          >
-                          <Text >
+                          onLayout={event =>
+                            handleSentenceLayout(index, event)
+                          }>
+                          <Text>
                             <Text
                               style={{
-                                color:
-                                   'black',
+                                color: 'black',
                                 borderRadius: 20,
                                 fontFamily: 'outfit',
                                 fontSize: 20,
                                 textAlign: 'center',
-
-                              }} >
+                              }}>
                               {word}
                             </Text>
-                            <Text>{"\n"}</Text>
-                            <Text>{"\n"}</Text>
-                            <Text                               style={{
-                                color:
-                                   'black',
+                            <Text>{'\n'}</Text>
+                            <Text>{'\n'}</Text>
+                            <Text
+                              style={{
+                                color: 'black',
                                 borderRadius: 20,
                                 fontFamily: 'outfit',
                                 fontSize: 20,
-                                textAlign: 'center'}}>
-                                  {translation?.split(".")?.[index]}</Text>
+                                textAlign: 'center',
+                              }}>
+                              {translation?.split('.')?.[index]}
+                            </Text>
                           </Text>
                         </View>
                       );
                     })
-                  : storyParagraph?.split(/(\s+|[.,!?؛؟«»؟،٫:]+)/).filter(sentence => sentence.trim() !== '').map((word, index) => {
-                      if(/[.,!?؛؟«»؟،٫:]+/.test(word)) {
-                      // Render punctuation mark
-                      return (
-                        <Text
-                          key={index}
-                            style={{
-                              flex: 0,
-                              marginVertical: height * 0.005,
-                              color: highlightIndex?.some(idx => idx == index)
-                                ? 'white'
-                                : 'black',
-                              fontFamily: 'outfit',
-                              fontSize: 20,
-                              textAlign: 'right',
-                              borderTopRightRadius:
-                              (storyAudioPlaying &&
-                                index == highlightIndex?.[0]) ||
-                              (!storyAudioPlaying && selectedWord)
-                                ? 5
-                                : 0,
-                            borderBottomRightRadius:
-                              (storyAudioPlaying &&
-                                index == highlightIndex?.[0]) ||
-                              (!storyAudioPlaying && selectedWord)
-                                ? 5
-                                : 0,
-                            borderTopLeftRadius:
-                              (storyAudioPlaying &&
-                                index ==
-                                highlightIndex?.filter(x => x !== undefined).pop() ) ||
-                              (!storyAudioPlaying && selectedWord)
-                                ? 5
-                                : 0,
-                            borderBottomLeftRadius:
-                              (storyAudioPlaying &&
-                                index ==
-                                highlightIndex?.filter(x => x !== undefined).pop() ) ||
-                              (!storyAudioPlaying && selectedWord)
-                                ? 5
-                                : 0,
-                            backgroundColor:
-                              highlightIndex?.length > 0 &&
-                              highlightIndex?.some(idx => idx == index)
-                                ? '#eaaa00'
-                                : 'transparent',
-                            }}
-                        >
-                          {word}
-                        </Text>
-                      );
-                    } else {
-                      return (
-                      
-                        <Pressable
-                          focusable={true}
-                          key={index}
-                          ref={(ref) => {
-
-                            pressableRefs.current[index] = ref;
-              
-                          }}
-                          onPress={() => onPressWord(word, index)}
-                          style={{
-                            flex: 0,
-                            textAlign: 'center',
-                            justifyContent: 'center',
-                            overflow: 'hidden',
-                            // borderRadius: storyAudioPlaying && (index == highlightIndex[highlightIndex.length-1] || index == highlightIndex[0]) ? 5: 0,
-                            borderTopRightRadius:
-                              (storyAudioPlaying &&
-                                index == highlightIndex?.[0]) ||
-                              (!storyAudioPlaying && selectedWord)
-                                ? 5
-                                : 0,
-                            borderBottomRightRadius:
-                              (storyAudioPlaying &&
-                                index == highlightIndex?.[0]) ||
-                              (!storyAudioPlaying && selectedWord)
-                                ? 5
-                                : 0,
-                            borderTopLeftRadius:
-                              (storyAudioPlaying &&
-                                index ==
-                                highlightIndex?.filter(x => x !== undefined).pop() ) ||
-                              (!storyAudioPlaying && selectedWord)
-                                ? 5
-                                : 0,
-                            borderBottomLeftRadius:
-                              (storyAudioPlaying &&
-                                index ==
-                                highlightIndex?.filter(x => x !== undefined).pop() ) ||
-                              (!storyAudioPlaying && selectedWord)
-                                ? 5
-                                : 0,
-                            backgroundColor:
-                              highlightIndex?.length > 0 &&
-                              highlightIndex?.some(idx => idx == index)
-                                ? '#eaaa00'
-                                : 'transparent',
-                            paddingHorizontal: 3,
-                            marginVertical: height * 0.005,
-                          }}
-                          onLayout={(event) => handleWordLayout(index, event)}
-                          // onLayout={(event) => {
-
-                          //     const {y} = event.nativeEvent.layout
-              
-                          //     pressablePositions[index] = y;
-              
-                          //   }}
-                          >
-                          <Text
-                            // onLayout={(event)=> {
-                            //     // console.log("event", event.nativeEvent)
-                            //     const {x, y, height, width} = event.nativeEvent.layout;
-                            //     setLayoutIds([...layoutIds, y ])
-                            //   }
-                            // }>
-                           
-                            >
+                  : storyParagraph
+                      ?.split(/(\s+|[.,!?؛؟«»؟،٫:]+)/)
+                      .filter(sentence => sentence.trim() !== '')
+                      .map((word, index) => {
+                        if (/[.,!?؛؟«»؟،٫:]+/.test(word)) {
+                          // Render punctuation mark
+                          return (
                             <Text
-                              ref={textRef}
-                              collapsable={false}
-                              samaga={index}
+                              key={index}
                               style={{
+                                flex: 0,
+                                marginVertical: height * 0.005,
                                 color: highlightIndex?.some(idx => idx == index)
                                   ? 'white'
                                   : 'black',
                                 fontFamily: 'outfit',
                                 fontSize: 20,
-                                textAlign: 'center',
-                              }} >
+                                textAlign: 'right',
+                                borderTopRightRadius:
+                                  (storyAudioPlaying &&
+                                    index == highlightIndex?.[0]) ||
+                                  (!storyAudioPlaying && selectedWord)
+                                    ? 5
+                                    : 0,
+                                borderBottomRightRadius:
+                                  (storyAudioPlaying &&
+                                    index == highlightIndex?.[0]) ||
+                                  (!storyAudioPlaying && selectedWord)
+                                    ? 5
+                                    : 0,
+                                borderTopLeftRadius:
+                                  (storyAudioPlaying &&
+                                    index ==
+                                      highlightIndex
+                                        ?.filter(x => x !== undefined)
+                                        .pop()) ||
+                                  (!storyAudioPlaying && selectedWord)
+                                    ? 5
+                                    : 0,
+                                borderBottomLeftRadius:
+                                  (storyAudioPlaying &&
+                                    index ==
+                                      highlightIndex
+                                        ?.filter(x => x !== undefined)
+                                        .pop()) ||
+                                  (!storyAudioPlaying && selectedWord)
+                                    ? 5
+                                    : 0,
+                                backgroundColor:
+                                  highlightIndex?.length > 0 &&
+                                  highlightIndex?.some(idx => idx == index)
+                                    ? '#eaaa00'
+                                    : 'transparent',
+                              }}>
                               {word}
                             </Text>
-                          </Text>
-                        </Pressable>
-                      );
-                    }
-                    })}
+                          );
+                        } else {
+                          return (
+                            <Pressable
+                              focusable={true}
+                              key={index}
+                              ref={ref => {
+                                pressableRefs.current[index] = ref;
+                              }}
+                              onPress={() => onPressWord(word, index)}
+                              style={{
+                                flex: 0,
+                                textAlign: 'center',
+                                justifyContent: 'center',
+                                overflow: 'hidden',
+                                // borderRadius: storyAudioPlaying && (index == highlightIndex[highlightIndex.length-1] || index == highlightIndex[0]) ? 5: 0,
+                                borderTopRightRadius:
+                                  (storyAudioPlaying &&
+                                    index == highlightIndex?.[0]) ||
+                                  (!storyAudioPlaying && selectedWord)
+                                    ? 5
+                                    : 0,
+                                borderBottomRightRadius:
+                                  (storyAudioPlaying &&
+                                    index == highlightIndex?.[0]) ||
+                                  (!storyAudioPlaying && selectedWord)
+                                    ? 5
+                                    : 0,
+                                borderTopLeftRadius:
+                                  (storyAudioPlaying &&
+                                    index ==
+                                      highlightIndex
+                                        ?.filter(x => x !== undefined)
+                                        .pop()) ||
+                                  (!storyAudioPlaying && selectedWord)
+                                    ? 5
+                                    : 0,
+                                borderBottomLeftRadius:
+                                  (storyAudioPlaying &&
+                                    index ==
+                                      highlightIndex
+                                        ?.filter(x => x !== undefined)
+                                        .pop()) ||
+                                  (!storyAudioPlaying && selectedWord)
+                                    ? 5
+                                    : 0,
+                                backgroundColor:
+                                  highlightIndex?.length > 0 &&
+                                  highlightIndex?.some(idx => idx == index)
+                                    ? '#eaaa00'
+                                    : 'transparent',
+                                paddingHorizontal: 3,
+                                marginVertical: height * 0.005,
+                              }}
+                              onLayout={event => handleWordLayout(index, event)}
+                              // onLayout={(event) => {
+
+                              //     const {y} = event.nativeEvent.layout
+
+                              //     pressablePositions[index] = y;
+
+                              //   }}
+                            >
+                              <Text
+                              // onLayout={(event)=> {
+                              //     // console.log("event", event.nativeEvent)
+                              //     const {x, y, height, width} = event.nativeEvent.layout;
+                              //     setLayoutIds([...layoutIds, y ])
+                              //   }
+                              // }>
+                              >
+                                <Text
+                                  ref={textRef}
+                                  collapsable={false}
+                                  samaga={index}
+                                  style={{
+                                    color: highlightIndex?.some(
+                                      idx => idx == index,
+                                    )
+                                      ? 'white'
+                                      : 'black',
+                                    fontFamily: 'outfit',
+                                    fontSize: 20,
+                                    textAlign: 'center',
+                                  }}>
+                                  {word}
+                                </Text>
+                              </Text>
+                            </Pressable>
+                          );
+                        }
+                      })}
               </View>
             </View>
           </ScrollView>
@@ -824,9 +846,7 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
                   color="#eaaa00"
                   style={{marginTop: height * 0.02}}
                 /> */}
-                <View style={{marginTop: height * 0.02}}>
-
-                </View>
+                <View style={{marginTop: height * 0.02}}></View>
                 <Text
                   style={{
                     fontFamily: 'outfit',
@@ -882,7 +902,7 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
                     </Text>
                   </View>
                   <View style={styles.resultsHeaderIconContainer}>
-                    <Ionicons name="trophy" size={80} color="orange" />
+                    <Image source={TROPHY} style={{width: 80, height: 80}} />
                   </View>
                 </View>
                 <View style={styles.quizResults}>
@@ -1007,17 +1027,12 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
                             width: '20%',
                             textAlign: 'right',
                           }}>
-                          <Ionicons
-                            name={
+                          <Image
+                            style={{width: width * 0.06, height: width * 0.06}}
+                            source={
                               question.answer === chosenAnswers[question.code]
-                                ? 'checkmark-circle'
-                                : 'close-circle'
-                            }
-                            size={width * 0.07}
-                            color={
-                              question.answer === chosenAnswers[question.code]
-                                ? '#eaaa00'
-                                : '#ff0000'
+                                ? CHECK
+                                : CROSS
                             }
                           />
                         </View>
@@ -1127,15 +1142,17 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
                       <View style={styles.cardButtons}>
                         <Pressable
                           style={
-                            userKeywords.filter(({text}) => text === selectedWord)
-                              .length > 0
+                            userKeywords.filter(
+                              ({text}) => text === selectedWord,
+                            ).length > 0
                               ? // trainingPressed
                                 styles.cardButtonUpPressed
                               : styles.cardButtonUp
                           }
                           onPress={() => {
-                            userKeywords.filter(({text}) => text === selectedWord)
-                              .length > 0
+                            userKeywords.filter(
+                              ({text}) => text === selectedWord,
+                            ).length > 0
                               ? //setTrainingPressed(false)
                                 dispatch(
                                   removeUserWords({
@@ -1146,7 +1163,7 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
                                   setUserWords({
                                     text: selectedWord,
                                     translation: SelectedWordTranslation,
-                                    audio:selectedWordAudio,
+                                    audio: selectedWordAudio,
                                     category: 'new',
                                   }),
                                 );
@@ -1285,7 +1302,6 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
   return (
     <View style={styles.container}>
       {this.renderphoto()}
-      
 
       <View style={styles.tabsContainer}>
         <ScrollView
@@ -1309,29 +1325,31 @@ const scrollTo = (sentenceIndex, wordIndexes) => {
       </View>
 
       {/* Content */}
-      {(
-      <View style={styles.contentContainer}>
-        {loading && (<View style={styles.loadingContainer}>
+      {
+        <View style={styles.contentContainer}>
+          {loading && (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator
+                size="large"
+                color="#eaaa00"
+                style={{
+                  flex: 1,
 
-<       ActivityIndicator  size="large" color="#eaaa00" style={{
+                  justifyContent: 'center',
 
-flex: 1,
+                  alignItems: 'center',
 
-justifyContent: 'center',
+                  transform: [{scale: 2}], // increase the size
+                }}
+              />
+            </View>
+          )}
 
-alignItems: 'center',
-
-transform: [{ scale: 2 }] // increase the size
-
-}}  />
-</View>)}
-
-      <View style={styles.hairlineLeft}></View>
-        {renderContent()}
-      </View>
-      )}
+          <View style={styles.hairlineLeft}></View>
+          {renderContent()}
+        </View>
+      }
       <CustomAudioPlayer
-     
         audioUrl={audioSrc}
         setHighlightIndex={setHighlightIndex}
         setTranslationHighlightIndex={setTranslationHighlightIndex}
@@ -1340,14 +1358,13 @@ transform: [{ scale: 2 }] // increase the size
         textRef={textRef}
         scrollTo={scrollTo}
       />
-     
     </View>
   );
-};
+}
 const styles = StyleSheet.create({
   loadingContainer: {
-    width: "100%",
-    height: "100%"
+    width: '100%',
+    height: '100%',
   },
   scrollableResults: {
     display: 'flex',

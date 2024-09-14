@@ -31,7 +31,7 @@ export default function Header() {
   const dispatch = useDispatch();
 
   const handleNewPress =() =>{
-    if(keywords.filter(item => item.category === 'new')?.length == 0 ){
+    if(keywords?.filter(item => item.category === 'new')?.length == 0 ){
       getKeyWordsForTraining().then(res=>{
         res?.map((key)=>{
           if(!keywords.some((item)=> item?.text == key?.text))
@@ -48,7 +48,7 @@ export default function Header() {
 
 
   useEffect(()=>{
-    if(keywords.filter(item => item.category === 'new')?.length == 0){
+    if(keywords?.filter(item => item.category === 'new')?.length == 0){
       getKeyWordsForTraining().then(res=>{
         res?.map((key)=>{
           if(!keywords.filter((item)=> item?.text !== key?.text))
@@ -61,7 +61,7 @@ export default function Header() {
     }
   },[])
   useEffect(()=>{
-    if(keywords.filter(item => item.category === 'new')?.length == 0){
+    if(keywords?.filter(item => item.category === 'new')?.length == 0){
       getKeyWordsForTraining().then(res=>{
         res?.map((key)=>{
           if(!keywords.filter((item)=> item?.text !== key?.text))
@@ -132,7 +132,7 @@ export default function Header() {
           }>
           <Text style={styles.keywordType}>سهل</Text>
           <Text style={styles.easyText}>
-            {keywords.filter(item => item.category === 'easy').length} كلمات
+            {keywords?.filter(item => item.category === 'easy').length} كلمات
           </Text>
           <FontAwesomeIcon
             icon={faAngleLeft}
@@ -148,7 +148,7 @@ export default function Header() {
           }>
           <Text style={styles.keywordType}>متوسط</Text>
           <Text style={styles.mediumText}>
-            {keywords.filter(item => item.category === 'medium').length} كلمات
+            {keywords?.filter(item => item.category === 'medium').length} كلمات
           </Text>
           <FontAwesomeIcon
             icon={faAngleLeft}
@@ -164,7 +164,7 @@ export default function Header() {
           }>
           <Text style={styles.keywordType}>صعب</Text>
           <Text style={styles.hardText}>
-            {keywords.filter(item => item.category === 'hard').length} كلمات
+            {keywords?.filter(item => item.category === 'hard').length} كلمات
           </Text>
           <FontAwesomeIcon
             icon={faAngleLeft}
@@ -183,7 +183,7 @@ export default function Header() {
             <FontAwesomeIcon icon={faCalendar}></FontAwesomeIcon>
             <Text style={styles.keywordType}>جديد</Text>
             <Text style={styles.easyText}>
-              {keywords.filter(item => item.category === 'new').length}
+              {keywords?.filter(item => item.category === 'new').length}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -197,7 +197,7 @@ export default function Header() {
             <FontAwesomeIcon icon={faCheck}></FontAwesomeIcon>
             <Text style={styles.keywordType}>تم</Text>
             <Text style={styles.easyText}>
-              {keywords.filter(item => item.category === 'done').length}
+              {keywords?.filter(item => item.category === 'done').length}
             </Text>
           </TouchableOpacity>
         </View>

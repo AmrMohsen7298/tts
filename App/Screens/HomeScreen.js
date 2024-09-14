@@ -10,20 +10,18 @@ import {
   FlatList,
   ActivityIndicator,
   Animated,
+  Image,
 } from 'react-native';
 import Header from '../Components/HomeScreen/Header';
 import StoriesCard from '../Components/HomeScreen/storiesCard';
 import LevelsCard from '../Components/HomeScreen/levelsCard';
-
-import Ionicons from 'react-native-vector-icons/Ionicons'; // Correct import
-
+import GIFT from '../../assets/gift.png';
+import CIRCLECHECK from '../../assets/circle-check.png';
 import {StackActions, useNavigation} from '@react-navigation/native';
-// import StackNavigation from '../Navigations/StackNavigation';
 import {getAllLessons, getLessonById} from '../Services/LessonServices';
 import {levels} from '../Utils/constants';
 import {useStateValue} from '../store/contextStore/StateContext';
 import {useSelector} from 'react-redux';
-
 
 const {width, height} = Dimensions.get('window');
 
@@ -35,7 +33,7 @@ export default function HomeScreen() {
   const [hideLearned, setHideLearned] = useState(false);
   const learnedLessons = useSelector(state => state.storyReducer.learned);
   const [loading, setLoading] = useState(true);
- 
+
   const tabs = [
     levels.A1,
     levels.A2,
@@ -54,7 +52,7 @@ export default function HomeScreen() {
   useEffect(() => {
     getAllLessons().then(
       resp => setLessons(resp),
-      
+
       setLoading(false),
     );
   }, []);
@@ -203,7 +201,7 @@ export default function HomeScreen() {
                   }}>
                   قصص مجانية
                 </Text>
-                <Ionicons name="gift-outline" size={19} color="black" />
+                <Image source={GIFT} style={{width: 17, height: 17}} />
               </View>
             </View>
             <View style={{width: width, padding: 10, justifyContent: 'center'}}>
@@ -232,12 +230,16 @@ export default function HomeScreen() {
                       fontSize: 17,
                       color: '#33333395',
                     }}>
-                    <Ionicons
-                      name="checkmark-circle-outline"
+                    {/* <FontAwesomeIcon
+                      name={faCheckCircle}
                       size={18}
                       color="#33333395"
-                    />
+                    /> */}
                     اخفاء ما تعلمت
+                    <Image
+                      source={CIRCLECHECK}
+                      style={{width: 20, height: 20, margin: 5}}
+                    />
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -297,11 +299,7 @@ export default function HomeScreen() {
           </View>
         )}
       </ScrollView>
-      <Animated.View
-        style={[
-          styles.animatedTabsContainer,
-          {top: stickyTop},
-        ]}>
+      <Animated.View style={[styles.animatedTabsContainer, {top: stickyTop}]}>
         {tabsList()}
       </Animated.View>
     </View>
