@@ -73,6 +73,19 @@ android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
+flavorDimensions "appstore"
+
+ productFlavors {
+ googlePlay {
+    dimension "appstore"
+    missingDimensionStrategy "store", "play"
+  }
+
+  amazon {
+    dimension "appstore"
+    missingDimensionStrategy "store", "amazon"
+  }
+}
 
     namespace "com.belarabi"
     defaultConfig {
@@ -114,7 +127,7 @@ dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
     implementation project(':rn-fetch-blob') 
-
+    implementation "com.android.billingclient:billing:4.0.0"
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
     } else {

@@ -1,4 +1,4 @@
-package com.tts
+package com.belarabi
 
 import android.app.Application
 import com.facebook.react.PackageList
