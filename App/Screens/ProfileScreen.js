@@ -209,6 +209,7 @@ import {
   SafeAreaView,
   Pressable,
 } from 'react-native';
+import { Linking } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import user from './../../assets/Images/profile.jpg';
 import setting from './../../assets/setting.png';
@@ -312,11 +313,20 @@ const ProfileScreen = () => {
           <ReaderTrakerCard title="تتبع القراءة" storiesCount={0} />
         </View>
       </ScrollView>
-      <View style={styles.hairlineLeft}></View>
       <View style={styles.loginButtonContainer}>
         <Pressable style={styles.button} onPress={handleLoginPress}>
           <Text style={styles.buttonText}>تسجيل دخول</Text>
         </Pressable>
+      </View>
+      <View style={styles.hairlineLeft}></View>
+     
+      
+      <View></View>
+      <View>
+      <Text style={{color: 'blue',padding:'8%'}}
+      onPress={() => Linking.openURL('https://belarabi.equant-tech.com/privacypolicy.html')}>
+  privacy policy
+</Text>
       </View>
     </SafeAreaView>
   );
