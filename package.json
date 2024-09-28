@@ -31,6 +31,7 @@
     "expo-blur": "^12.9.2",
     "expo-file-system": "^16.0.9",
     "expo-font": "~11.10.3",
+    "firebase": "^10.13.2",
     "js-file-download": "^0.4.12",
     "react": "18.2.0",
     "react-native": "0.74.1",

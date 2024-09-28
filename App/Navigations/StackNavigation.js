@@ -8,6 +8,7 @@ import ProfileScreen from '../Screens/ProfileScreen';
 import {useStateValue} from '../store/contextStore/StateContext';
 import ARROWBACKBLACK from '../../assets/arrow-back-black.png';
 import ARROWBACKWHITE from '../../assets/arrow-back-white.png';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 const {width, height} = Dimensions.get('window');
 const Stack = createStackNavigator();
 
@@ -32,18 +33,20 @@ function StackNavigation() {
           headerBackgroundContainerStyle: {backgroundColor: 'transparent'},
           headerTitleStyle: {color: 'white'},
           headerLeft: () => (
-            <Image
-              source={ARROWBACKWHITE}
+            <TouchableOpacity
               onPress={() => {
                 navigation.goBack('HomeScreen');
                 dispatch({type: 'SHOW_NAVBAR', payload: true});
-              }}
-              style={{
-                width: 25,
-                height: 25,
-                paddingHorizontal: width * 0.05,
-              }}
-            />
+              }}>
+              <Image
+                source={ARROWBACKWHITE}
+                style={{
+                  width: 25,
+                  height: 25,
+                  paddingHorizontal: width * 0.05,
+                }}
+              />
+            </TouchableOpacity>
           ),
         })}
       />
@@ -58,19 +61,21 @@ function StackNavigation() {
           headerBackgroundContainerStyle: {backgroundColor: 'transparent'},
           headerTitleStyle: {color: 'black'},
           headerLeft: () => (
-            <Image
-              source={ARROWBACKBLACK}
+            <TouchableOpacity
               onPress={() => {
                 navigation.goBack(HomeScreen);
                 dispatch({type: 'SHOW_NAVBAR', payload: true});
-              }}
-              style={{
-                width: 25,
-                height: 25,
-                paddingHorizontal: width * 0.05,
-                marginTop: height * 0.026,
-              }}
-            />
+              }}>
+              <Image
+                source={ARROWBACKBLACK}
+                style={{
+                  width: 25,
+                  height: 25,
+                  paddingHorizontal: width * 0.05,
+                  marginTop: height * 0.026,
+                }}
+              />
+            </TouchableOpacity>
           ),
         })}
       />

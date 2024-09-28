@@ -10,12 +10,12 @@ import {
   SET_KEYWORDS_LIST,
   SET_USER_KEYWORDS,
   REMOVE_USER_KEYWORDS,
+  CURRENT_UID,
 } from '../Actions/StoryActions';
 
+import {createStore, combineReducers} from 'redux';
 
-import {createStore, combineReducers } from 'redux';
-
-import { persistStore, persistReducer } from 'redux-persist';
+import {persistStore, persistReducer} from 'redux-persist';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -26,6 +26,7 @@ const initialState = {
   learned: [],
   keywords: [],
   userKeywords: [],
+  uid: '',
   // Define your initial state properties here
 };
 const persistConfig = {
@@ -39,6 +40,11 @@ const reducer = (state = initialState, action) => {
   const payload = action && action.payload;
   console.log;
   switch (type) {
+    case CURRENT_UID:
+      return {
+        ...state,
+        uid: payload,
+      };
     case SET_AUDIO_PLAYING:
       return {
         ...state,
@@ -91,32 +97,34 @@ const reducer = (state = initialState, action) => {
           },
         ],
       };
-      case SET_USER_KEYWORDS:
-        console.log("SETUSERWORDS", state)
-        return {
-          ...state,
-          userKeywords: [
-            ...state.userKeywords?.filter(({text}) => text !== payload.text),
-            {
-              keyword_id: payload.keyword_id ?? 0,
-              tutorialId: payload.tutorialId ?? 0,
-              type: payload.type,
-              description: payload.description ?? '',
-              translation: payload.translation,
-              keyFlag: payload.keyFlag,
-              audio: payload.audio ?? [],
-              text: payload.text,
-              category: payload.category ?? 'new',
-            },
-          ],
-        };
-      case REMOVE_USER_KEYWORDS:
-        return {
-          ...state,
-          userKeywords: [...state.userKeywords?.filter(({text}) => text !== payload.text)],
-        };
+    case SET_USER_KEYWORDS:
+      console.log('SETUSERWORDS', state);
+      return {
+        ...state,
+        userKeywords: [
+          ...state.userKeywords?.filter(({text}) => text !== payload.text),
+          {
+            keyword_id: payload.keyword_id ?? 0,
+            tutorialId: payload.tutorialId ?? 0,
+            type: payload.type,
+            description: payload.description ?? '',
+            translation: payload.translation,
+            keyFlag: payload.keyFlag,
+            audio: payload.audio ?? [],
+            text: payload.text,
+            category: payload.category ?? 'new',
+          },
+        ],
+      };
+    case REMOVE_USER_KEYWORDS:
+      return {
+        ...state,
+        userKeywords: [
+          ...state.userKeywords?.filter(({text}) => text !== payload.text),
+        ],
+      };
     case REMOVE_KEYWORDS:
-      console.log("STATE", state.keywords)
+      console.log('STATE', state.keywords);
       return {
         ...state,
         keywords: [...state.keywords.filter(({text}) => text !== payload.text)],
@@ -124,8 +132,8 @@ const reducer = (state = initialState, action) => {
     case SET_KEYWORDS_LIST:
       return {
         ...state,
-        keywords: [...state.keywords, ...payload]
-      }
+        keywords: [...state.keywords, ...payload],
+      };
     default:
       return state;
   }
