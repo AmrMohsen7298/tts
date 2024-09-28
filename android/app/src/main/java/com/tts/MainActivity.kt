@@ -1,4 +1,4 @@
-package com.tts
+package com.belarabi
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
