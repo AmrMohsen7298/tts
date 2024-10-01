@@ -14,20 +14,18 @@ import {
 import {Linking} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import user from './../../assets/Images/profile.jpg';
-import setting from './../../assets/setting.png';
 import login from './../../assets/eye.png';
 import Colors from './../Utils/Colors';
 import fire from './../../assets/fire.png';
 import {ScrollView} from 'react-native-gesture-handler';
 import {useStateValue} from '../store/contextStore/StateContext';
-import {auth} from '../../firebaseConfig';
+import {auth, db} from '../../firebaseConfig';
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   signInWithEmailAndPassword,
 } from 'firebase/auth';
-import {useDispatch} from 'react-redux';
-import {setCurrentUID} from '../Actions/StoryActions';
+import {collection, query, where} from 'firebase/firestore';
 
 const {width, height} = Dimensions.get('window');
 
@@ -38,11 +36,26 @@ const ProfileScreen = () => {
   const email = useRef('');
   const password = useRef('');
   const [pending, setPending] = useState(false);
-  const appDispatch = useDispatch();
+
+  const checkIsSubscribed = async () => {
+    try {
+      if (!uid) throw new Error('user not signed in');
+      const q = query(collection(db, 'subscriptions'), where('uid', '==', uid));
+      const querySnapshot = await getDocs(q);
+      const now = new Date().getMilliseconds();
+      const monthTime = 60 * 60 * 24 * 30 * 1000;
+
+      if (querySnapshot.some(doc => +doc.data().timestamp + monthTime < now)) {
+        dispatch({type: 'IS_SUBSCRIBED', payload: true});
+      }
+    } catch (e) {
+      console.log(e.message ?? 'user not signed in');
+    }
+  };
 
   useEffect(() => {
     dispatch({type: 'SHOW_NAVBAR', payload: false});
-    onAuthStateChanged(auth, user => {
+    onAuthStateChanged(auth, async user => {
       if (user) {
         // User is signed in, see docs for a list of available properties
         // https://firebase.google.com/docs/reference/js/auth.user
@@ -50,6 +63,7 @@ const ProfileScreen = () => {
         setLoggedInUser(uid);
         // appDispatch(setCurrentUID(uid));
         dispatch({type: 'CURRENT_UID', payload: uid});
+        await checkIsSubscribed();
         // ...
       } else {
         setLoggedInUser('');

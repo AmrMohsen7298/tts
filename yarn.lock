@@ -9834,6 +9834,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-iap@npm:next":
+  version: 12.14.2-rc.1
+  resolution: "react-native-iap@npm:12.14.2-rc.1"
+  peerDependencies:
+    expo: ">=47.0.0"
+    react: ">=16.13.1"
+    react-native: ">=0.65.1"
+  peerDependenciesMeta:
+    expo:
+      optional: true
+  checksum: 390cc366991d747c488709369d62014b3b28033d101582dc8a2f300aed5643646bc7addcbb26bb2be0e05e4f8b8dc4601465697279dab8acaa576aee1c05ccc7
+  languageName: node
+  linkType: hard
+
 "react-native-paper@npm:^5.12.3":
   version: 5.12.5
   resolution: "react-native-paper@npm:5.12.5"
@@ -11247,6 +11261,7 @@ __metadata:
     react-native-circular-progress: ^1.4.0
     react-native-fs: ^2.20.0
     react-native-gesture-handler: ~2.14.0
+    react-native-iap: next
     react-native-paper: ^5.12.3
     react-native-safe-area-context: ^4.10.1
     react-native-screens: ~3.29.0

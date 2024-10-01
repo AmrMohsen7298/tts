@@ -10,6 +10,7 @@ export const SET_KEYWORDS_LIST = 'SET_KEYWORDS_LIST';
 export const SET_USER_KEYWORDS = 'SET_USER_WORDS';
 export const REMOVE_USER_KEYWORDS = 'REMOVE_USER_WORDS';
 export const CURRENT_UID = 'CURRENT_UID';
+export const IS_SUBSCRIBED = 'IS_SUBSCRIBED';
 export const setCurrentUID = uid => {
   return {
     type: CURRENT_UID,
@@ -84,6 +85,13 @@ export const setUserWords = payload => {
 export const removeUserWords = payload => {
   return {
     type: REMOVE_USER_KEYWORDS,
+    payload,
+  };
+};
+
+export const setIsSubscribed = payload => {
+  return {
+    type: IS_SUBSCRIBED,
     payload,
   };
 };

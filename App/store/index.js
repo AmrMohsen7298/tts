@@ -11,6 +11,7 @@ import {
   SET_USER_KEYWORDS,
   REMOVE_USER_KEYWORDS,
   CURRENT_UID,
+  IS_SUBSCRIBED,
 } from '../Actions/StoryActions';
 
 import {createStore, combineReducers} from 'redux';
@@ -27,6 +28,7 @@ const initialState = {
   keywords: [],
   userKeywords: [],
   uid: '',
+  isSubscribed: false,
   // Define your initial state properties here
 };
 const persistConfig = {
@@ -133,6 +135,11 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         keywords: [...state.keywords, ...payload],
+      };
+    case IS_SUBSCRIBED:
+      return {
+        ...state,
+        isSubscribed: payload,
       };
     default:
       return state;
