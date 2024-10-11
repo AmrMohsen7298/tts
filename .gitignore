@@ -72,3 +72,8 @@ yarn-error.log
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+/.vs/tts/v16
+/.vs/VSWorkspaceState.json
+/.vs/tts/config
+/.vs/ProjectSettings.json
+/.vs
