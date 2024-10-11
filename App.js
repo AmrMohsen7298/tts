@@ -2,7 +2,8 @@ import React, {useState} from 'react';
 import {StyleSheet} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import TabNavigation from './App/Navigations/TabNavigation';
-import {library} from '@fortawesome/fontawesome-svg-core';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { withIAPContext } from 'react-native-iap';
 import {
   faInfoCircle,
   faCalendar,
@@ -30,19 +31,19 @@ library.add(
   faPlay,
 );
 
-export default function App() {
-  return (
+const App = () =>
     <StateProvider>
-      <Provider store={store}>
-        <PersistGate loading={null} persistor={persistor}>
-          <NavigationContainer>
-            <TabNavigation />
-          </NavigationContainer>
-        </PersistGate>
-      </Provider>
-    </StateProvider>
-  );
-}
+        <Provider store={store}>
+            <PersistGate loading={null} persistor={persistor}>
+                <NavigationContainer>
+                    <TabNavigation />
+                </NavigationContainer>
+            </PersistGate>
+        </Provider>
+    </StateProvider>;
+
+export default withIAPContext(App);
+
 
 const styles = StyleSheet.create({
   container: {

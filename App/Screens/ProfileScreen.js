@@ -19,13 +19,15 @@ import Colors from './../Utils/Colors';
 import fire from './../../assets/fire.png';
 import {ScrollView} from 'react-native-gesture-handler';
 import {useStateValue} from '../store/contextStore/StateContext';
-import {auth, db} from '../../firebaseConfig';
+import { auth, db } from '../../firebaseConfig';
+
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   signInWithEmailAndPassword,
 } from 'firebase/auth';
 import {collection, query, where} from 'firebase/firestore';
+import useInAppPurchase from '../Hooks/useInAppPurchase';
 
 const {width, height} = Dimensions.get('window');
 
@@ -35,7 +37,9 @@ const ProfileScreen = () => {
   const [viewLoginOrSignupForm, setViewLoginOrSignupForm] = useState();
   const email = useRef('');
   const password = useRef('');
-  const [pending, setPending] = useState(false);
+    const [pending, setPending] = useState(false);
+    const { isSubscribed,
+        connectionErrorMsg, subscribeToApp } = useInAppPurchase()
 
   const checkIsSubscribed = async () => {
     try {
@@ -308,13 +312,23 @@ const ProfileScreen = () => {
             style={styles.button}
             onPress={() => setViewLoginOrSignupForm('signup')}>
             <Text style={styles.buttonText}>إنشاء حساب</Text>
-          </Pressable>
+                  </Pressable>
+                  <Pressable onPress={() => subscribeToApp()} style={styles.button}>
+                      <Text>
+
+                          subscribe
+                      </Text>
+
+                  </Pressable>
         </View>
-      )}
+          )}
+         
       <View style={styles.hairlineLeft}></View>
 
-      <View></View>
-      <View>
+          <View>
+
+          </View>
+          <View>
         <Text
           style={{color: 'blue', padding: '8%'}}
           onPress={() =>
