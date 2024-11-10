@@ -7,7 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 // Play store item Ids
 const itemSKUs = Platform.select({
-    android: ['com.belarabi.basesubscription'],
+    android: ['belarabisubscription'],
 });
 
 const useInAppPurchase = () => {
@@ -80,7 +80,7 @@ const useInAppPurchase = () => {
     }
     // If we are connected & have products, purchase the item. Google will handle if user has no internet here.
     else if (products?.length > 0) {
-      requestPurchase(itemSKUs[0]);
+        requestPurchase("belarabisubscription");
       console.log('Purchasing products...');
     }
     // If we are connected but have no products returned, try to get products and purchase.
