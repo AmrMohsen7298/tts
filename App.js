@@ -1,9 +1,9 @@
-import React, {useState} from 'react';
+import React, { useState, useEffect } from 'react';
 import {StyleSheet} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import TabNavigation from './App/Navigations/TabNavigation';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { withIAPContext } from 'react-native-iap';
+import { withIAPContext, initConnection } from 'react-native-iap';
 import {
   faInfoCircle,
   faCalendar,
@@ -31,8 +31,17 @@ library.add(
   faPlay,
 );
 
-const App = () =>
-    <StateProvider>
+const App = () => {
+    useEffect(() => {
+        const initIAPConnection = async () => {
+            const connected = await initConnection();
+            if (!connected) {
+                console.log("Failed to connect to IAP");
+            }
+        };
+        initIAPConnection();
+    }, []);
+    return (<StateProvider>
         <Provider store={store}>
             <PersistGate loading={null} persistor={persistor}>
                 <NavigationContainer>
@@ -40,7 +49,8 @@ const App = () =>
                 </NavigationContainer>
             </PersistGate>
         </Provider>
-    </StateProvider>;
+    </StateProvider>);
+}
 
 export default withIAPContext(App);
 

@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react';
 import {Platform} from 'react-native';
-import {requestPurchase, useIAP} from 'react-native-iap';
+import { requestPurchase, requestSubscription, useIAP} from 'react-native-iap';
 import {collection, addDoc, serverTimestamp} from 'firebase/firestore';
 import {db} from '../../firebaseConfig';
 import {useDispatch, useSelector} from 'react-redux';
@@ -26,7 +26,9 @@ const useInAppPurchase = () => {
   } = useIAP();
 
   const uid = useSelector(state => state.storyReducer.uid);
-  const isSubscribed = useSelector(state => state.storyReducer.isSubscribed);
+    const isSubscribed = useSelector(state => state.storyReducer.isSubscribed);
+    const [subscription, setSubscription] = useState(null);
+    const [offerToken, setOfferToken] = useState(null);
 
   const createSubscription = async () => {
     try {
@@ -45,11 +47,20 @@ const useInAppPurchase = () => {
   useEffect(() => {
       if (connected) {
           console.log("itemsSkus", itemSKUs)
-          getSubscriptions({ skus: itemSKUs });
+          let sub = async () => {
+              let subs = await getSubscriptions({ skus: itemSKUs });
+          }
+          sub()
       console.log('Getting subscriptions...');
     }
       console.log(subscriptions);
-  }, [connected, getSubscriptions  ]);
+  }, [connected, getSubscriptions]);
+    useEffect(() => {
+        if (subscriptions) {
+            setOfferToken(subscriptions?.[0]?.subscriptionOfferDetails?.[0]?.offerToken);
+        }
+        
+    }, [subscriptions]);
   // currentPurchase will change when the requestPurchase function is called. The purchase then needs to be checked and the purchase acknowledged so Google knows we have awared the user the in-app product.
   useEffect(() => {
     const checkCurrentPurchase = async purchase => {
@@ -79,9 +90,34 @@ const useInAppPurchase = () => {
       setConnectionErrorMsg('Please check your internet connection');
     }
     // If we are connected & have products, purchase the item. Google will handle if user has no internet here.
-    else if (products?.length > 0) {
-        requestPurchase("belarabisubscription");
-      console.log('Purchasing products...');
+    else if (subscriptions?.length > 0) {
+        console.log("SUBSCRIPTIONS", subscriptions)
+        console.log("OFFERTOKEN", offerToken)
+        let data = await requestSubscription({
+            sku: itemSKUs[0],
+            ...(offerToken && {
+                subscriptionOffers: [
+                    {
+                        sku: itemSKUs[0],
+                        offerToken: offerToken,
+                    },
+                ],
+            }),
+        })
+            .then(async requestSubscriptionIAP => {
+                if (
+                    requestSubscriptionIAP &&
+                    (requestSubscriptionIAP[0]?.transactionReceipt ||
+                        requestSubscriptionIAP?.transactionReceipt)
+                ) {
+                    console.log("RECEIPT", requestSubscriptionIAP)
+                }
+            })
+            .catch(error => {
+                return error;
+            });
+
+      console.log('Purchasing products::', data);
     }
     // If we are connected but have no products returned, try to get products and purchase.
     else {
