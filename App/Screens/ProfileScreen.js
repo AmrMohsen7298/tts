@@ -1,82 +1,117 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  StyleSheet,
-  Dimensions,
-  SafeAreaView,
-  Pressable,
-  TextInput,
   Alert,
+  Dimensions,
+  Image,
+  Linking,
+  Pressable,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import {Linking} from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import user from './../../assets/Images/profile.jpg';
-import login from './../../assets/eye.png';
-import Colors from './../Utils/Colors';
-import fire from './../../assets/fire.png';
-import {ScrollView} from 'react-native-gesture-handler';
-import {useStateValue} from '../store/contextStore/StateContext';
 import { auth, db } from '../../firebaseConfig';
+import login from './../../assets/eye.png';
+import fire from './../../assets/fire.png';
+import Colors from './../Utils/Colors';
 
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   signInWithEmailAndPassword,
 } from 'firebase/auth';
-import {collection, query, where} from 'firebase/firestore';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  setCurrentUser,
+  setIsSubscribed
+} from '../Actions/StoryActions';
 import useInAppPurchase from '../Hooks/useInAppPurchase';
+import { useStateValue } from '../store/contextStore/StateContext';
 
 const {width, height} = Dimensions.get('window');
 
 const ProfileScreen = () => {
-  const {state, dispatch} = useStateValue();
-  const [loggedInUser, setLoggedInUser] = useState();
+  const {state, dispatch: contextDispatch} = useStateValue();
+  const dispatch = useDispatch();
+  const {
+    user,
+    // email: userEmail,
+    // password: userPassword,
+  } = useSelector(state => state.storyReducer);
   const [viewLoginOrSignupForm, setViewLoginOrSignupForm] = useState();
+  const [isLoggedIn, setIsLoggedIn] = useState();
   const email = useRef('');
   const password = useRef('');
-    const [pending, setPending] = useState(false);
-    const { isSubscribed,
-        connectionErrorMsg, subscribeToApp } = useInAppPurchase()
+  const [pending, setPending] = useState(false);
+  const {isSubscribed, connectionErrorMsg, subscribeToApp} = useInAppPurchase();
 
   const checkIsSubscribed = async () => {
     try {
-      if (!uid) throw new Error('user not signed in');
-      const q = query(collection(db, 'subscriptions'), where('uid', '==', uid));
+      if (!user) throw new Error('user not signed in');
+      const q = query(
+        collection(db, 'subscriptions'),
+        where('uid', '==', user.uid),
+      );
       const querySnapshot = await getDocs(q);
-      const now = new Date().getMilliseconds();
+      const subscriptions = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      const now = new Date().getTime();
       const monthTime = 60 * 60 * 24 * 30 * 1000;
 
-      if (querySnapshot.some(doc => +doc.data().timestamp + monthTime < now)) {
-        dispatch({type: 'IS_SUBSCRIBED', payload: true});
+      console.log({now, monthTime, subscriptions});
+
+      if (subscriptions.some(doc => +doc.data().timestamp + monthTime < now)) {
+        dispatch(setIsSubscribed(true));
       }
     } catch (e) {
       console.log(e.message ?? 'user not signed in');
     }
   };
 
+  // const reAuthUser = () => {
+  //   const currentUser = auth.currentUser;
+  //   if (!userEmail || !userPassword || currentUser) {
+  //     console.log('User is signed in or not credentials found.');
+  //     return;
+  //   }
+  //   signInWithEmailAndPassword(auth, userEmail, userPassword)
+  //     .then(userCredential => {
+  //       // Signed in
+  //       const user = userCredential.user;
+  //     })
+  //     .catch(error => {
+  //       const errorCode = error.code;
+  //       const errorMessage = error.message;
+  //     });
+  // };
+
   useEffect(() => {
-    dispatch({type: 'SHOW_NAVBAR', payload: false});
+    contextDispatch({type: 'SHOW_NAVBAR', payload: false});
     onAuthStateChanged(auth, async user => {
       if (user) {
         // User is signed in, see docs for a list of available properties
         // https://firebase.google.com/docs/reference/js/auth.user
         const uid = user.uid;
-        setLoggedInUser(uid);
-        // appDispatch(setCurrentUID(uid));
-        dispatch({type: 'CURRENT_UID', payload: uid});
+        dispatch(setCurrentUser(user));
+        setIsLoggedIn(true);
         await checkIsSubscribed();
         // ...
       } else {
-        setLoggedInUser('');
-        dispatch({type: 'CURRENT_UID', payload: ''});
-        // appDispatch(setCurrentUID(''));
+        dispatch(setCurrentUser(null));
+        setIsLoggedIn(false);
         // User is signed out
         // ...
       }
     });
+
+    // reAuthUser();
   }, []);
 
   const LearningProgressCard = ({title, storiesCount, wordsCount}) => {
@@ -152,7 +187,12 @@ const ProfileScreen = () => {
         .then(userCredential => {
           // Signed up
           const user = userCredential.user;
-          // ...
+          // dispatch(
+          //   setUserCredentials({
+          //     email: email.current.value,
+          //     password: password.current.value,
+          //   }),
+          // );
           setPending(false);
         })
         .catch(error => {
@@ -221,8 +261,13 @@ const ProfileScreen = () => {
         .then(userCredential => {
           // Signed in
           const user = userCredential.user;
+          // dispatch(
+          //   setUserCredentials({
+          //     email: email.current.value,
+          //     password: password.current.value,
+          //   }),
+          // );
           setPending(false);
-          // ...
         })
         .catch(error => {
           const errorCode = error.code;
@@ -271,9 +316,8 @@ const ProfileScreen = () => {
     );
   };
 
-  if (!loggedInUser && viewLoginOrSignupForm === 'login') return <LoginForm />;
-  if (!loggedInUser && viewLoginOrSignupForm === 'signup')
-    return <SignupForm />;
+  if (!isLoggedIn && viewLoginOrSignupForm === 'login') return <LoginForm />;
+  if (!isLoggedIn && viewLoginOrSignupForm === 'signup') return <SignupForm />;
 
   return (
     <SafeAreaView style={styles.mainContainer}>
@@ -286,6 +330,19 @@ const ProfileScreen = () => {
             <Text style={styles.accountTypeText}>نوع الحساب: مجاني</Text>
           </View>
           <Image source={user} style={styles.profileImage} />
+        </View>
+        <View style={{...styles.accountTypeContainer, ...styles.subscribe}}>
+          <Pressable
+            onPress={() => {
+              if (user?.uid) subscribeToApp();
+              else
+                Alert.alert(
+                  'عملية غير مقبولة',
+                  'يجب تسجيل الدخول أو إنشاء حساب لتتمكن من الاشتراك',
+                );
+            }}>
+            <Text style={styles.subscribeText}>إشترك الآن</Text>
+          </Pressable>
         </View>
         <View style={styles.cardContainer}>
           <LearningProgressCard
@@ -301,37 +358,29 @@ const ProfileScreen = () => {
           <ReaderTrakerCard title="تتبع القراءة" storiesCount={0} />
         </View>
       </ScrollView>
-          {!loggedInUser && (
-              <View style={styles.loginButtonContainer}>
-                  <Pressable
-                      style={styles.button}
-                      onPress={() => setViewLoginOrSignupForm('login')}>
-                      <Text style={styles.buttonText}>تسجيل دخول</Text>
-                  </Pressable>
-                  <Pressable
-                      style={styles.button}
-                      onPress={() => setViewLoginOrSignupForm('signup')}>
-                      <Text style={styles.buttonText}>إنشاء حساب</Text>
-                  </Pressable>
-                  <Pressable onPress={() => subscribeToApp()} style={styles.button}>
-                      <Text>
-                          subscribe
-                      </Text>
-                  </Pressable>
+      {!user?.uid && (
+        <View style={styles.loginButtonContainer}>
+          <Pressable
+            style={styles.button}
+            onPress={() => setViewLoginOrSignupForm('login')}>
+            <Text style={styles.buttonText}>تسجيل دخول</Text>
+          </Pressable>
+          <Pressable
+            style={styles.button}
+            onPress={() => setViewLoginOrSignupForm('signup')}>
+            <Text style={styles.buttonText}>إنشاء حساب</Text>
+          </Pressable>
+        </View>
+      )}
 
-
-
-
-              </View>
-              
-          )}
-         
       <View style={styles.hairlineLeft}></View>
 
-          <View>
-
-          </View>
-          <View>
+      <View>
+        <Pressable onPress={() => checkIsSubscribed()}>
+          <Text>TEST</Text>
+        </Pressable>
+      </View>
+      <View>
         <Text
           style={{color: 'blue', padding: '8%'}}
           onPress={() =>
@@ -414,8 +463,18 @@ const styles = StyleSheet.create({
     padding: height * 0.015,
     borderRadius: width * 0.02,
   },
+  subscribe: {
+    marginTop: height * 0.015,
+    marginBottom: height * 0.015,
+  },
   accountTypeText: {
     fontSize: width * 0.04,
+    fontWeight: 'bold',
+    color: 'white',
+  },
+  subscribeText: {
+    textAlign: 'center',
+    fontSize: width * 0.06,
     fontWeight: 'bold',
     color: 'white',
   },
@@ -514,6 +573,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: height * 0.015,
+    marginBottom: height * 0.015,
   },
 });
 

@@ -9,20 +9,38 @@ export const REMOVE_KEYWORDS = 'REMOVE_KEYWORDS';
 export const SET_KEYWORDS_LIST = 'SET_KEYWORDS_LIST';
 export const SET_USER_KEYWORDS = 'SET_USER_WORDS';
 export const REMOVE_USER_KEYWORDS = 'REMOVE_USER_WORDS';
-export const CURRENT_UID = 'CURRENT_UID';
+export const CURRENT_USER = 'CURRENT_USER';
 export const IS_SUBSCRIBED = 'IS_SUBSCRIBED';
-export const setCurrentUID = uid => {
+export const USER_CREDENTIALS = 'USER_CREDENTIALS';
+
+export const setUserCredentials = payload => {
   return {
-    type: CURRENT_UID,
-    payload: uid,
+    type: USER_CREDENTIALS,
+    payload,
   };
 };
+
+export const setCurrentUser = payload => {
+  return {
+    type: CURRENT_USER,
+    payload,
+  };
+};
+
+export const setIsSubscribed = payload => {
+  return {
+    type: IS_SUBSCRIBED,
+    payload,
+  };
+};
+
 export const setAudioPlaying = playingFlag => {
   return {
     type: SET_AUDIO_PLAYING,
     payload: playingFlag,
   };
 };
+
 export const setShowNavbar = showNavbar => {
   return {
     type: SHOW_NAVBAR,
@@ -85,13 +103,6 @@ export const setUserWords = payload => {
 export const removeUserWords = payload => {
   return {
     type: REMOVE_USER_KEYWORDS,
-    payload,
-  };
-};
-
-export const setIsSubscribed = payload => {
-  return {
-    type: IS_SUBSCRIBED,
     payload,
   };
 };

@@ -1,27 +1,27 @@
-import React, {useEffect, useRef, useState} from 'react';
+import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-  Dimensions,
-  Pressable,
-  FlatList,
   ActivityIndicator,
   Animated,
+  Dimensions,
+  FlatList,
   Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import Header from '../Components/HomeScreen/Header';
-import StoriesCard from '../Components/HomeScreen/storiesCard';
-import LevelsCard from '../Components/HomeScreen/levelsCard';
-import GIFT from '../../assets/gift.png';
+import { useSelector } from 'react-redux';
 import CIRCLECHECK from '../../assets/circle-check.png';
-import {StackActions, useNavigation} from '@react-navigation/native';
-import {getAllLessons, getLessonById} from '../Services/LessonServices';
-import {levels} from '../Utils/constants';
-import {useStateValue} from '../store/contextStore/StateContext';
-import {useSelector} from 'react-redux';
+import GIFT from '../../assets/gift.png';
+import Header from '../Components/HomeScreen/Header';
+import LevelsCard from '../Components/HomeScreen/levelsCard';
+import StoriesCard from '../Components/HomeScreen/storiesCard';
+import { getAllLessons, getLessonById } from '../Services/LessonServices';
+import { levels } from '../Utils/constants';
+import { useStateValue } from '../store/contextStore/StateContext';
 
 const {width, height} = Dimensions.get('window');
 
@@ -33,6 +33,8 @@ export default function HomeScreen() {
   const [hideLearned, setHideLearned] = useState(false);
   const learnedLessons = useSelector(state => state.storyReducer.learned);
   const [loading, setLoading] = useState(true);
+
+ 
 
   const tabs = [
     levels.A1,
