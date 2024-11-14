@@ -2,7 +2,7 @@ import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 import { requestPurchase, requestSubscription, useIAP } from 'react-native-iap';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { db } from '../../firebaseConfig';
 import { setIsSubscribed } from '../Actions/StoryActions';
 import { useStateValue } from '../store/contextStore/StateContext';
@@ -14,7 +14,8 @@ const itemSKUs = Platform.select({
 
 const useInAppPurchase = () => {
   const [connectionErrorMsg, setConnectionErrorMsg] = useState('');
-  const {state, dispatch} = useStateValue();
+    const { state, dispatch } = useStateValue();
+    const currentUser = useSelector(state => state.storyReducer.user)
   const appDispatch = useDispatch();
 
   const {
@@ -28,8 +29,8 @@ const useInAppPurchase = () => {
     currentPurchaseError,
   } = useIAP();
 
-  const uid = state.user?.uid;
-  const email = state.user?.email;
+    const uid = currentUser?.uid;
+    const email = currentUser?.email;
   const isSubscribed = state.isSubscribed;
   const [subscription, setSubscription] = useState(null);
   const [offerToken, setOfferToken] = useState(null);
@@ -45,9 +46,8 @@ const useInAppPurchase = () => {
         createdAt: serverTimestamp(),
       });
       dispatch({type: 'IS_SUBSCRIBED', payload: !!docRef.id});
-      appDispatch(setIsSubscribed(!!docRef.id));
     } catch (e) {
-      console.log('Could not create a subscription doc');
+      console.log('Could not create a subscription doc: ', e);
     }
   };
 
@@ -77,8 +77,9 @@ const useInAppPurchase = () => {
         const receipt = purchase.transactionReceipt;
         console.log('RECEIPT: ', receipt);
         if (receipt) {
-          // Give full app access
-          createSubscription(receipt);
+            // Give full app access
+          if (!state.isSubscribed)
+            createSubscription(receipt);
           try {
             const ackResult = await finishTransaction(purchase);
             console.log('ackResult: ', ackResult);
@@ -90,7 +91,7 @@ const useInAppPurchase = () => {
       }
     };
     checkCurrentPurchase(currentPurchase);
-  }, [currentPurchase, finishTransaction]);
+  }, [ finishTransaction]);
 
   const subscribeToApp = async () => {
     // Reset error msg

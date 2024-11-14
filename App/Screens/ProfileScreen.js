@@ -56,7 +56,6 @@ const ProfileScreen = () => {
       const querySnapshot = await getDocs(q);
 
       if (querySnapshot.empty) {
-        dispatch(setIsSubscribed(false));
         contextDispatch({type: 'IS_SUBSCRIBED', payload: false});
         console.log('NOT SUBSCRIBED');
         return;
@@ -68,8 +67,8 @@ const ProfileScreen = () => {
       }));
       
       if (subscriptions.some(doc => +doc.endDateTimestamp > now)) {
-        dispatch(setIsSubscribed(true));
-        contextDispatch({type: 'IS_SUBSCRIBED', payload: true});
+          contextDispatch({ type: 'IS_SUBSCRIBED', payload: true });
+          console.log(subscriptions)
         console.log('SUBSCRIBED');
       } else {
         dispatch(setIsSubscribed(false));
