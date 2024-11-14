@@ -22,7 +22,6 @@ import Colors from './../Utils/Colors';
 
 import {
   createUserWithEmailAndPassword,
-  getIdToken,
   onAuthStateChanged,
   signInWithEmailAndPassword,
 } from 'firebase/auth';
@@ -37,11 +36,7 @@ const {width, height} = Dimensions.get('window');
 const ProfileScreen = () => {
   const {state, dispatch: contextDispatch} = useStateValue();
   const dispatch = useDispatch();
-  const {
-    user: currentUser,
-    // email: userEmail,
-    // password: userPassword,
-  } = useSelector(state => state.storyReducer);
+  const {user: currentUser} = useSelector(state => state.storyReducer);
   const storeData = useSelector(state => state.storyReducer);
   const [viewLoginOrSignupForm, setViewLoginOrSignupForm] = useState();
   const [isLoggedIn, setIsLoggedIn] = useState();
@@ -51,25 +46,34 @@ const ProfileScreen = () => {
   const checkIsSubscribed = async () => {
     try {
       if (!currentUser) throw new Error('user not signed in');
+      const now = new Date().getTime();
+
       const q = query(
         collection(db, 'subscriptions'),
         where('uid', '==', currentUser.uid),
+        where('endDateTimestamp', '>', now),
       );
       const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        dispatch(setIsSubscribed(false));
+        contextDispatch({type: 'IS_SUBSCRIBED', payload: false});
+        console.log('NOT SUBSCRIBED');
+        return;
+      }
+
       const subscriptions = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
       }));
-      const now = new Date().getTime();
-      const monthTime = 60 * 60 * 24 * 30 * 1000;
-
-      console.log({now, monthTime, subscriptions});
-
-      if (subscriptions.some(doc => +doc.timestamp + monthTime > now)) {
+      
+      if (subscriptions.some(doc => +doc.endDateTimestamp > now)) {
         dispatch(setIsSubscribed(true));
+        contextDispatch({type: 'IS_SUBSCRIBED', payload: true});
         console.log('SUBSCRIBED');
       } else {
         dispatch(setIsSubscribed(false));
+        contextDispatch({type: 'IS_SUBSCRIBED', payload: false});
         console.log('NOT SUBSCRIBED');
       }
     } catch (e) {
@@ -80,19 +84,20 @@ const ProfileScreen = () => {
   const reAuthUser = () => {
     const currentStoredUser = auth.currentUser;
     if (!currentUser?.email || !currentUser?.password || currentStoredUser) {
-      console.log('User is not signed in or not credentials found.', 
+      console.log(
+        'User is not signed in or not credentials found.',
         currentUser?.email,
         currentUser?.password,
         currentStoredUser,
       );
       return;
     }
-    console.log('LOGGING USER IN AGAIN')
+    console.log('LOGGING USER IN AGAIN');
     signInWithEmailAndPassword(auth, currentUser?.email, currentUser?.password)
-    .then(userCredential => {
-      // Signed in
-      const user = userCredential.user;
-      console.log('USER LOGGED IN AGAIN');
+      .then(userCredential => {
+        // Signed in
+        const user = userCredential.user;
+        console.log('USER LOGGED IN AGAIN');
       })
       .catch(error => {
         const errorCode = error.code;
@@ -104,27 +109,18 @@ const ProfileScreen = () => {
     contextDispatch({type: 'SHOW_NAVBAR', payload: false});
     onAuthStateChanged(auth, async user => {
       if (user) {
-        // User is signed in, see docs for a list of available properties
-        // https://firebase.google.com/docs/reference/js/auth.user
         const uid = user.uid;
-        // dispatch(setCurrentUser(user));
-        getIdToken(user).then((idToken) => {
-          console.log("ID Token: ", idToken);
-          // Use the ID token for your Firestore requests
-        });
         setIsLoggedIn(true);
         await checkIsSubscribed();
-        // ...
       } else {
-        dispatch(setCurrentUser(null));
         setIsLoggedIn(false);
-        // User is signed out
-        // ...
       }
     });
-
-    reAuthUser();
   }, []);
+
+  useEffect(() => {
+    reAuthUser();
+  }, [currentUser]);
 
   const LearningProgressCard = ({title, storiesCount, wordsCount}) => {
     return (
@@ -353,19 +349,21 @@ const ProfileScreen = () => {
           </View>
           <Image source={user} style={styles.profileImage} />
         </View>
-        <View style={{...styles.accountTypeContainer, ...styles.subscribe}}>
-          <Pressable
-            onPress={() => {
-              if (currentUser?.uid) subscribeToApp();
-              else
-                Alert.alert(
-                  'عملية غير مقبولة',
-                  'يجب تسجيل الدخول أو إنشاء حساب لتتمكن من الاشتراك',
-                );
-            }}>
-            <Text style={styles.subscribeText}>إشترك الآن</Text>
-          </Pressable>
-        </View>
+        {!isSubscribed && (
+          <View style={{...styles.accountTypeContainer, ...styles.subscribe}}>
+            <Pressable
+              onPress={() => {
+                if (currentUser?.uid) subscribeToApp();
+                else
+                  Alert.alert(
+                    'عملية غير مقبولة',
+                    'يجب تسجيل الدخول أو إنشاء حساب لتتمكن من الاشتراك',
+                  );
+              }}>
+              <Text style={styles.subscribeText}>إشترك الآن</Text>
+            </Pressable>
+          </View>
+        )}
         <View style={styles.cardContainer}>
           <LearningProgressCard
             title="تقدمك في التعلم"
@@ -380,7 +378,7 @@ const ProfileScreen = () => {
           <ReaderTrakerCard title="تتبع القراءة" storiesCount={0} />
         </View>
       </ScrollView>
-      {!currentUser?.uid && (
+      {!isLoggedIn && (
         <View style={styles.loginButtonContainer}>
           <Pressable
             style={styles.button}
@@ -397,20 +395,21 @@ const ProfileScreen = () => {
 
       <View style={styles.hairlineLeft}></View>
 
-      <View>
+      {/* <View>
         <Pressable
           onPress={() => {
-            console.log(auth.currentUser);
+            // console.log(auth.currentUser);
             // console.log({
             //   email: currentUser?.email,
             //   password: currentUser?.password,
             // });
             // console.log("");
             // checkIsSubscribed()
+            console.log({isLoggedIn, viewLoginOrSignupForm, isSubscribed});
           }}>
           <Text>TEST</Text>
         </Pressable>
-      </View>
+      </View> */}
       <View>
         <Text
           style={{color: 'blue', padding: '8%'}}

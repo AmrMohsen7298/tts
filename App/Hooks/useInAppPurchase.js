@@ -2,7 +2,9 @@ import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 import { requestPurchase, requestSubscription, useIAP } from 'react-native-iap';
+import { useDispatch } from 'react-redux';
 import { db } from '../../firebaseConfig';
+import { setIsSubscribed } from '../Actions/StoryActions';
 import { useStateValue } from '../store/contextStore/StateContext';
 
 // Play store item Ids
@@ -13,6 +15,7 @@ const itemSKUs = Platform.select({
 const useInAppPurchase = () => {
   const [connectionErrorMsg, setConnectionErrorMsg] = useState('');
   const {state, dispatch} = useStateValue();
+  const appDispatch = useDispatch();
 
   const {
     connected,
@@ -26,19 +29,23 @@ const useInAppPurchase = () => {
   } = useIAP();
 
   const uid = state.user?.uid;
+  const email = state.user?.email;
   const isSubscribed = state.isSubscribed;
   const [subscription, setSubscription] = useState(null);
   const [offerToken, setOfferToken] = useState(null);
 
-  const createSubscription = async (receipt) => {
+  const createSubscription = async receipt => {
     try {
       const docRef = await addDoc(collection(db, 'subscriptions'), {
         uid,
+        email,
         receipt: receipt,
-        timestamp: new Date().getMilliseconds(),
+        timestamp: new Date().getTime(),
+        endDateTimestamp: new Date().getTime() + 60 * 60 * 24 * 30 * 1000,
         createdAt: serverTimestamp(),
       });
       dispatch({type: 'IS_SUBSCRIBED', payload: !!docRef.id});
+      appDispatch(setIsSubscribed(!!docRef.id));
     } catch (e) {
       console.log('Could not create a subscription doc');
     }

@@ -2,6 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   Animated,
   Dimensions,
   FlatList,
@@ -29,12 +30,10 @@ export default function HomeScreen() {
   const navigation = useNavigation();
   const [lessons, setLessons] = useState([]);
   const [activeTab, setActiveTab] = useState(0);
-  const {state, dispatch: contextDispatch} = useStateValue();
+  const {state, dispatch} = useStateValue();
   const [hideLearned, setHideLearned] = useState(false);
   const learnedLessons = useSelector(state => state.storyReducer.learned);
   const [loading, setLoading] = useState(true);
-
- 
 
   const tabs = [
     levels.A1,
@@ -65,6 +64,15 @@ export default function HomeScreen() {
   // },[hideLearned])
 
   const handleOnPress = (lessonId, lessonImage) => {
+    const isSubscribed = state.isSubscribed;
+    const isLessonPaid = lessons.find(lesson => lesson.id === lessonId).paid;
+    if (!isSubscribed && isLessonPaid) {
+      Alert.alert(
+        'عملية غير مقبولة',
+        'يجب تسجيل الدخول و الاشتراك للحصول على هذا الدرس',
+      );
+      return;
+    }
     getLessonById(lessonId).then(resp => {
       navigation.navigate('LessonScreen', {lessonId, image: lessonImage});
     });
