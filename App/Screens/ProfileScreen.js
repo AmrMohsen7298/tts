@@ -17,19 +17,18 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { auth, db } from '../../firebaseConfig';
 import login from './../../assets/eye.png';
 import fire from './../../assets/fire.png';
+import user from './../../assets/Images/profile.jpg';
 import Colors from './../Utils/Colors';
 
 import {
   createUserWithEmailAndPassword,
+  getIdToken,
   onAuthStateChanged,
   signInWithEmailAndPassword,
 } from 'firebase/auth';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  setCurrentUser,
-  setIsSubscribed
-} from '../Actions/StoryActions';
+import { setCurrentUser, setIsSubscribed } from '../Actions/StoryActions';
 import useInAppPurchase from '../Hooks/useInAppPurchase';
 import { useStateValue } from '../store/contextStore/StateContext';
 
@@ -39,23 +38,22 @@ const ProfileScreen = () => {
   const {state, dispatch: contextDispatch} = useStateValue();
   const dispatch = useDispatch();
   const {
-    user,
+    user: currentUser,
     // email: userEmail,
     // password: userPassword,
   } = useSelector(state => state.storyReducer);
+  const storeData = useSelector(state => state.storyReducer);
   const [viewLoginOrSignupForm, setViewLoginOrSignupForm] = useState();
   const [isLoggedIn, setIsLoggedIn] = useState();
-  const email = useRef('');
-  const password = useRef('');
-  const [pending, setPending] = useState(false);
+
   const {isSubscribed, connectionErrorMsg, subscribeToApp} = useInAppPurchase();
 
   const checkIsSubscribed = async () => {
     try {
-      if (!user) throw new Error('user not signed in');
+      if (!currentUser) throw new Error('user not signed in');
       const q = query(
         collection(db, 'subscriptions'),
-        where('uid', '==', user.uid),
+        where('uid', '==', currentUser.uid),
       );
       const querySnapshot = await getDocs(q);
       const subscriptions = querySnapshot.docs.map(doc => ({
@@ -67,30 +65,40 @@ const ProfileScreen = () => {
 
       console.log({now, monthTime, subscriptions});
 
-      if (subscriptions.some(doc => +doc.data().timestamp + monthTime < now)) {
+      if (subscriptions.some(doc => +doc.timestamp + monthTime > now)) {
         dispatch(setIsSubscribed(true));
+        console.log('SUBSCRIBED');
+      } else {
+        dispatch(setIsSubscribed(false));
+        console.log('NOT SUBSCRIBED');
       }
     } catch (e) {
       console.log(e.message ?? 'user not signed in');
     }
   };
 
-  // const reAuthUser = () => {
-  //   const currentUser = auth.currentUser;
-  //   if (!userEmail || !userPassword || currentUser) {
-  //     console.log('User is signed in or not credentials found.');
-  //     return;
-  //   }
-  //   signInWithEmailAndPassword(auth, userEmail, userPassword)
-  //     .then(userCredential => {
-  //       // Signed in
-  //       const user = userCredential.user;
-  //     })
-  //     .catch(error => {
-  //       const errorCode = error.code;
-  //       const errorMessage = error.message;
-  //     });
-  // };
+  const reAuthUser = () => {
+    const currentStoredUser = auth.currentUser;
+    if (!currentUser?.email || !currentUser?.password || currentStoredUser) {
+      console.log('User is not signed in or not credentials found.', 
+        currentUser?.email,
+        currentUser?.password,
+        currentStoredUser,
+      );
+      return;
+    }
+    console.log('LOGGING USER IN AGAIN')
+    signInWithEmailAndPassword(auth, currentUser?.email, currentUser?.password)
+    .then(userCredential => {
+      // Signed in
+      const user = userCredential.user;
+      console.log('USER LOGGED IN AGAIN');
+      })
+      .catch(error => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+      });
+  };
 
   useEffect(() => {
     contextDispatch({type: 'SHOW_NAVBAR', payload: false});
@@ -99,7 +107,11 @@ const ProfileScreen = () => {
         // User is signed in, see docs for a list of available properties
         // https://firebase.google.com/docs/reference/js/auth.user
         const uid = user.uid;
-        dispatch(setCurrentUser(user));
+        // dispatch(setCurrentUser(user));
+        getIdToken(user).then((idToken) => {
+          console.log("ID Token: ", idToken);
+          // Use the ID token for your Firestore requests
+        });
         setIsLoggedIn(true);
         await checkIsSubscribed();
         // ...
@@ -111,7 +123,7 @@ const ProfileScreen = () => {
       }
     });
 
-    // reAuthUser();
+    reAuthUser();
   }, []);
 
   const LearningProgressCard = ({title, storiesCount, wordsCount}) => {
@@ -170,30 +182,35 @@ const ProfileScreen = () => {
   };
 
   const SignupForm = () => {
+    const email = useRef('');
+    const password = useRef('');
+    const [emailState, setEmailState] = useState();
+    const [passwordState, setPasswordState] = useState();
+    const [pending, setPending] = useState(false);
     const handleSignup = () => {
-      setPending(true);
-      if (!email.current.value || !password.current.value) {
+      if (!emailState || !passwordState) {
+        console.log({emailState, passwordState});
         Alert.alert(
           'بيانات غير صحيحة',
           'يجب إدخال البريد الإلكتروني و كلمة السر',
         );
         return;
       }
-      createUserWithEmailAndPassword(
-        auth,
-        email.current.value,
-        password.current.value,
-      )
-        .then(userCredential => {
+      setPending(true);
+      createUserWithEmailAndPassword(auth, emailState, passwordState)
+        .then(async userCredential => {
           // Signed up
           const user = userCredential.user;
           // dispatch(
           //   setUserCredentials({
-          //     email: email.current.value,
-          //     password: password.current.value,
+          //     email,
+          //     password,
           //   }),
           // );
+          dispatch(setCurrentUser({...user, password: passwordState}));
+          await checkIsSubscribed();
           setPending(false);
+          setIsLoggedIn(true);
         })
         .catch(error => {
           const errorCode = error.code;
@@ -216,13 +233,13 @@ const ProfileScreen = () => {
           <TextInput
             ref={email}
             style={styles.loginInput}
-            onChangeText={text => (email.current.value = text)}
+            onChangeText={text => setEmailState(text)}
             placeholder="البريد الإلكتروني"
           />
           <TextInput
             ref={password}
             style={styles.loginInput}
-            onChangeText={text => (password.current.value = text)}
+            onChangeText={text => setPasswordState(text)}
             placeholder="كلمة السر"
             secureTextEntry
           />
@@ -230,7 +247,7 @@ const ProfileScreen = () => {
             <TouchableOpacity
               disabled
               style={styles.disabledloginButton}
-              onPress={handleSignup}>
+              onPress={() => handleSignup(emailState, passwordState)}>
               <Text style={styles.buttonText}>جاري الإنشاء</Text>
             </TouchableOpacity>
           ) : (
@@ -244,30 +261,35 @@ const ProfileScreen = () => {
   };
 
   const LoginForm = () => {
+    const email = useRef('');
+    const password = useRef('');
+    const [emailState, setEmailState] = useState();
+    const [passwordState, setPasswordState] = useState();
+    const [pending, setPending] = useState(false);
     const handleLogin = () => {
-      setPending(true);
-      if (!email.current.value || !password.current.value) {
+      if (!emailState || !passwordState) {
+        console.log({emailState, passwordState});
         Alert.alert(
           'بيانات غير صحيحة',
           'يجب إدخال البريد الإلكتروني و كلمة السر',
         );
         return;
       }
-      signInWithEmailAndPassword(
-        auth,
-        email.current.value,
-        password.current.value,
-      )
-        .then(userCredential => {
+      setPending(true);
+      signInWithEmailAndPassword(auth, emailState, passwordState)
+        .then(async userCredential => {
           // Signed in
           const user = userCredential.user;
           // dispatch(
           //   setUserCredentials({
-          //     email: email.current.value,
-          //     password: password.current.value,
+          //     email: email,
+          //     password: password,
           //   }),
           // );
+          dispatch(setCurrentUser({...user, password: passwordState}));
+          await checkIsSubscribed();
           setPending(false);
+          setIsLoggedIn(true);
         })
         .catch(error => {
           const errorCode = error.code;
@@ -289,13 +311,13 @@ const ProfileScreen = () => {
           <TextInput
             ref={email}
             style={styles.loginInput}
-            onChangeText={text => (email.current.value = text)}
+            onChangeText={text => setEmailState(text)}
             placeholder="البريد الإلكتروني"
           />
           <TextInput
             ref={password}
             style={styles.loginInput}
-            onChangeText={text => (password.current.value = text)}
+            onChangeText={text => setPasswordState(text)}
             placeholder="كلمة السر"
             secureTextEntry
           />
@@ -334,7 +356,7 @@ const ProfileScreen = () => {
         <View style={{...styles.accountTypeContainer, ...styles.subscribe}}>
           <Pressable
             onPress={() => {
-              if (user?.uid) subscribeToApp();
+              if (currentUser?.uid) subscribeToApp();
               else
                 Alert.alert(
                   'عملية غير مقبولة',
@@ -358,7 +380,7 @@ const ProfileScreen = () => {
           <ReaderTrakerCard title="تتبع القراءة" storiesCount={0} />
         </View>
       </ScrollView>
-      {!user?.uid && (
+      {!currentUser?.uid && (
         <View style={styles.loginButtonContainer}>
           <Pressable
             style={styles.button}
@@ -376,7 +398,16 @@ const ProfileScreen = () => {
       <View style={styles.hairlineLeft}></View>
 
       <View>
-        <Pressable onPress={() => checkIsSubscribed()}>
+        <Pressable
+          onPress={() => {
+            console.log(auth.currentUser);
+            // console.log({
+            //   email: currentUser?.email,
+            //   password: currentUser?.password,
+            // });
+            // console.log("");
+            // checkIsSubscribed()
+          }}>
           <Text>TEST</Text>
         </Pressable>
       </View>

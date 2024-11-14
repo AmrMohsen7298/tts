@@ -12,7 +12,7 @@ import {
   SET_KEYWORDS_LIST,
   SET_USER_KEYWORDS,
   SHOW_NAVBAR,
-  USER_CREDENTIALS
+  USER_CREDENTIALS,
 } from '../Actions/StoryActions';
 
 import { combineReducers, createStore } from 'redux';
@@ -30,6 +30,8 @@ const initialState = {
   userKeywords: [],
   user: null,
   isSubscribed: false,
+  email: null,
+  password: null,
   // Define your initial state properties here
 };
 const persistConfig = {
@@ -41,8 +43,13 @@ const persistConfig = {
 const reducer = (state = initialState, action) => {
   const type = action && action.type;
   const payload = action && action.payload;
-  console.log;
   switch (type) {
+    case USER_CREDENTIALS:
+      return {
+        ...state,
+        email: payload.email,
+        password: payload.password,
+      };
     case CURRENT_USER:
       return {
         ...state,
@@ -141,12 +148,6 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         isSubscribed: payload,
-      };
-    case USER_CREDENTIALS:
-      return {
-        ...state,
-        email: payload.email,
-        password: payload.password,
       };
     default:
       return state;
