@@ -37,11 +37,16 @@ const ProfileScreen = () => {
   const {state, dispatch: contextDispatch} = useStateValue();
   const dispatch = useDispatch();
   const {user: currentUser} = useSelector(state => state.storyReducer);
-  const storeData = useSelector(state => state.storyReducer);
   const [viewLoginOrSignupForm, setViewLoginOrSignupForm] = useState();
   const [isLoggedIn, setIsLoggedIn] = useState();
 
   const {isSubscribed, connectionErrorMsg, subscribeToApp} = useInAppPurchase();
+
+  const logout = () => {
+    auth?.signOut();
+    dispatch(setCurrentUser(null));
+    contextDispatch({type: 'IS_SUBSCRIBED', payload: false});
+  };
 
   const checkIsSubscribed = async () => {
     try {
@@ -65,10 +70,10 @@ const ProfileScreen = () => {
         id: doc.id,
         ...doc.data(),
       }));
-      
+
       if (subscriptions.some(doc => +doc.endDateTimestamp > now)) {
-          contextDispatch({ type: 'IS_SUBSCRIBED', payload: true });
-          console.log(subscriptions)
+        contextDispatch({type: 'IS_SUBSCRIBED', payload: true});
+        console.log(subscriptions);
         console.log('SUBSCRIBED');
       } else {
         dispatch(setIsSubscribed(false));
@@ -344,7 +349,7 @@ const ProfileScreen = () => {
         </View>
         <View style={styles.profileContainer}>
           <View style={styles.accountTypeContainer}>
-            <Text style={styles.accountTypeText}>نوع الحساب: مجاني</Text>
+            <Text style={styles.accountTypeText}>نوع الحساب: {state.isSubscribed ? 'مدفوع' : 'مجاني'}</Text>
           </View>
           <Image source={user} style={styles.profileImage} />
         </View>
@@ -377,7 +382,7 @@ const ProfileScreen = () => {
           <ReaderTrakerCard title="تتبع القراءة" storiesCount={0} />
         </View>
       </ScrollView>
-      {!isLoggedIn && (
+      {!isLoggedIn ? (
         <View style={styles.loginButtonContainer}>
           <Pressable
             style={styles.button}
@@ -388,6 +393,14 @@ const ProfileScreen = () => {
             style={styles.button}
             onPress={() => setViewLoginOrSignupForm('signup')}>
             <Text style={styles.buttonText}>إنشاء حساب</Text>
+          </Pressable>
+        </View>
+      ) : (
+        <View style={styles.loginButtonContainer}>
+          <Pressable
+            style={{...styles.button, width: '90%'}}
+            onPress={logout}>
+            <Text style={styles.buttonText}>تسجيل الخروج</Text>
           </Pressable>
         </View>
       )}

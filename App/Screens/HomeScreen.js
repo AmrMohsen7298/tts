@@ -188,9 +188,8 @@ export default function HomeScreen() {
               style={{
                 display: 'flex',
                 flexDirection: 'row',
-                gap: 7,
                 justifyContent: 'flex-end',
-                right: '1%',
+                right: width * 0.03,
               }}>
               <View
                 style={{
