@@ -1,24 +1,25 @@
-import {useEffect, useState} from 'react';
-import {Platform} from 'react-native';
-import {requestPurchase, useIAP} from 'react-native-iap';
-import {collection, addDoc, serverTimestamp} from 'firebase/firestore';
-import {db} from '../../firebaseConfig';
-import {useDispatch, useSelector} from 'react-redux';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { useEffect, useState } from 'react';
+import { Platform } from 'react-native';
+import { requestPurchase, useIAP } from 'react-native-iap';
+import { useSelector } from 'react-redux';
+import { db } from '../../firebaseConfig';
+import { useStateValue } from '../store/contextStore/StateContext';
 
 // Play store item Ids
 const itemSKUs = Platform.select({
-    android: ['com.belarabi.basesubscription'],
+  android: ['com.belarabi.basesubscription'],
 });
 
 const useInAppPurchase = () => {
   const [connectionErrorMsg, setConnectionErrorMsg] = useState('');
-  const dispatch = useDispatch();
+  const {state, dispatch: contextDispatch} = useStateValue();
 
   const {
     connected,
-      products,
+    products,
     subscriptions,
-      getProducts,
+    getProducts,
     getSubscriptions,
     finishTransaction,
     currentPurchase,
@@ -26,7 +27,8 @@ const useInAppPurchase = () => {
   } = useIAP();
 
   const uid = useSelector(state => state.storyReducer.uid);
-  const isSubscribed = useSelector(state => state.storyReducer.isSubscribed);
+  // const isSubscribed = useSelector(state => state.storyReducer.isSubscribed);
+  const isSubscribed = state.isSubscribed;
 
   const createSubscription = async () => {
     try {
@@ -35,7 +37,7 @@ const useInAppPurchase = () => {
         timestamp: new Date().getMilliseconds(),
         createdAt: serverTimestamp(),
       });
-      dispatch({type: 'IS_SUBSCRIBED', payload: !!docRef.id});
+      contextDispatch({type: 'IS_SUBSCRIBED', payload: !!docRef.id});
     } catch (e) {
       console.log('Could not create a subscription doc');
     }
@@ -43,13 +45,13 @@ const useInAppPurchase = () => {
 
   // Get products from play store.
   useEffect(() => {
-      if (connected) {
-          console.log("itemsSkus", itemSKUs)
-          getSubscriptions({ skus: itemSKUs });
+    if (connected) {
+      console.log('itemsSkus', itemSKUs);
+      getSubscriptions({skus: itemSKUs});
       console.log('Getting subscriptions...');
     }
-      console.log(subscriptions);
-  }, [connected, getSubscriptions  ]);
+    console.log(subscriptions);
+  }, [connected, getSubscriptions]);
   // currentPurchase will change when the requestPurchase function is called. The purchase then needs to be checked and the purchase acknowledged so Google knows we have awared the user the in-app product.
   useEffect(() => {
     const checkCurrentPurchase = async purchase => {

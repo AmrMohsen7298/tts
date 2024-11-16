@@ -1,27 +1,27 @@
-import React, {useEffect, useRef, useState} from 'react';
+import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-  Dimensions,
-  Pressable,
-  FlatList,
   ActivityIndicator,
   Animated,
+  Dimensions,
+  FlatList,
   Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import Header from '../Components/HomeScreen/Header';
-import StoriesCard from '../Components/HomeScreen/storiesCard';
-import LevelsCard from '../Components/HomeScreen/levelsCard';
-import GIFT from '../../assets/gift.png';
+import { useSelector } from 'react-redux';
 import CIRCLECHECK from '../../assets/circle-check.png';
-import {StackActions, useNavigation} from '@react-navigation/native';
-import {getAllLessons, getLessonById} from '../Services/LessonServices';
-import {levels} from '../Utils/constants';
-import {useStateValue} from '../store/contextStore/StateContext';
-import {useSelector} from 'react-redux';
+import GIFT from '../../assets/gift.png';
+import Header from '../Components/HomeScreen/Header';
+import LevelsCard from '../Components/HomeScreen/levelsCard';
+import StoriesCard from '../Components/HomeScreen/storiesCard';
+import { getAllLessons, getLessonById } from '../Services/LessonServices';
+import { levels } from '../Utils/constants';
+import { useStateValue } from '../store/contextStore/StateContext';
 
 const {width, height} = Dimensions.get('window');
 
@@ -41,12 +41,6 @@ export default function HomeScreen() {
     levels.A4,
     levels.A5,
     levels.A6,
-    levels.B1,
-    levels.B2,
-    levels.B3,
-    levels.C1,
-    levels.C2,
-    levels.C3,
   ];
 
   useEffect(() => {
@@ -180,18 +174,13 @@ export default function HomeScreen() {
                 flexDirection: 'row',
                 gap: 7,
                 justifyContent: 'flex-end',
-                right: '1%',
+                right: width * 0.05,
               }}>
               <View
                 style={{
                   display: 'flex',
-
                   flexDirection: 'row',
                   gap: 7,
-                  justifyContent: 'flex-end',
-                  right: '1%',
-                  borderRadius: 6,
-                  padding: '1%',
                 }}>
                 <Text
                   style={{

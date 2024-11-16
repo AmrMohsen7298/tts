@@ -9,11 +9,12 @@ export const REMOVE_KEYWORDS = 'REMOVE_KEYWORDS';
 export const SET_KEYWORDS_LIST = 'SET_KEYWORDS_LIST';
 export const SET_USER_KEYWORDS = 'SET_USER_WORDS';
 export const REMOVE_USER_KEYWORDS = 'REMOVE_USER_WORDS';
-export const CURRENT_UID = 'CURRENT_UID';
+export const CURRENT_USER = 'CURRENT_USER';
 export const IS_SUBSCRIBED = 'IS_SUBSCRIBED';
-export const setCurrentUID = uid => {
+
+export const setCurrentUser = uid => {
   return {
-    type: CURRENT_UID,
+    type: CURRENT_USER,
     payload: uid,
   };
 };

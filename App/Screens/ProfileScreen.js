@@ -86,13 +86,13 @@ const ProfileScreen = () => {
   };
 
   const reAuthUser = () => {
-    const currentStoredUser = auth.currentUser;
-    if (!currentUser?.email || !currentUser?.password || currentStoredUser) {
+    const currentFirebaseUser = auth.currentUser;
+    if (!currentUser?.email || !currentUser?.password || currentFirebaseUser) {
       console.log(
-        'User is not signed in or not credentials found.',
+        'User is already signed in or no credentials found.',
         currentUser?.email,
         currentUser?.password,
-        currentStoredUser,
+        currentFirebaseUser,
       );
       return;
     }
@@ -349,11 +349,13 @@ const ProfileScreen = () => {
         </View>
         <View style={styles.profileContainer}>
           <View style={styles.accountTypeContainer}>
-            <Text style={styles.accountTypeText}>نوع الحساب: {state.isSubscribed ? 'مدفوع' : 'مجاني'}</Text>
+            <Text style={styles.accountTypeText}>
+              نوع الحساب: {state.isSubscribed ? 'مدفوع' : 'مجاني'}
+            </Text>
           </View>
           <Image source={user} style={styles.profileImage} />
         </View>
-        {!isSubscribed && (
+        {!state.isSubscribed && (
           <View style={{...styles.accountTypeContainer, ...styles.subscribe}}>
             <Pressable
               onPress={() => {
@@ -397,9 +399,7 @@ const ProfileScreen = () => {
         </View>
       ) : (
         <View style={styles.loginButtonContainer}>
-          <Pressable
-            style={{...styles.button, width: '90%'}}
-            onPress={logout}>
+          <Pressable style={{...styles.button, width: '90%'}} onPress={logout}>
             <Text style={styles.buttonText}>تسجيل الخروج</Text>
           </Pressable>
         </View>
@@ -454,6 +454,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
     textAlign: 'right',
+    color: '#333',
   },
   loginHairlineLeft: {
     marginBottom: 20,

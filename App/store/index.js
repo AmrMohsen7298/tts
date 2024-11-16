@@ -1,22 +1,22 @@
 import {
   ADD_FAVORITE,
-  REMOVE_FAVORITE,
-  SET_AUDIO_PLAYING,
-  SHOW_NAVBAR,
   ADD_TO_LEARNED,
+  CURRENT_USER,
+  IS_SUBSCRIBED,
+  REMOVE_FAVORITE,
   REMOVE_FROM_LEARNED,
-  SET_KEYWORDS,
   REMOVE_KEYWORDS,
+  REMOVE_USER_KEYWORDS,
+  SET_AUDIO_PLAYING,
+  SET_KEYWORDS,
   SET_KEYWORDS_LIST,
   SET_USER_KEYWORDS,
-  REMOVE_USER_KEYWORDS,
-  CURRENT_UID,
-  IS_SUBSCRIBED,
+  SHOW_NAVBAR,
 } from '../Actions/StoryActions';
 
-import {createStore, combineReducers} from 'redux';
+import { combineReducers, createStore } from 'redux';
 
-import {persistStore, persistReducer} from 'redux-persist';
+import { persistReducer, persistStore } from 'redux-persist';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -27,7 +27,7 @@ const initialState = {
   learned: [],
   keywords: [],
   userKeywords: [],
-  uid: '',
+  user: null,
   isSubscribed: false,
   // Define your initial state properties here
 };
@@ -42,10 +42,10 @@ const reducer = (state = initialState, action) => {
   const payload = action && action.payload;
   console.log;
   switch (type) {
-    case CURRENT_UID:
+    case CURRENT_USER:
       return {
         ...state,
-        uid: payload,
+        user: payload,
       };
     case SET_AUDIO_PLAYING:
       return {
@@ -154,4 +154,5 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
 const store = createStore(persistedReducer);
 
 const persistor = persistStore(store);
-export {store, persistor};
+export { persistor, store };
+
