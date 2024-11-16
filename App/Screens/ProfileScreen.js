@@ -1,83 +1,130 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  StyleSheet,
-  Dimensions,
-  SafeAreaView,
-  Pressable,
-  TextInput,
   Alert,
+  Dimensions,
+  Image,
+  Linking,
+  Pressable,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import {Linking} from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import user from './../../assets/Images/profile.jpg';
-import login from './../../assets/eye.png';
-import Colors from './../Utils/Colors';
-import fire from './../../assets/fire.png';
-import {ScrollView} from 'react-native-gesture-handler';
-import {useStateValue} from '../store/contextStore/StateContext';
 import { auth, db } from '../../firebaseConfig';
+import login from './../../assets/eye.png';
+import fire from './../../assets/fire.png';
+import user from './../../assets/Images/profile.jpg';
+import Colors from './../Utils/Colors';
 
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   signInWithEmailAndPassword,
 } from 'firebase/auth';
-import {collection, query, where} from 'firebase/firestore';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { useDispatch, useSelector } from 'react-redux';
+import { setCurrentUser, setIsSubscribed } from '../Actions/StoryActions';
 import useInAppPurchase from '../Hooks/useInAppPurchase';
+import { useStateValue } from '../store/contextStore/StateContext';
 
 const {width, height} = Dimensions.get('window');
 
 const ProfileScreen = () => {
-  const {state, dispatch} = useStateValue();
-  const [loggedInUser, setLoggedInUser] = useState();
+  const {state, dispatch: contextDispatch} = useStateValue();
+  const dispatch = useDispatch();
+  const {user: currentUser} = useSelector(state => state.storyReducer);
   const [viewLoginOrSignupForm, setViewLoginOrSignupForm] = useState();
-  const email = useRef('');
-  const password = useRef('');
-    const [pending, setPending] = useState(false);
-    const { isSubscribed,
-        connectionErrorMsg, subscribeToApp } = useInAppPurchase()
+  const [isLoggedIn, setIsLoggedIn] = useState();
+
+  const {isSubscribed, connectionErrorMsg, subscribeToApp} = useInAppPurchase();
+
+  const logout = () => {
+    auth?.signOut();
+    dispatch(setCurrentUser(null));
+    contextDispatch({type: 'IS_SUBSCRIBED', payload: false});
+  };
 
   const checkIsSubscribed = async () => {
     try {
-      if (!uid) throw new Error('user not signed in');
-      const q = query(collection(db, 'subscriptions'), where('uid', '==', uid));
-      const querySnapshot = await getDocs(q);
-      const now = new Date().getMilliseconds();
-      const monthTime = 60 * 60 * 24 * 30 * 1000;
+      if (!currentUser) throw new Error('user not signed in');
+      const now = new Date().getTime();
 
-      if (querySnapshot.some(doc => +doc.data().timestamp + monthTime < now)) {
-        dispatch({type: 'IS_SUBSCRIBED', payload: true});
+      const q = query(
+        collection(db, 'subscriptions'),
+        where('uid', '==', currentUser.uid),
+        where('endDateTimestamp', '>', now),
+      );
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        contextDispatch({type: 'IS_SUBSCRIBED', payload: false});
+        console.log('NOT SUBSCRIBED');
+        return;
+      }
+
+      const subscriptions = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      if (subscriptions.some(doc => +doc.endDateTimestamp > now)) {
+        contextDispatch({type: 'IS_SUBSCRIBED', payload: true});
+        console.log(subscriptions);
+        console.log('SUBSCRIBED');
+      } else {
+        dispatch(setIsSubscribed(false));
+        contextDispatch({type: 'IS_SUBSCRIBED', payload: false});
+        console.log('NOT SUBSCRIBED');
       }
     } catch (e) {
       console.log(e.message ?? 'user not signed in');
     }
   };
 
+  const reAuthUser = () => {
+    const currentStoredUser = auth.currentUser;
+    if (!currentUser?.email || !currentUser?.password || currentStoredUser) {
+      console.log(
+        'User is not signed in or not credentials found.',
+        currentUser?.email,
+        currentUser?.password,
+        currentStoredUser,
+      );
+      return;
+    }
+    console.log('LOGGING USER IN AGAIN');
+    signInWithEmailAndPassword(auth, currentUser?.email, currentUser?.password)
+      .then(userCredential => {
+        // Signed in
+        const user = userCredential.user;
+        console.log('USER LOGGED IN AGAIN');
+      })
+      .catch(error => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+      });
+  };
+
   useEffect(() => {
-    dispatch({type: 'SHOW_NAVBAR', payload: false});
+    contextDispatch({type: 'SHOW_NAVBAR', payload: false});
     onAuthStateChanged(auth, async user => {
       if (user) {
-        // User is signed in, see docs for a list of available properties
-        // https://firebase.google.com/docs/reference/js/auth.user
         const uid = user.uid;
-        setLoggedInUser(uid);
-        // appDispatch(setCurrentUID(uid));
-        dispatch({type: 'CURRENT_UID', payload: uid});
+        setIsLoggedIn(true);
         await checkIsSubscribed();
-        // ...
       } else {
-        setLoggedInUser('');
-        dispatch({type: 'CURRENT_UID', payload: ''});
-        // appDispatch(setCurrentUID(''));
-        // User is signed out
-        // ...
+        setIsLoggedIn(false);
       }
     });
   }, []);
+
+  useEffect(() => {
+    reAuthUser();
+  }, [currentUser]);
 
   const LearningProgressCard = ({title, storiesCount, wordsCount}) => {
     return (
@@ -135,25 +182,35 @@ const ProfileScreen = () => {
   };
 
   const SignupForm = () => {
+    const email = useRef('');
+    const password = useRef('');
+    const [emailState, setEmailState] = useState();
+    const [passwordState, setPasswordState] = useState();
+    const [pending, setPending] = useState(false);
     const handleSignup = () => {
-      setPending(true);
-      if (!email.current.value || !password.current.value) {
+      if (!emailState || !passwordState) {
+        console.log({emailState, passwordState});
         Alert.alert(
           'بيانات غير صحيحة',
           'يجب إدخال البريد الإلكتروني و كلمة السر',
         );
         return;
       }
-      createUserWithEmailAndPassword(
-        auth,
-        email.current.value,
-        password.current.value,
-      )
-        .then(userCredential => {
+      setPending(true);
+      createUserWithEmailAndPassword(auth, emailState, passwordState)
+        .then(async userCredential => {
           // Signed up
           const user = userCredential.user;
-          // ...
+          // dispatch(
+          //   setUserCredentials({
+          //     email,
+          //     password,
+          //   }),
+          // );
+          dispatch(setCurrentUser({...user, password: passwordState}));
+          await checkIsSubscribed();
           setPending(false);
+          setIsLoggedIn(true);
         })
         .catch(error => {
           const errorCode = error.code;
@@ -176,13 +233,13 @@ const ProfileScreen = () => {
           <TextInput
             ref={email}
             style={styles.loginInput}
-            onChangeText={text => (email.current.value = text)}
+            onChangeText={text => setEmailState(text)}
             placeholder="البريد الإلكتروني"
           />
           <TextInput
             ref={password}
             style={styles.loginInput}
-            onChangeText={text => (password.current.value = text)}
+            onChangeText={text => setPasswordState(text)}
             placeholder="كلمة السر"
             secureTextEntry
           />
@@ -190,7 +247,7 @@ const ProfileScreen = () => {
             <TouchableOpacity
               disabled
               style={styles.disabledloginButton}
-              onPress={handleSignup}>
+              onPress={() => handleSignup(emailState, passwordState)}>
               <Text style={styles.buttonText}>جاري الإنشاء</Text>
             </TouchableOpacity>
           ) : (
@@ -204,25 +261,35 @@ const ProfileScreen = () => {
   };
 
   const LoginForm = () => {
+    const email = useRef('');
+    const password = useRef('');
+    const [emailState, setEmailState] = useState();
+    const [passwordState, setPasswordState] = useState();
+    const [pending, setPending] = useState(false);
     const handleLogin = () => {
-      setPending(true);
-      if (!email.current.value || !password.current.value) {
+      if (!emailState || !passwordState) {
+        console.log({emailState, passwordState});
         Alert.alert(
           'بيانات غير صحيحة',
           'يجب إدخال البريد الإلكتروني و كلمة السر',
         );
         return;
       }
-      signInWithEmailAndPassword(
-        auth,
-        email.current.value,
-        password.current.value,
-      )
-        .then(userCredential => {
+      setPending(true);
+      signInWithEmailAndPassword(auth, emailState, passwordState)
+        .then(async userCredential => {
           // Signed in
           const user = userCredential.user;
+          // dispatch(
+          //   setUserCredentials({
+          //     email: email,
+          //     password: password,
+          //   }),
+          // );
+          dispatch(setCurrentUser({...user, password: passwordState}));
+          await checkIsSubscribed();
           setPending(false);
-          // ...
+          setIsLoggedIn(true);
         })
         .catch(error => {
           const errorCode = error.code;
@@ -244,13 +311,13 @@ const ProfileScreen = () => {
           <TextInput
             ref={email}
             style={styles.loginInput}
-            onChangeText={text => (email.current.value = text)}
+            onChangeText={text => setEmailState(text)}
             placeholder="البريد الإلكتروني"
           />
           <TextInput
             ref={password}
             style={styles.loginInput}
-            onChangeText={text => (password.current.value = text)}
+            onChangeText={text => setPasswordState(text)}
             placeholder="كلمة السر"
             secureTextEntry
           />
@@ -271,9 +338,8 @@ const ProfileScreen = () => {
     );
   };
 
-  if (!loggedInUser && viewLoginOrSignupForm === 'login') return <LoginForm />;
-  if (!loggedInUser && viewLoginOrSignupForm === 'signup')
-    return <SignupForm />;
+  if (!isLoggedIn && viewLoginOrSignupForm === 'login') return <LoginForm />;
+  if (!isLoggedIn && viewLoginOrSignupForm === 'signup') return <SignupForm />;
 
   return (
     <SafeAreaView style={styles.mainContainer}>
@@ -283,10 +349,25 @@ const ProfileScreen = () => {
         </View>
         <View style={styles.profileContainer}>
           <View style={styles.accountTypeContainer}>
-            <Text style={styles.accountTypeText}>نوع الحساب: مجاني</Text>
+            <Text style={styles.accountTypeText}>نوع الحساب: {state.isSubscribed ? 'مدفوع' : 'مجاني'}</Text>
           </View>
           <Image source={user} style={styles.profileImage} />
         </View>
+        {!isSubscribed && (
+          <View style={{...styles.accountTypeContainer, ...styles.subscribe}}>
+            <Pressable
+              onPress={() => {
+                if (currentUser?.uid) subscribeToApp();
+                else
+                  Alert.alert(
+                    'عملية غير مقبولة',
+                    'يجب تسجيل الدخول أو إنشاء حساب لتتمكن من الاشتراك',
+                  );
+              }}>
+              <Text style={styles.subscribeText}>إشترك الآن</Text>
+            </Pressable>
+          </View>
+        )}
         <View style={styles.cardContainer}>
           <LearningProgressCard
             title="تقدمك في التعلم"
@@ -301,14 +382,47 @@ const ProfileScreen = () => {
           <ReaderTrakerCard title="تتبع القراءة" storiesCount={0} />
         </View>
       </ScrollView>
-     
-         
+      {!isLoggedIn ? (
+        <View style={styles.loginButtonContainer}>
+          <Pressable
+            style={styles.button}
+            onPress={() => setViewLoginOrSignupForm('login')}>
+            <Text style={styles.buttonText}>تسجيل دخول</Text>
+          </Pressable>
+          <Pressable
+            style={styles.button}
+            onPress={() => setViewLoginOrSignupForm('signup')}>
+            <Text style={styles.buttonText}>إنشاء حساب</Text>
+          </Pressable>
+        </View>
+      ) : (
+        <View style={styles.loginButtonContainer}>
+          <Pressable
+            style={{...styles.button, width: '90%'}}
+            onPress={logout}>
+            <Text style={styles.buttonText}>تسجيل الخروج</Text>
+          </Pressable>
+        </View>
+      )}
+
       <View style={styles.hairlineLeft}></View>
 
-          <View>
-
-          </View>
-          <View>
+      {/* <View>
+        <Pressable
+          onPress={() => {
+            // console.log(auth.currentUser);
+            // console.log({
+            //   email: currentUser?.email,
+            //   password: currentUser?.password,
+            // });
+            // console.log("");
+            // checkIsSubscribed()
+            console.log({isLoggedIn, viewLoginOrSignupForm, isSubscribed});
+          }}>
+          <Text>TEST</Text>
+        </Pressable>
+      </View> */}
+      <View>
         <Text
           style={{color: 'blue', padding: '8%'}}
           onPress={() =>
@@ -391,8 +505,18 @@ const styles = StyleSheet.create({
     padding: height * 0.015,
     borderRadius: width * 0.02,
   },
+  subscribe: {
+    marginTop: height * 0.015,
+    marginBottom: height * 0.015,
+  },
   accountTypeText: {
     fontSize: width * 0.04,
+    fontWeight: 'bold',
+    color: 'white',
+  },
+  subscribeText: {
+    textAlign: 'center',
+    fontSize: width * 0.06,
     fontWeight: 'bold',
     color: 'white',
   },
@@ -491,6 +615,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: height * 0.015,
+    marginBottom: height * 0.015,
   },
 });
 
