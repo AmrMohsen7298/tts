@@ -301,27 +301,7 @@ const ProfileScreen = () => {
           <ReaderTrakerCard title="تتبع القراءة" storiesCount={0} />
         </View>
       </ScrollView>
-      {/*{!loggedInUser && (*/}
-      {/*  <View style={styles.loginButtonContainer}>*/}
-      {/*    <Pressable*/}
-      {/*      style={styles.button}*/}
-      {/*      onPress={() => setViewLoginOrSignupForm('login')}>*/}
-      {/*      <Text style={styles.buttonText}>تسجيل دخول</Text>*/}
-      {/*    </Pressable>*/}
-      {/*    <Pressable*/}
-      {/*      style={styles.button}*/}
-      {/*      onPress={() => setViewLoginOrSignupForm('signup')}>*/}
-      {/*      <Text style={styles.buttonText}>إنشاء حساب</Text>*/}
-      {/*            </Pressable>*/}
-      {/*            */}{/*<Pressable onPress={() => subscribeToApp()} style={styles.button}>*/}
-      {/*            */}{/*    <Text>*/}
-
-      {/*            */}{/*        subscribe*/}
-      {/*            */}{/*    </Text>*/}
-
-      {/*            */}{/*</Pressable>*/}
-      {/*  </View>*/}
-      {/*    )}*/}
+     
          
       <View style={styles.hairlineLeft}></View>
 
