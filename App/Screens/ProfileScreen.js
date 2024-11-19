@@ -22,7 +22,6 @@ import Colors from './../Utils/Colors';
 
 import {
   createUserWithEmailAndPassword,
-  onAuthStateChanged,
   signInWithEmailAndPassword,
 } from 'firebase/auth';
 import { collection, getDocs, query, where } from 'firebase/firestore';

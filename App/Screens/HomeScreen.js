@@ -1,4 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
+import { onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -16,12 +17,12 @@ import {
 import { useSelector } from 'react-redux';
 import CIRCLECHECK from '../../assets/circle-check.png';
 import GIFT from '../../assets/gift.png';
+import { auth } from '../../firebaseConfig';
 import Header from '../Components/HomeScreen/Header';
 import LevelsCard from '../Components/HomeScreen/levelsCard';
 import StoriesCard from '../Components/HomeScreen/storiesCard';
 import { getAllLessons, getLessonById } from '../Services/LessonServices';
 import { levels } from '../Utils/constants';
-import { useStateValue } from '../store/contextStore/StateContext';
 
 const {width, height} = Dimensions.get('window');
 
@@ -29,9 +30,9 @@ export default function HomeScreen() {
   const navigation = useNavigation();
   const [lessons, setLessons] = useState([]);
   const [activeTab, setActiveTab] = useState(0);
-  const {state, dispatch: contextDispatch} = useStateValue();
   const [hideLearned, setHideLearned] = useState(false);
   const learnedLessons = useSelector(state => state.storyReducer.learned);
+  const {user: currentUser} = useSelector(state => state.storyReducer);
   const [loading, setLoading] = useState(true);
 
   const tabs = [
@@ -55,6 +56,46 @@ export default function HomeScreen() {
   //     lessons.filter
   //   }
   // },[hideLearned])
+
+  const reAuthUser = () => {
+    const currentFirebaseUser = auth.currentUser;
+    if (!currentUser?.email || !currentUser?.password || currentFirebaseUser) {
+      console.log(
+        'User is already signed in or no credentials found.',
+        currentUser?.email,
+        currentUser?.password,
+        currentFirebaseUser,
+      );
+      return;
+    }
+    console.log('LOGGING USER IN AGAIN');
+    signInWithEmailAndPassword(auth, currentUser?.email, currentUser?.password)
+      .then(userCredential => {
+        // Signed in
+        const user = userCredential.user;
+        console.log('USER LOGGED IN AGAIN');
+      })
+      .catch(error => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+      });
+  };
+
+  useEffect(() => {
+    onAuthStateChanged(auth, async user => {
+      if (user) {
+        const uid = user.uid;
+        setIsLoggedIn(true);
+        await checkIsSubscribed();
+      } else {
+        setIsLoggedIn(false);
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    reAuthUser();
+  }, [currentUser]);
 
   const handleOnPress = (lessonId, lessonImage) => {
     getLessonById(lessonId).then(resp => {

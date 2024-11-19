@@ -1,39 +1,30 @@
 import React, {
+  useCallback,
   useEffect,
   useRef,
-  useState,
-  useCallback,
-  useLayoutEffect,
+  useState
 } from 'react';
 // import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from "expo-av";
-import {AnimatedCircularProgress} from 'react-native-circular-progress';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
-  View,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Pressable,
+  ActivityIndicator,
+  Dimensions,
   Image,
   ImageBackground,
-  Dimensions,
-  findNodeHandle,
-  measureLayout,
-  ActivityIndicator,
-  measure,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
-import TextHighlighter from './../Components/TextHighlighter';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import { AnimatedCircularProgress } from 'react-native-circular-progress';
 // import { faDumbbell, faPlay } from "@fortawesome/free-solid-svg-icons";
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import pic from '../../assets/Images/bird.jpg';
-import Colors from '../Utils/Colors';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import KeywordCard from '../Components/KeyWordCard/KeywordCard';
 import Card from '../Components/Card';
-import {LessonTabs} from '../Utils/constants';
+import KeywordCard from '../Components/KeyWordCard/KeywordCard';
 import {
   getAudioTimePoints,
   getGrammerByTutorialId,
@@ -43,33 +34,28 @@ import {
   getStoryById,
   getWordByText,
 } from '../Services/LessonServices';
+import Colors from '../Utils/Colors';
+import { LessonTabs } from '../Utils/constants';
 
-import CircularProgress from '../Utils/pie';
-import {useFocusEffect} from '@react-navigation/native';
-import {connect, useDispatch, useSelector} from 'react-redux';
-import CustomAudioPlayer from '../Components/AudioPlayer/CustomAudioPlayer';
+import Sound from 'react-native-sound';
+import { useDispatch, useSelector } from 'react-redux';
+import RNFetchBlob from 'rn-fetch-blob';
+import CROSS from '../../assets/check-cross.png';
+import CHECK from '../../assets/check-orange.png';
+import CHECKMARKWHITE from '../../assets/checkmark-white.png';
+import TROPHY from '../../assets/trophy.png';
 import {
   addFavorite,
   addToLearned,
   removeFavorite,
   removeFromLearned,
   removeUserWords,
-  removeWordTraining,
   setAudioPlaying,
   setUserWords,
-  setWordTraining,
-  setWordsTrainingList,
+  setWordTraining
 } from '../Actions/StoryActions';
-import Sound from 'react-native-sound';
-import RNFetchBlob from 'rn-fetch-blob';
-import {useStateValue} from '../store/contextStore/StateContext';
-import {text} from '@fortawesome/fontawesome-svg-core';
-import {FlatList} from 'react-native-gesture-handler';
-import CHECKMARKWHITE from '../../assets/checkmark-white.png';
-import TROPHY from '../../assets/trophy.png';
-import CHECK from '../../assets/check-orange.png';
-import CROSS from '../../assets/check-cross.png';
-import CIRCLECHECK from '../../assets/checkmark-white.png';
+import CustomAudioPlayer from '../Components/AudioPlayer/CustomAudioPlayer';
+import { useStateValue } from '../store/contextStore/StateContext';
 // import CustomAudioPlayer from "../Components/AudioPlayer/CustomAudioPlayer";
 
 const {width, height} = Dimensions.get('window');
@@ -381,6 +367,9 @@ export default function LessonScreen(props) {
         });
       });
     });
+    return () => {
+      contextDispatch({type: 'SHOW_NAVBAR', payload: true});
+    };
   }, []);
   useEffect(() => {
     if (storyParagraph) {
