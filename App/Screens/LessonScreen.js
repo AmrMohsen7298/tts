@@ -381,6 +381,9 @@ export default function LessonScreen(props) {
         });
       });
     });
+      return () => {
+          contextDispatch({ type: 'SHOW_NAVBAR', payload: true });
+      };
   }, []);
   useEffect(() => {
     if (storyParagraph) {

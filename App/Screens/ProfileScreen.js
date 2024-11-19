@@ -120,6 +120,9 @@ const ProfileScreen = () => {
         setIsLoggedIn(false);
       }
     });
+      return () => {
+      contextDispatch({type: 'SHOW_NAVBAR', payload: true});
+    };
   }, []);
 
   useEffect(() => {
@@ -453,7 +456,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 15,
     borderRadius: 10,
-    textAlign: 'right',
+      textAlign: 'right',
+      color: 'black'
   },
   loginHairlineLeft: {
     marginBottom: 20,
