@@ -119,6 +119,10 @@ const ProfileScreen = () => {
         setIsLoggedIn(false);
       }
     });
+
+    return () => {
+      contextDispatch({type: 'SHOW_NAVBAR', payload: true});
+    }
   }, []);
 
   useEffect(() => {
