@@ -80,8 +80,8 @@ const useInAppPurchase = () => {
             // Give full app access
           if (!state.isSubscribed)
             createSubscription(receipt);
-          try {
-            const ackResult = await finishTransaction(purchase);
+            try {
+                const ackResult = await finishTransaction({ purchase,isConsumable: false });
             console.log('ackResult: ', ackResult);
           } catch (ackErr) {
             // We would need a backend to validate receipts for purhcases that pended for a while and were then declined. So I'll assume most purchase attempts go through successfully (OK ackResult) & take the hit for the ones that don't (user will still have full app access).
