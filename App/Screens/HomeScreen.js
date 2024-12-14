@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -20,7 +20,7 @@ import GIFT from '../../assets/gift.png';
 import Header from '../Components/HomeScreen/Header';
 import LevelsCard from '../Components/HomeScreen/levelsCard';
 import StoriesCard from '../Components/HomeScreen/storiesCard';
-import { getAllLessons, getLessonById } from '../Services/LessonServices';
+import { getAllLessons, getLessonById, getFreeLessons } from '../Services/LessonServices';
 import { levels } from '../Utils/constants';
 import { useStateValue } from '../store/contextStore/StateContext';
 import { auth } from '../../firebaseConfig';
@@ -30,12 +30,15 @@ const {width, height} = Dimensions.get('window');
 export default function HomeScreen() {
   const navigation = useNavigation();
   const [lessons, setLessons] = useState([]);
-  const [activeTab, setActiveTab] = useState(0);
+  const activeTab = useRef(levels.A1);
   const {state, dispatch} = useStateValue();
   const [hideLearned, setHideLearned] = useState(false);
     const learnedLessons = useSelector(state => state.storyReducer.learned);
     const { user: currentUser } = useSelector(state => state.storyReducer);
-  const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(true);
+    const page = useRef(0);
+    const pageFree = useRef(0);
+    const [freeLessons, setFreeLessons] = useState([])
 
   const tabs = [
     levels.A1,
@@ -52,14 +55,148 @@ export default function HomeScreen() {
     levels.C3,
   ];
 
-  useEffect(() => {
-    getAllLessons().then(
-      resp => setLessons(resp),
+    useEffect(() => {
+        getAllLessons(activeTab.current?.text, page?.current).then(
+            (resp) => {
+                setLessons(resp)
+            }
+        )
+        getFreeLessons(page?.current).then((resp) => {
+            setFreeLessons(resp)
 
-      setLoading(false),
-    );
+        }).finally(() => setLoading(false))
   }, []);
+    const increaseFreePage = () => {
+        //pageFree.current += 1;
+        //setLoading(true)
+        //getFreeLessons(pageFree.current).then(
+        //    if (resp.length === 0) {
 
+        //    // Handle the empty response case
+
+        //    console.log("No more lessons available.");
+
+        //    // Optionally, you can show a message to the user
+
+        //    // setNoMoreLessons(true); // Example state to show a message
+
+        //} else {
+
+        //    // If there are lessons, append them to the existing list
+
+        //        resp => setFreeLessons(([...freeLessons, ...resp]),
+        //        ).finally(() => setLoading(false)).catch(() => setLoading(false)));
+
+        //}
+        pageFree.current += 1;
+
+        setLoading(true);
+
+
+
+        getFreeLessons(pageFree.current)
+
+            .then(resp => {
+
+                // Check if the response is empty
+
+                if (resp.length === 0) {
+
+                    // Handle the empty response case
+
+                    console.log("No more lessons available.");
+
+                    // Optionally, you can show a message to the user
+
+                    // setNoMoreLessons(true); // Example state to show a message
+
+                } else {
+
+                    // If there are lessons, append them to the existing list
+
+                    setFreeLessons([...freeLessons, ...resp]);
+
+                }
+
+            })
+
+            .catch(error => {
+
+                console.error("Error fetching lessons:", error);
+
+                // Handle the error case (e.g., show an error message)
+
+            })
+
+            .finally(() => {
+
+                setLoading(false);
+
+            });
+
+    
+        
+    }
+    //useEffect(() => {
+    //    console.log("RECHED HERE");
+    //        setLoading(true);
+
+    //}, [page.current, activeTab.current])
+
+    const handleActiveTab = (tab) => {
+        activeTab.current = tab
+        setLoading(true)
+        getAllLessons(activeTab.current?.text, page.current).then(
+            resp => setLessons([...lessons, ...resp]),
+        ).finally(() => setLoading(false)).catch(() => setLoading(false));
+    }
+    const increasePage = () => {
+        page.current += 1;
+        setLoading(true)
+        //        resp => setLessons([...lessons, ...resp]),
+        //).finally(() => setLoading(false)).catch(() => setLoading(false));
+
+        getAllLessons(activeTab.current?.text, page.current).
+            then(resp => {
+
+            // Check if the response is empty
+
+            if (resp.length === 0) {
+
+                // Handle the empty response case
+
+                console.log("No more lessons available.");
+
+                // Optionally, you can show a message to the user
+
+                // setNoMoreLessons(true); // Example state to show a message
+
+            } else {
+
+                // If there are lessons, append them to the existing list
+
+                setLessons([...lessons, ...resp])
+
+            }
+
+        })
+            .catch(error => {
+
+                console.error("Error fetching lessons:", error);
+
+                // Handle the error case (e.g., show an error message)
+
+            })
+
+            .finally(() => {
+
+                setLoading(false);
+
+            });
+
+
+    }
+   
   // useEffect(()=>{
   //   if(hideLearned){
   //     lessons.filter
@@ -118,13 +255,29 @@ export default function HomeScreen() {
     getLessonById(lessonId).then(resp => {
       navigation.navigate('LessonScreen', {lessonId, image: lessonImage});
     });
-  };
+    };
 
-  const HorizontalFlatList = ({lessons}) => {
-    return (
+    const handleOnPressFree = (lessonId, lessonImage) => {
+        const isSubscribed = state.isSubscribed;
+        const isLessonPaid = freeLessons.find(lesson => lesson.id === lessonId).paid;
+        if (!isSubscribed && isLessonPaid) {
+            Alert.alert(
+                'عملية غير مقبولة',
+                'يجب تسجيل الدخول و الاشتراك للحصول على هذا الدرس',
+            );
+            return;
+        }
+        getLessonById(lessonId).then(resp => {
+            navigation.navigate('LessonScreen', { lessonId, image: lessonImage });
+        });
+    };
+
+  const HorizontalFlatList = () => {
+      return (
+        <View>
       <FlatList
         horizontal
-        data={lessons}
+        data={freeLessons}
         contentContainerStyle={{
           marginLeft: width * 0.02,
           alignItems: 'center',
@@ -133,23 +286,41 @@ export default function HomeScreen() {
         keyExtractor={item => item.id.toString()}
         showsHorizontalScrollIndicator={false}
         renderItem={({item, index}) =>
-          !item.paid && (
+            !item.paid && (
+
             <Pressable
-              style={{
-                paddingRight: index !== lessons.length - 1 ? width * 0.03 : 0,
+                    style={{
+                        paddingRight: index !== freeLessons.length - 1 ? width * 0.03 : 0,
               }}
               onPress={() =>
-                handleOnPress(item.id, 'data:image/png;base64,' + item.image)
+                  handleOnPressFree(item.id, 'data:image/png;base64,' + item.image)
               }>
               <StoriesCard
                 title={item.title}
                 description={item.description}
                 image={'data:image/png;base64,' + item.image}
               />
-            </Pressable>
+                </Pressable>
+
           )
         }
-      />
+
+              />
+              <View   style={styles.loginButtonContainer}>
+                  <Pressable
+                      style={{
+                          ...styles.button, width: '100%', marginTop: width * 0.02,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                      }}
+                      onPress={() => increaseFreePage()}
+                  >
+
+                      <Text style={styles.buttonText}>المزيد</Text>
+                  </Pressable>
+              </View>
+          </View>
+
     );
   };
 
@@ -162,11 +333,11 @@ export default function HomeScreen() {
         {tabs.map((tab, index) => (
           <TouchableOpacity
             key={index}
-            style={[styles.tab, activeTab === index && styles.activeTab]}
-            onPress={() => setActiveTab(index)}>
+            style={[styles.tab, activeTab.current === tab && styles.activeTab]}
+            onPress={() => handleActiveTab(tab)}>
             <Text
               style={
-                activeTab === index ? styles.tabTextActive : styles.tabText
+                activeTab.current === tab ? styles.tabTextActive : styles.tabText
               }>
               {tab.text}
             </Text>
@@ -256,7 +427,8 @@ export default function HomeScreen() {
               </View>
             </View>
             <View style={{width: width, padding: 10, justifyContent: 'center'}}>
-              <HorizontalFlatList lessons={lessons} />
+            <HorizontalFlatList lessons={freeLessons} />
+                            
             </View>
 
             <View
@@ -307,8 +479,8 @@ export default function HomeScreen() {
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{paddingHorizontal: '1%', gap: 5}}>
               {lessons?.length > 0 &&
-                lessons
-                  .filter(f => f.level == tabs?.[activeTab]?.text)
+                                  lessons
+                                      .filter(f => f.level == activeTab.current.text)
                   .filter(f => {
                     if (hideLearned)
                       if (!learnedLessons) {
@@ -345,8 +517,18 @@ export default function HomeScreen() {
                           </View>
                         </Pressable>
                       ),
-                  )}
-            </ScrollView>
+                                  )}
+                              <View >
+                                  <Pressable
+                                      style={{ ...styles.buttonMore, width:'100' }}
+                                      onPress={() => increasePage()}
+                                  >
+
+                                      <Text style={styles.buttonText}>المزيد</Text>
+                                  </Pressable>
+                              </View>
+             </ScrollView>
+
           </View>
         )}
       </ScrollView>
@@ -467,7 +649,31 @@ const styles = StyleSheet.create({
     width: 200,
     height: 50,
     alignItems: 'center',
-  },
+    },
+    buttonMore: {
+       
+        backgroundColor: 'white',
+
+        paddingHorizontal: '10%',
+
+        paddingVertical: 10,
+
+        borderRadius: 5,
+
+        marginHorizontal: 5,
+
+        borderColor: '#eaaa00',
+
+        borderWidth: 1,
+
+        width: 200,
+
+        height: 50,
+
+        alignItems: 'center',
+
+        justifyContent: 'center',
+    },
   buttonText: {
     fontFamily: 'outfitSemi',
     fontSize: 16,

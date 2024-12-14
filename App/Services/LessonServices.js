@@ -1,17 +1,44 @@
-import axios from "axios";
+﻿import axios from "axios";
 
-export const getAllLessons = async() =>{
-    return await axios.get('https://bel-arabi.com/api/tutorials',{method: 'GET',
-    headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-    }})
-    .then(response => response.data)
-
-    .catch(error => {
-      console.error("errorlessons",error);
-    });
+export const getAllLessons = async (level = 'اولي ابتدائي', page = 0, size = 10) => {
+    try {
+        console.log(level, page, size);
+        const response = await axios.get(`https://bel-arabi.com/api/tutorials/level/${level}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            params: {
+                page,
+                size
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error("errorlessons", error);  // Optional: throw the error so it can be caught where the function is called
+    }
 }
+export const getFreeLessons = async (page = 0) => {
+    try {
+        
+        const response = await axios.get(`https://bel-arabi.com/api/tutorials/free`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            params: {
+                page
+            }
+        });
+        console.log(response.data)
+        return response.data;
+    } catch (error) {
+        console.error("errorlessons", error);  // Optional: throw the error so it can be caught where the function is called
+    }
+}
+
 
 export const getStoryAudio = async(storyId)=>{
     return await fetch(`https://bel-arabi.com/tts/paragraph/${storyId}`)
