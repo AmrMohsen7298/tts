@@ -39,7 +39,7 @@ export default function HomeScreen() {
     const page = useRef(0);
     const pageFree = useRef(0);
     const [freeLessons, setFreeLessons] = useState([])
-
+    const [loadingMore, setLoadingMore] = useState(false);
   const tabs = [
     levels.A1,
     levels.A2,
@@ -65,6 +65,11 @@ export default function HomeScreen() {
             setFreeLessons(resp)
 
         }).finally(() => setLoading(false))
+        return (() => {
+            page.current = 0
+            setLessons([])
+            
+        })
   }, []);
     const increaseFreePage = () => {
         //pageFree.current += 1;
@@ -90,7 +95,7 @@ export default function HomeScreen() {
         //}
         pageFree.current += 1;
 
-        setLoading(true);
+        setLoadingMore(true);
 
 
 
@@ -105,7 +110,9 @@ export default function HomeScreen() {
                     // Handle the empty response case
 
                     console.log("No more lessons available.");
-
+                    Alert.alert(
+                        'ليس هناك دروس اخري...',
+                    );
                     // Optionally, you can show a message to the user
 
                     // setNoMoreLessons(true); // Example state to show a message
@@ -130,7 +137,7 @@ export default function HomeScreen() {
 
             .finally(() => {
 
-                setLoading(false);
+                setLoadingMore(false);
 
             });
 
@@ -145,6 +152,8 @@ export default function HomeScreen() {
 
     const handleActiveTab = (tab) => {
         activeTab.current = tab
+        page.current = 0
+        setLessons([])
         setLoading(true)
         getAllLessons(activeTab.current?.text, page.current).then(
             resp => setLessons([...lessons, ...resp]),
@@ -152,7 +161,8 @@ export default function HomeScreen() {
     }
     const increasePage = () => {
         page.current += 1;
-        setLoading(true)
+        setLoadingMore(true)
+       /* setLoading(true)*/
         //        resp => setLessons([...lessons, ...resp]),
         //).finally(() => setLoading(false)).catch(() => setLoading(false));
 
@@ -166,7 +176,9 @@ export default function HomeScreen() {
                 // Handle the empty response case
 
                 console.log("No more lessons available.");
-
+                Alert.alert(
+                    'ليس هناك دروس اخري...',
+                );
                 // Optionally, you can show a message to the user
 
                 // setNoMoreLessons(true); // Example state to show a message
@@ -190,7 +202,7 @@ export default function HomeScreen() {
 
             .finally(() => {
 
-                setLoading(false);
+                setLoadingMore(false)
 
             });
 
@@ -314,9 +326,22 @@ export default function HomeScreen() {
                           justifyContent: 'center',
                       }}
                       onPress={() => increaseFreePage()}
+                      disabled={loadingMore}
                   >
+                      {loadingMore ? (
 
-                      <Text style={styles.buttonText}>المزيد</Text>
+                          <ActivityIndicator size="small" color="black" />
+
+                      ) : (
+
+                          <Text style={styles.buttonText}>المزيد</Text>
+
+                      )}
+
+                  
+                      
+
+                      
                   </Pressable>
               </View>
           </View>
@@ -522,9 +547,19 @@ export default function HomeScreen() {
                                   <Pressable
                                       style={{ ...styles.buttonMore, width:'100' }}
                                       onPress={() => increasePage()}
+                                      disabled={loadingMore}
                                   >
+                                      {loadingMore ? (
 
-                                      <Text style={styles.buttonText}>المزيد</Text>
+                                          <ActivityIndicator size="small" color="black" />
+
+                                      ) : (
+
+                                              <Text style={styles.buttonText}>المزيد</Text>
+
+                                      )}
+
+                                     
                                   </Pressable>
                               </View>
              </ScrollView>

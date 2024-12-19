@@ -3,7 +3,8 @@
 const initialState = {
   showNavbar: true,
   user: null,
-  isSubscribed: false,
+    isSubscribed: false,
+  currentTab : "",
 };
 
 function reducer(state, action) {
@@ -13,7 +14,9 @@ function reducer(state, action) {
     case 'CURRENT_USER':
       return {...state, user: action.payload};
     case 'IS_SUBSCRIBED':
-      return {...state, isSubscribed: action.payload};
+          return { ...state, isSubscribed: action.payload };
+      case 'activeTab':
+          return { ...state, currentTab: action.payload }
     default:
       return state;
   }

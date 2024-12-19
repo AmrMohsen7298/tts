@@ -32,7 +32,7 @@ export const getFreeLessons = async (page = 0) => {
                 page
             }
         });
-        console.log(response.data)
+       
         return response.data;
     } catch (error) {
         console.error("errorlessons", error);  // Optional: throw the error so it can be caught where the function is called

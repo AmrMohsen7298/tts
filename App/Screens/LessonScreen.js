@@ -898,7 +898,7 @@ export default function LessonScreen(props) {
               <ScrollView style={styles.scrollableResults}>
                 <View style={styles.resultsHeader}>
                   <View style={styles.resultsHeaderTextContainer}>
-                    <Text style={styles.resultsHeaderText}>عمل رائع!</Text>
+                                    <Text style={styles.resultsHeaderText}>{score / quizData?.length * 100 >50 ? score / quizData?.length * 100 > 75 ?"عمل رائع":"عمل جيد ":"ابذل مجهود اكثر"}</Text>
                     <Text style={styles.resultsBodyText}>
                       لقد حصلت على {score} من {quizData?.length}. إستمر على
                       مستواك!
