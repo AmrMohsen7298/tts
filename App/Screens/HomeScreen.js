@@ -40,6 +40,8 @@ export default function HomeScreen() {
     const pageFree = useRef(0);
     const [freeLessons, setFreeLessons] = useState([])
     const [loadingMore, setLoadingMore] = useState(false);
+    const [lock, setLock] = useState(true);
+    const [isLoggedIn, setIsLoggedIn] = useState();
   const tabs = [
     levels.A1,
     levels.A2,
@@ -217,8 +219,16 @@ export default function HomeScreen() {
     const reAuthUser = () => {
         const currentFirebaseUser = auth.currentUser;
         if (!currentUser?.email || !currentUser?.password || currentFirebaseUser) {
+            
+            if (currentFirebaseUser == null) {
+                setLock(true)
+            }
+            else {
+                setLock(false)
+            }
             console.log(
                 'User is already signed in or no credentials found.',
+                lock,
                 currentUser?.email,
                 currentUser?.password,
                 currentFirebaseUser,
@@ -231,6 +241,7 @@ export default function HomeScreen() {
                 // Signed in
                 const user = userCredential.user;
                 console.log('USER LOGGED IN AGAIN');
+
             })
             .catch(error => {
                 const errorCode = error.code;
@@ -243,9 +254,11 @@ export default function HomeScreen() {
             if (user) {
                 const uid = user.uid;
                 setIsLoggedIn(true);
+              
                 await checkIsSubscribed();
             } else {
                 setIsLoggedIn(false);
+             
             }
         });
     }, []);
@@ -257,13 +270,15 @@ export default function HomeScreen() {
   const handleOnPress = (lessonId, lessonImage) => {
     const isSubscribed = state.isSubscribed;
     const isLessonPaid = lessons.find(lesson => lesson.id === lessonId).paid;
-    if (!isSubscribed && isLessonPaid) {
-      Alert.alert(
-        'عملية غير مقبولة',
-        'يجب تسجيل الدخول و الاشتراك للحصول على هذا الدرس',
-      );
-      return;
-    }
+      if (!isSubscribed && isLessonPaid) {
+          Alert.alert(
+              'عملية غير مقبولة',
+              'يجب تسجيل الدخول و الاشتراك للحصول على هذا الدرس',
+          );
+         
+          return;
+      }
+    
     getLessonById(lessonId).then(resp => {
       navigation.navigate('LessonScreen', {lessonId, image: lessonImage});
     });
@@ -531,7 +546,8 @@ export default function HomeScreen() {
                               title={lesson?.title}
                               description={lesson?.description}
                               image={'data:image/png;base64,' + lesson?.image}
-                              key={index}
+                               key={index}
+                               showLock={lock}
                               onPress={() =>
                                 handleOnPress(
                                   lesson?.id,

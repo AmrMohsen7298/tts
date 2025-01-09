@@ -16,10 +16,11 @@ export default function App(props) {
   return (
     <View style={styles.container}>
       <View style={styles.card_template}>
-        <Image style={styles.card_image} source={{uri: props?.image}} />
-        <View style={styles.lock_container}>
-          <Entypo name="lock" size={15} color="white" />
-        </View>
+              <Image style={styles.card_image} source={{ uri: props?.image }} />
+              {props.showLock && (
+                  <View style={styles.lock_container}>
+                      <Entypo name="lock" size={15} color="white" />
+                  </View>)}
         <View style={styles.text_container}>
           <Text style={styles.card_title}>{props?.title}</Text>
           <Text style={styles.card_desc} numberOfLines={1}>
