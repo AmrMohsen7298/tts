@@ -1,39 +1,25 @@
-import React, {
-  useEffect,
-  useRef,
-  useState,
-  useCallback,
-  useLayoutEffect,
-} from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 // import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from "expo-av";
-import {AnimatedCircularProgress} from 'react-native-circular-progress';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
-  View,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Pressable,
+  ActivityIndicator,
+  Dimensions,
   Image,
   ImageBackground,
-  Dimensions,
-  findNodeHandle,
-  measureLayout,
-  ActivityIndicator,
-  measure,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import TextHighlighter from './../Components/TextHighlighter';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import { AnimatedCircularProgress } from 'react-native-circular-progress';
 // import { faDumbbell, faPlay } from "@fortawesome/free-solid-svg-icons";
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import pic from '../../assets/Images/bird.jpg';
-import Colors from '../Utils/Colors';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import KeywordCard from '../Components/KeyWordCard/KeywordCard';
 import Card from '../Components/Card';
-import {LessonTabs} from '../Utils/constants';
+import KeywordCard from '../Components/KeyWordCard/KeywordCard';
 import {
   getAudioTimePoints,
   getGrammerByTutorialId,
@@ -43,33 +29,28 @@ import {
   getStoryById,
   getWordByText,
 } from '../Services/LessonServices';
+import Colors from '../Utils/Colors';
+import { LessonTabs } from '../Utils/constants';
 
-import CircularProgress from '../Utils/pie';
-import {useFocusEffect} from '@react-navigation/native';
-import {connect, useDispatch, useSelector} from 'react-redux';
-import CustomAudioPlayer from '../Components/AudioPlayer/CustomAudioPlayer';
+import Sound from 'react-native-sound';
+import { useDispatch, useSelector } from 'react-redux';
+import RNFetchBlob from 'rn-fetch-blob';
+import CROSS from '../../assets/check-cross.png';
+import CHECK from '../../assets/check-orange.png';
+import CHECKMARKWHITE from '../../assets/checkmark-white.png';
+import TROPHY from '../../assets/trophy.png';
 import {
   addFavorite,
   addToLearned,
   removeFavorite,
   removeFromLearned,
   removeUserWords,
-  removeWordTraining,
   setAudioPlaying,
   setUserWords,
   setWordTraining,
-  setWordsTrainingList,
 } from '../Actions/StoryActions';
-import Sound from 'react-native-sound';
-import RNFetchBlob from 'rn-fetch-blob';
-import {useStateValue} from '../store/contextStore/StateContext';
-import {text} from '@fortawesome/fontawesome-svg-core';
-import {FlatList} from 'react-native-gesture-handler';
-import CHECKMARKWHITE from '../../assets/checkmark-white.png';
-import TROPHY from '../../assets/trophy.png';
-import CHECK from '../../assets/check-orange.png';
-import CROSS from '../../assets/check-cross.png';
-import CIRCLECHECK from '../../assets/checkmark-white.png';
+import CustomAudioPlayer from '../Components/AudioPlayer/CustomAudioPlayer';
+import { useStateValue } from '../store/contextStore/StateContext';
 // import CustomAudioPlayer from "../Components/AudioPlayer/CustomAudioPlayer";
 
 const {width, height} = Dimensions.get('window');
@@ -116,28 +97,39 @@ const DoneLearning = ({lessonId}) => {
     learned = [];
   } else {
     return (
-      <View style={styles.buttonWrapper}>
+      <>
         <View
           style={{
-            ...styles.buttonContainer,
-            backgroundColor: learned?.some(id => id == lessonId)
-              ? '#eaaa00'
-              : '#333',
+            ...styles.buttonWrapper,
+            marginTop: height * 0.03,
           }}>
-          <TouchableOpacity
-            style={styles.touchable}
-            onPress={() => {
-              !learned?.some(id => id == lessonId)
-                ? dispatch(addToLearned(lessonId))
-                : dispatch(removeFromLearned(lessonId));
+          <View
+            style={{
+              ...styles.buttonContainer,
+              borderRadius: 20,
+              paddingVertical: height * 0.008,
+              minWidth: width * 0.28,
+              backgroundColor: learned?.some(id => id == lessonId)
+                ? '#eaaa00'
+                : '#333',
             }}>
-            <Text style={styles.touchableText}>
-              تم التعلم{' '}
+            <TouchableOpacity
+              style={{
+                ...styles.touchable,
+                display: 'flex',
+                flexDirection: 'row',
+              }}
+              onPress={() => {
+                !learned?.some(id => id == lessonId)
+                  ? dispatch(addToLearned(lessonId))
+                  : dispatch(removeFromLearned(lessonId));
+              }}>
               <Image source={CHECKMARKWHITE} style={{width: 20, height: 20}} />
-            </Text>
-          </TouchableOpacity>
+              <Text style={styles.touchableText}>تم التعلم</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
+      </>
     );
   }
 };
@@ -348,42 +340,46 @@ export default function LessonScreen(props) {
     setLoading(true);
     contextDispatch({type: 'SHOW_NAVBAR', payload: false});
 
-    getQuizByTutorialId(props?.route?.params?.lessonId).then(res => {
-      setQuizData(res?.questions);
-    });
-    getKeywordsbyTutorialId(props?.route?.params?.lessonId).then(res => {
-      res?.map(key => {
-        dispatch(setWordTraining(key));
-      });
-
-      setLessonKeyWords(res);
-    });
-    getGrammerByTutorialId(props?.route?.params?.lessonId).then(res => {
-      setGrammar(res);
-    });
-    getStoryById(props?.route?.params?.lessonId).then(resp => {
-      setStoryParagraph(resp?.paragraph);
-      setTranslation(resp?.translation);
-      setName(resp?.name);
-      getStoryAudio(resp?.id).then(res => {
-        var reader = new FileReader();
-        reader.readAsDataURL(res);
-        reader.onload = () => {
-          setAudioSrc(reader?.result?.split(',')[1]);
-        };
-      });
-      getAudioTimePoints(resp?.id).then(res => {
-        res?.map(time => {
-          setTimePoints(prevTimePoints => [
-            ...prevTimePoints,
-            time?.['timeSeconds_'],
-          ]);
+    Promise.all([
+      getQuizByTutorialId(props?.route?.params?.lessonId).then(res => {
+        setQuizData(res?.questions);
+      }),
+      getKeywordsbyTutorialId(props?.route?.params?.lessonId).then(res => {
+        res?.map(key => {
+          dispatch(setWordTraining(key));
         });
-      });
+
+        setLessonKeyWords(res);
+      }),
+      getGrammerByTutorialId(props?.route?.params?.lessonId).then(res => {
+        setGrammar(res);
+      }),
+      getStoryById(props?.route?.params?.lessonId).then(resp => {
+        setStoryParagraph(resp?.paragraph);
+        setTranslation(resp?.translation);
+        setName(resp?.name);
+        getStoryAudio(resp?.id).then(res => {
+          var reader = new FileReader();
+          reader.readAsDataURL(res);
+          reader.onload = () => {
+            setAudioSrc(reader?.result?.split(',')[1]);
+          };
+        });
+        getAudioTimePoints(resp?.id).then(res => {
+          res?.map(time => {
+            setTimePoints(prevTimePoints => [
+              ...prevTimePoints,
+              time?.['timeSeconds_'],
+            ]);
+          });
+        });
+      }),
+    ]).then(() => {
+      setLoading(false);
     });
-      return () => {
-          contextDispatch({ type: 'SHOW_NAVBAR', payload: true });
-      };
+    return () => {
+      contextDispatch({type: 'SHOW_NAVBAR', payload: true});
+    };
   }, []);
   useEffect(() => {
     if (storyParagraph) {
@@ -540,531 +536,442 @@ export default function LessonScreen(props) {
     switch (activeTab) {
       case 0:
         return (
-          <ScrollView
-            ref={scrollStory}
-            style={{
-              bottom: 'auto',
-              backgroundColor: 'white',
-              overflow: 'croll',
-            }}
-            horizontal={false}
-            showsHorizontalScrollIndicator={true}
-            contentContainerStyle={{paddingHorizontal: 'auto'}}>
-            <View style={{display: 'flex', marginVertical: height * 0.02}}>
-              <Text style={{fontSize: 30, color: 'black'}}>{name}</Text>
-            </View>
-            <View
+          <>
+            <ScrollView
+              ref={scrollStory}
               style={{
-                width: width * 0.9,
+                bottom: 'auto',
                 backgroundColor: 'white',
-                display: 'flex',
-                direction: 'rtl',
-              }}>
+                overflow: 'croll',
+              }}
+              horizontal={false}
+              showsHorizontalScrollIndicator={true}
+              contentContainerStyle={{paddingHorizontal: 'auto'}}>
+              <View style={{display: 'flex', marginVertical: height * 0.02}}>
+                <Text style={{fontSize: 30, color: 'black'}}>{name}</Text>
+              </View>
               <View
                 style={{
-                  flexDirection: 'row',
-                  justifyContent: 'flex-start',
-                  gap: 15,
-                  // padding: 'auto',
-                  paddingBottom: height * 0.02,
-                  position: 'absolute',
-                  right: 1,
+                  width: width * 0.9,
+                  backgroundColor: 'white',
+                  display: 'flex',
+                  direction: 'rtl',
                 }}>
-                <View>
-                  <Text style={styles.card_level}>A1</Text>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'flex-start',
+                    gap: 15,
+                    // padding: 'auto',
+                    paddingBottom: height * 0.02,
+                    position: 'absolute',
+                    right: 1,
+                  }}>
+                  <View>
+                    <Text style={styles.card_level}>A1</Text>
+                  </View>
+
+                  <MaterialIcons
+                    name="translate"
+                    size={22}
+                    color={translateButton ? '#eaaa00' : 'rgba(0, 0, 0, 0.2)'}
+                    onPress={() => setTranslateButton(!translateButton)}
+                  />
+                  <MaterialIcons
+                    name="favorite"
+                    size={22}
+                    color={favoriteButton ? 'red' : 'rgba(0, 0, 0, 0.2)'}
+                    onPress={() =>
+                      favoriteButton
+                        ? setFavorites(false, props?.route?.params?.lessonId)
+                        : setFavorites(true, props?.route?.params?.lessonId)
+                    }
+                  />
                 </View>
 
-                <MaterialIcons
-                  name="translate"
-                  size={22}
-                  color={translateButton ? '#eaaa00' : 'rgba(0, 0, 0, 0.2)'}
-                  onPress={() => setTranslateButton(!translateButton)}
-                />
-                <MaterialIcons
-                  name="favorite"
-                  size={22}
-                  color={favoriteButton ? 'red' : 'rgba(0, 0, 0, 0.2)'}
-                  onPress={() =>
-                    favoriteButton
-                      ? setFavorites(false, props?.route?.params?.lessonId)
-                      : setFavorites(true, props?.route?.params?.lessonId)
-                  }
-                />
-              </View>
-
-              <View
-                style={{
-                  flexDirection: translateButton ? 'row' : 'row-reverse',
-                  flexWrap: 'wrap',
-                  gap: translateButton ? 3 : 0,
-                  position: 'relative',
-                  paddingTop: height * 0.06,
-                }}>
-                {translateButton
-                  ? storyParagraph?.split('.').map((word, index) => {
-                      return (
-                        <View
-                          key={index}
-                          style={{
-                            flex: 0,
-                            textAlign: 'center',
-                            justifyContent: 'center',
-                            // overflow: 'hidden',
-                            // borderRadius: storyAudioPlaying && (index == highlightIndex[highlightIndex.length-1] || index == highlightIndex[0]) ? 5: 0,
-                            borderTopRightRadius:
-                              (storyAudioPlaying &&
-                                index == translationHighlightIndex?.[0]) ||
-                              (!storyAudioPlaying && selectedWord)
-                                ? 5
-                                : 0,
-                            borderBottomRightRadius:
-                              (storyAudioPlaying &&
-                                index == translationHighlightIndex?.[0]) ||
-                              (!storyAudioPlaying && selectedWord)
-                                ? 5
-                                : 0,
-                            borderTopLeftRadius:
-                              (storyAudioPlaying &&
-                                index ==
-                                  translationHighlightIndex?.[
-                                    translationHighlightIndex?.length - 1
-                                  ]) ||
-                              (!storyAudioPlaying && selectedWord)
-                                ? 5
-                                : 0,
-                            borderBottomLeftRadius:
-                              (storyAudioPlaying &&
-                                index ==
-                                  translationHighlightIndex?.[
-                                    translationHighlightIndex?.length - 1
-                                  ]) ||
-                              (!storyAudioPlaying && selectedWord)
-                                ? 5
-                                : 0,
-                            backgroundColor:
-                              translationHighlightIndex?.length > 0 &&
-                              translationHighlightIndex?.some(
-                                idx => idx == index,
-                              )
-                                ? '#eaaa00'
-                                : 'transparent',
-                            paddingHorizontal: 3,
-                            marginVertical: height * 0.005,
-                          }}
-                          onLayout={event =>
-                            handleSentenceLayout(index, event)
-                          }>
-                          <Text>
-                            <Text
-                              style={{
-                                color: 'black',
-                                borderRadius: 20,
-                                fontFamily: 'outfit',
-                                fontSize: 20,
-                                textAlign: 'center',
-                              }}>
-                              {word}
-                            </Text>
-                            <Text>{'\n'}</Text>
-                            <Text>{'\n'}</Text>
-                            <Text
-                              style={{
-                                color: 'black',
-                                borderRadius: 20,
-                                fontFamily: 'outfit',
-                                fontSize: 20,
-                                textAlign: 'center',
-                              }}>
-                              {translation?.split('.')?.[index]}
-                            </Text>
-                          </Text>
-                        </View>
-                      );
-                    })
-                  : storyParagraph
-                      ?.split(/(\s+|[.,!?؛؟«»؟،٫:]+)/)
-                      .filter(sentence => sentence.trim() !== '')
-                      .map((word, index) => {
-                        if (/[.,!?؛؟«»؟،٫:]+/.test(word)) {
-                          // Render punctuation mark
-                          return (
-                            <Text
-                              key={index}
-                              style={{
-                                flex: 0,
-                                marginVertical: height * 0.005,
-                                color: highlightIndex?.some(idx => idx == index)
-                                  ? 'white'
-                                  : 'black',
-                                fontFamily: 'outfit',
-                                fontSize: 20,
-                                textAlign: 'right',
-                                borderTopRightRadius:
-                                  (storyAudioPlaying &&
-                                    index == highlightIndex?.[0]) ||
-                                  (!storyAudioPlaying && selectedWord)
-                                    ? 5
-                                    : 0,
-                                borderBottomRightRadius:
-                                  (storyAudioPlaying &&
-                                    index == highlightIndex?.[0]) ||
-                                  (!storyAudioPlaying && selectedWord)
-                                    ? 5
-                                    : 0,
-                                borderTopLeftRadius:
-                                  (storyAudioPlaying &&
-                                    index ==
-                                      highlightIndex
-                                        ?.filter(x => x !== undefined)
-                                        .pop()) ||
-                                  (!storyAudioPlaying && selectedWord)
-                                    ? 5
-                                    : 0,
-                                borderBottomLeftRadius:
-                                  (storyAudioPlaying &&
-                                    index ==
-                                      highlightIndex
-                                        ?.filter(x => x !== undefined)
-                                        .pop()) ||
-                                  (!storyAudioPlaying && selectedWord)
-                                    ? 5
-                                    : 0,
-                                backgroundColor:
-                                  highlightIndex?.length > 0 &&
-                                  highlightIndex?.some(idx => idx == index)
-                                    ? '#eaaa00'
-                                    : 'transparent',
-                              }}>
-                              {word}
-                            </Text>
-                          );
-                        } else {
-                          return (
-                            <Pressable
-                              focusable={true}
-                              key={index}
-                              ref={ref => {
-                                pressableRefs.current[index] = ref;
-                              }}
-                              onPress={() => onPressWord(word, index)}
-                              style={{
-                                flex: 0,
-                                textAlign: 'center',
-                                justifyContent: 'center',
-                                overflow: 'hidden',
-                                // borderRadius: storyAudioPlaying && (index == highlightIndex[highlightIndex.length-1] || index == highlightIndex[0]) ? 5: 0,
-                                borderTopRightRadius:
-                                  (storyAudioPlaying &&
-                                    index == highlightIndex?.[0]) ||
-                                  (!storyAudioPlaying && selectedWord)
-                                    ? 5
-                                    : 0,
-                                borderBottomRightRadius:
-                                  (storyAudioPlaying &&
-                                    index == highlightIndex?.[0]) ||
-                                  (!storyAudioPlaying && selectedWord)
-                                    ? 5
-                                    : 0,
-                                borderTopLeftRadius:
-                                  (storyAudioPlaying &&
-                                    index ==
-                                      highlightIndex
-                                        ?.filter(x => x !== undefined)
-                                        .pop()) ||
-                                  (!storyAudioPlaying && selectedWord)
-                                    ? 5
-                                    : 0,
-                                borderBottomLeftRadius:
-                                  (storyAudioPlaying &&
-                                    index ==
-                                      highlightIndex
-                                        ?.filter(x => x !== undefined)
-                                        .pop()) ||
-                                  (!storyAudioPlaying && selectedWord)
-                                    ? 5
-                                    : 0,
-                                backgroundColor:
-                                  highlightIndex?.length > 0 &&
-                                  highlightIndex?.some(idx => idx == index)
-                                    ? '#eaaa00'
-                                    : 'transparent',
-                                paddingHorizontal: 3,
-                                marginVertical: height * 0.005,
-                              }}
-                              onLayout={event => handleWordLayout(index, event)}
-                              // onLayout={(event) => {
-
-                              //     const {y} = event.nativeEvent.layout
-
-                              //     pressablePositions[index] = y;
-
-                              //   }}
-                            >
+                <View
+                  style={{
+                    flexDirection: translateButton ? 'row' : 'row-reverse',
+                    flexWrap: 'wrap',
+                    gap: translateButton ? 3 : 0,
+                    position: 'relative',
+                    paddingTop: height * 0.06,
+                  }}>
+                  {translateButton
+                    ? storyParagraph?.split('.').map((word, index) => {
+                        return (
+                          <View
+                            key={index}
+                            style={{
+                              flex: 0,
+                              textAlign: 'center',
+                              justifyContent: 'center',
+                              // overflow: 'hidden',
+                              // borderRadius: storyAudioPlaying && (index == highlightIndex[highlightIndex.length-1] || index == highlightIndex[0]) ? 5: 0,
+                              borderTopRightRadius:
+                                (storyAudioPlaying &&
+                                  index == translationHighlightIndex?.[0]) ||
+                                (!storyAudioPlaying && selectedWord)
+                                  ? 5
+                                  : 0,
+                              borderBottomRightRadius:
+                                (storyAudioPlaying &&
+                                  index == translationHighlightIndex?.[0]) ||
+                                (!storyAudioPlaying && selectedWord)
+                                  ? 5
+                                  : 0,
+                              borderTopLeftRadius:
+                                (storyAudioPlaying &&
+                                  index ==
+                                    translationHighlightIndex?.[
+                                      translationHighlightIndex?.length - 1
+                                    ]) ||
+                                (!storyAudioPlaying && selectedWord)
+                                  ? 5
+                                  : 0,
+                              borderBottomLeftRadius:
+                                (storyAudioPlaying &&
+                                  index ==
+                                    translationHighlightIndex?.[
+                                      translationHighlightIndex?.length - 1
+                                    ]) ||
+                                (!storyAudioPlaying && selectedWord)
+                                  ? 5
+                                  : 0,
+                              backgroundColor:
+                                translationHighlightIndex?.length > 0 &&
+                                translationHighlightIndex?.some(
+                                  idx => idx == index,
+                                )
+                                  ? '#eaaa00'
+                                  : 'transparent',
+                              paddingHorizontal: 3,
+                              marginVertical: height * 0.005,
+                            }}
+                            onLayout={event =>
+                              handleSentenceLayout(index, event)
+                            }>
+                            <Text>
                               <Text
-                              // onLayout={(event)=> {
-                              //     // console.log("event", event.nativeEvent)
-                              //     const {x, y, height, width} = event.nativeEvent.layout;
-                              //     setLayoutIds([...layoutIds, y ])
-                              //   }
-                              // }>
+                                style={{
+                                  color: 'black',
+                                  borderRadius: 20,
+                                  fontFamily: 'outfit',
+                                  fontSize: 20,
+                                  textAlign: 'center',
+                                }}>
+                                {word}
+                              </Text>
+                              <Text>{'\n'}</Text>
+                              <Text>{'\n'}</Text>
+                              <Text
+                                style={{
+                                  color: 'black',
+                                  borderRadius: 20,
+                                  fontFamily: 'outfit',
+                                  fontSize: 20,
+                                  textAlign: 'center',
+                                }}>
+                                {translation?.split('.')?.[index]}
+                              </Text>
+                            </Text>
+                          </View>
+                        );
+                      })
+                    : storyParagraph
+                        ?.split(/(\s+|[.,!?؛؟«»؟،٫:]+)/)
+                        .filter(sentence => sentence.trim() !== '')
+                        .map((word, index) => {
+                          if (/[.,!?؛؟«»؟،٫:]+/.test(word)) {
+                            // Render punctuation mark
+                            return (
+                              <Text
+                                key={index}
+                                style={{
+                                  flex: 0,
+                                  marginVertical: height * 0.005,
+                                  color: highlightIndex?.some(
+                                    idx => idx == index,
+                                  )
+                                    ? 'white'
+                                    : 'black',
+                                  fontFamily: 'outfit',
+                                  fontSize: 20,
+                                  textAlign: 'right',
+                                  borderTopRightRadius:
+                                    (storyAudioPlaying &&
+                                      index == highlightIndex?.[0]) ||
+                                    (!storyAudioPlaying && selectedWord)
+                                      ? 5
+                                      : 0,
+                                  borderBottomRightRadius:
+                                    (storyAudioPlaying &&
+                                      index == highlightIndex?.[0]) ||
+                                    (!storyAudioPlaying && selectedWord)
+                                      ? 5
+                                      : 0,
+                                  borderTopLeftRadius:
+                                    (storyAudioPlaying &&
+                                      index ==
+                                        highlightIndex
+                                          ?.filter(x => x !== undefined)
+                                          .pop()) ||
+                                    (!storyAudioPlaying && selectedWord)
+                                      ? 5
+                                      : 0,
+                                  borderBottomLeftRadius:
+                                    (storyAudioPlaying &&
+                                      index ==
+                                        highlightIndex
+                                          ?.filter(x => x !== undefined)
+                                          .pop()) ||
+                                    (!storyAudioPlaying && selectedWord)
+                                      ? 5
+                                      : 0,
+                                  backgroundColor:
+                                    highlightIndex?.length > 0 &&
+                                    highlightIndex?.some(idx => idx == index)
+                                      ? '#eaaa00'
+                                      : 'transparent',
+                                }}>
+                                {word}
+                              </Text>
+                            );
+                          } else {
+                            return (
+                              <Pressable
+                                focusable={true}
+                                key={index}
+                                ref={ref => {
+                                  pressableRefs.current[index] = ref;
+                                }}
+                                onPress={() => onPressWord(word, index)}
+                                style={{
+                                  flex: 0,
+                                  textAlign: 'center',
+                                  justifyContent: 'center',
+                                  overflow: 'hidden',
+                                  // borderRadius: storyAudioPlaying && (index == highlightIndex[highlightIndex.length-1] || index == highlightIndex[0]) ? 5: 0,
+                                  borderTopRightRadius:
+                                    (storyAudioPlaying &&
+                                      index == highlightIndex?.[0]) ||
+                                    (!storyAudioPlaying && selectedWord)
+                                      ? 5
+                                      : 0,
+                                  borderBottomRightRadius:
+                                    (storyAudioPlaying &&
+                                      index == highlightIndex?.[0]) ||
+                                    (!storyAudioPlaying && selectedWord)
+                                      ? 5
+                                      : 0,
+                                  borderTopLeftRadius:
+                                    (storyAudioPlaying &&
+                                      index ==
+                                        highlightIndex
+                                          ?.filter(x => x !== undefined)
+                                          .pop()) ||
+                                    (!storyAudioPlaying && selectedWord)
+                                      ? 5
+                                      : 0,
+                                  borderBottomLeftRadius:
+                                    (storyAudioPlaying &&
+                                      index ==
+                                        highlightIndex
+                                          ?.filter(x => x !== undefined)
+                                          .pop()) ||
+                                    (!storyAudioPlaying && selectedWord)
+                                      ? 5
+                                      : 0,
+                                  backgroundColor:
+                                    highlightIndex?.length > 0 &&
+                                    highlightIndex?.some(idx => idx == index)
+                                      ? '#eaaa00'
+                                      : 'transparent',
+                                  paddingHorizontal: 3,
+                                  marginVertical: height * 0.005,
+                                }}
+                                onLayout={event =>
+                                  handleWordLayout(index, event)
+                                }
+                                // onLayout={(event) => {
+
+                                //     const {y} = event.nativeEvent.layout
+
+                                //     pressablePositions[index] = y;
+
+                                //   }}
                               >
                                 <Text
-                                  ref={textRef}
-                                  collapsable={false}
-                                  samaga={index}
-                                  style={{
-                                    color: highlightIndex?.some(
-                                      idx => idx == index,
-                                    )
-                                      ? 'white'
-                                      : 'black',
-                                    fontFamily: 'outfit',
-                                    fontSize: 20,
-                                    textAlign: 'center',
-                                  }}>
-                                  {word}
+                                // onLayout={(event)=> {
+                                //     // console.log("event", event.nativeEvent)
+                                //     const {x, y, height, width} = event.nativeEvent.layout;
+                                //     setLayoutIds([...layoutIds, y ])
+                                //   }
+                                // }>
+                                >
+                                  <Text
+                                    ref={textRef}
+                                    collapsable={false}
+                                    samaga={index}
+                                    style={{
+                                      color: highlightIndex?.some(
+                                        idx => idx == index,
+                                      )
+                                        ? 'white'
+                                        : 'black',
+                                      fontFamily: 'outfit',
+                                      fontSize: 20,
+                                      textAlign: 'center',
+                                    }}>
+                                    {word}
+                                  </Text>
                                 </Text>
-                              </Text>
-                            </Pressable>
-                          );
-                        }
-                      })}
+                              </Pressable>
+                            );
+                          }
+                        })}
+                </View>
               </View>
-            </View>
-          </ScrollView>
+            </ScrollView>
+          </>
         );
       case 1:
         return (
           <>
-            {currentIndex < quizData?.length ? (
-              <View
-                style={{
-                  flexDirection: 'column',
-                  gap: 40,
-                  alignItems: 'center',
-                }}>
-                {/* <AntDesign
+            <>
+              {currentIndex < quizData?.length ? (
+                <View
+                  style={{
+                    flexDirection: 'column',
+                    gap: 40,
+                    alignItems: 'center',
+                  }}>
+                  {/* <AntDesign
                   name="sound"
                   size={25}
                   color="#eaaa00"
                   style={{marginTop: height * 0.02}}
                 /> */}
-                <View style={{marginTop: height * 0.02}}></View>
-                <Text
-                  style={{
-                    fontFamily: 'outfit',
-                    textAlign: 'center',
-                    fontSize: 24,
-                    color: 'black',
-                  }}>
-                  {quizData[currentIndex].text}
-                </Text>
-                <View style={{flexDirection: 'column', gap: 10, marginTop: 10}}>
-                  {quizData[currentIndex].choices.map(choice => (
-                    <TouchableOpacity
-                      disabled={answerPressed}
-                      style={{
-                        ...styles.button,
-                        backgroundColor: getAnsBgColor({
-                          question: quizData[currentIndex],
-                          choice,
-                        }),
-                        borderColor: getAnsBorderColor({
-                          question: quizData[currentIndex],
-                          choice,
-                        }),
-                      }}
-                      onPress={() =>
-                        checkAnswer({
-                          question: quizData[currentIndex],
-                          answer: choice,
-                        })
-                      }>
-                      <Text
+                  <View style={{marginTop: height * 0.02}}></View>
+                  <Text
+                    style={{
+                      fontFamily: 'outfit',
+                      textAlign: 'center',
+                      fontSize: 24,
+                      color: 'black',
+                    }}>
+                    {quizData[currentIndex].text}
+                  </Text>
+                  <View
+                    style={{flexDirection: 'column', gap: 10, marginTop: 10}}>
+                    {quizData[currentIndex].choices.map(choice => (
+                      <TouchableOpacity
+                        disabled={answerPressed}
                         style={{
-                          ...styles.buttonText,
-                          color: getAnsTextColor({
+                          ...styles.button,
+                          backgroundColor: getAnsBgColor({
                             question: quizData[currentIndex],
                             choice,
                           }),
-                        }}>
-                        {choice}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </View>
-            ) : (
-              <ScrollView style={styles.scrollableResults}>
-                <View style={styles.resultsHeader}>
-                  <View style={styles.resultsHeaderTextContainer}>
-                                    <Text style={styles.resultsHeaderText}>{score / quizData?.length * 100 >50 ? score / quizData?.length * 100 > 75 ?"عمل رائع":"عمل جيد ":"ابذل مجهود اكثر"}</Text>
-                    <Text style={styles.resultsBodyText}>
-                      لقد حصلت على {score} من {quizData?.length}. إستمر على
-                      مستواك!
-                    </Text>
-                  </View>
-                  <View style={styles.resultsHeaderIconContainer}>
-                    <Image source={TROPHY} style={{width: 80, height: 80}} />
-                  </View>
-                </View>
-                <View style={styles.quizResults}>
-                  <Text style={styles.resultsHeaderText}>نتيجتك</Text>
-                  <View style={styles.resultsDetailsBox}>
-                    <Text style={styles.resultsHeaderText}>
-                      <AnimatedCircularProgress
-                        size={60}
-                        width={6}
-                        fill={(score / quizData?.length) * 100}
-                        tintColor="#eaaa00"
-                        onAnimationComplete={() =>
-                          console.log('onAnimationComplete')
-                        }
-                        backgroundColor="#c73434"
-                        rotation={0}>
-                        {fill => (
-                          <Text
-                            style={{
-                              fontSize: 15,
-                              fontWeight: 'bold',
-                              color: 'black',
-                            }}>
-                            {(score / quizData?.length) * 100}%
-                          </Text>
-                        )}
-                      </AnimatedCircularProgress>
-                    </Text>
-                    <View style={styles.correctIncorrect}>
-                      <Text style={styles.correctIncorrectText}>
-                        إجابة صحيحة
-                      </Text>
-                      <Text style={styles.correctIncorrectText}>
-                        إجابة غير صحيحة
-                      </Text>
-                    </View>
-                    <View style={styles.correctIncorrect}>
-                      <Text
-                        style={{
-                          ...styles.correctIncorrectNumbers,
-                          color: '#eaaa00',
-                          backgroundColor: '#eaaa0030',
-                        }}>
-                        {score}
-                      </Text>
-                      <Text
-                        style={{
-                          ...styles.correctIncorrectNumbers,
-                          color: '#ff0000',
-                          backgroundColor: '#ff000020',
-                        }}>
-                        {quizData?.length - score}
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-                <Pressable
-                  style={{
-                    ...styles.button,
-                    borderRadius: width * 0.05,
-                    backgroundColor: '#eaaa00',
-                    width: width * 0.9,
-                    alignSelf: 'center',
-                  }}
-                  onPress={() => {
-                    setScore(0);
-                    setCurrentIndex(0);
-                    setAnswerPressed(false);
-                  }}>
-                  <Text
-                    style={{
-                      ...styles.buttonText,
-                      color: 'white',
-                      fontWeight: 'bold',
-                      fontSize: 22,
-                    }}>
-                    إعادة الإمتحان
-                  </Text>
-                </Pressable>
-                <Text
-                  style={{
-                    ...styles.resultsHeaderText,
-                    marginTop: height * 0.03,
-                    marginRight: width * 0.05,
-                  }}>
-                  إجاباتك
-                </Text>
-                <View
-                  style={{
-                    ...styles.quizResults,
-                    marginTop: 0,
-                    gap: height * 0.01,
-                  }}>
-                  {quizData?.map(question => (
-                    <View
-                      style={{
-                        ...styles.questionResultsDetailsBox,
-                        marginTop: 0,
-                      }}>
-                      <View
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row-reverse',
-                          alignItems: 'center',
-                          gap: width * 0.02,
-                          paddingHorizontal: width * 0.02,
-                          width: '100%',
-                        }}>
+                          borderColor: getAnsBorderColor({
+                            question: quizData[currentIndex],
+                            choice,
+                          }),
+                        }}
+                        onPress={() =>
+                          checkAnswer({
+                            question: quizData[currentIndex],
+                            answer: choice,
+                          })
+                        }>
                         <Text
                           style={{
-                            color: 'black',
-                            width: '80%',
-                            textAlign: 'right',
-                            fontSize: 17,
-                            fontWeight: 'bold',
+                            ...styles.buttonText,
+                            color: getAnsTextColor({
+                              question: quizData[currentIndex],
+                              choice,
+                            }),
                           }}>
-                          {question.text}
+                          {choice}
                         </Text>
-                        <View
-                          style={{
-                            color: 'black',
-                            width: '20%',
-                            textAlign: 'right',
-                          }}>
-                          <Image
-                            style={{width: width * 0.06, height: width * 0.06}}
-                            source={
-                              question.answer === chosenAnswers[question.code]
-                                ? CHECK
-                                : CROSS
-                            }
-                          />
-                        </View>
-                      </View>
-                      {question.choices.map(choice => (
-                        <>
-                          <View
-                            style={{
-                              ...styles.hairlineLeft,
-                              marginTop: height * 0.02,
-                              marginBottom: height * 0.01,
-                            }}></View>
-                          <Text
-                            style={{
-                              color: getResultAnsColor({
-                                question,
-                                chosenAns: chosenAnswers[question.code],
-                                currentChoice: choice,
-                              }),
-                              textAlign: 'right',
-                              fontWeight: 'bold',
-                              fontSize: 15,
-                            }}>
-                            {choice}
-                          </Text>
-                        </>
-                      ))}
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
+              ) : (
+                <ScrollView style={styles.scrollableResults}>
+                  <View style={styles.resultsHeader}>
+                    <View style={styles.resultsHeaderTextContainer}>
+                      <Text style={styles.resultsHeaderText}>
+                        {(score / quizData?.length) * 100 > 50
+                          ? (score / quizData?.length) * 100 > 75
+                            ? 'عمل رائع'
+                            : 'عمل جيد '
+                          : 'ابذل مجهود اكثر'}
+                      </Text>
+                      <Text style={styles.resultsBodyText}>
+                        لقد حصلت على {score} من {quizData?.length}. إستمر على
+                        مستواك!
+                      </Text>
                     </View>
-                  ))}
+                    <View style={styles.resultsHeaderIconContainer}>
+                      <Image source={TROPHY} style={{width: 80, height: 80}} />
+                    </View>
+                  </View>
+                  <View style={styles.quizResults}>
+                    <Text style={styles.resultsHeaderText}>نتيجتك</Text>
+                    <View style={styles.resultsDetailsBox}>
+                      <Text style={styles.resultsHeaderText}>
+                        <AnimatedCircularProgress
+                          size={60}
+                          width={6}
+                          fill={(score / quizData?.length) * 100}
+                          tintColor="#eaaa00"
+                          onAnimationComplete={() =>
+                            console.log('onAnimationComplete')
+                          }
+                          backgroundColor="#c73434"
+                          rotation={0}>
+                          {fill => (
+                            <Text
+                              style={{
+                                fontSize: 15,
+                                fontWeight: 'bold',
+                                color: 'black',
+                              }}>
+                              {(score / quizData?.length) * 100}%
+                            </Text>
+                          )}
+                        </AnimatedCircularProgress>
+                      </Text>
+                      <View style={styles.correctIncorrect}>
+                        <Text style={styles.correctIncorrectText}>
+                          إجابة صحيحة
+                        </Text>
+                        <Text style={styles.correctIncorrectText}>
+                          إجابة غير صحيحة
+                        </Text>
+                      </View>
+                      <View style={styles.correctIncorrect}>
+                        <Text
+                          style={{
+                            ...styles.correctIncorrectNumbers,
+                            color: '#eaaa00',
+                            backgroundColor: '#eaaa0030',
+                          }}>
+                          {score}
+                        </Text>
+                        <Text
+                          style={{
+                            ...styles.correctIncorrectNumbers,
+                            color: '#ff0000',
+                            backgroundColor: '#ff000020',
+                          }}>
+                          {quizData?.length - score}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
                   <Pressable
                     style={{
                       ...styles.button,
@@ -1088,29 +995,140 @@ export default function LessonScreen(props) {
                       إعادة الإمتحان
                     </Text>
                   </Pressable>
-                </View>
-              </ScrollView>
-            )}
+                  <Text
+                    style={{
+                      ...styles.resultsHeaderText,
+                      marginTop: height * 0.03,
+                      marginRight: width * 0.05,
+                    }}>
+                    إجاباتك
+                  </Text>
+                  <View
+                    style={{
+                      ...styles.quizResults,
+                      marginTop: 0,
+                      gap: height * 0.01,
+                    }}>
+                    {quizData?.map(question => (
+                      <View
+                        style={{
+                          ...styles.questionResultsDetailsBox,
+                          marginTop: 0,
+                        }}>
+                        <View
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row-reverse',
+                            alignItems: 'center',
+                            gap: width * 0.02,
+                            paddingHorizontal: width * 0.02,
+                            width: '100%',
+                          }}>
+                          <Text
+                            style={{
+                              color: 'black',
+                              width: '80%',
+                              textAlign: 'right',
+                              fontSize: 17,
+                              fontWeight: 'bold',
+                            }}>
+                            {question.text}
+                          </Text>
+                          <View
+                            style={{
+                              color: 'black',
+                              width: '20%',
+                              textAlign: 'right',
+                            }}>
+                            <Image
+                              style={{
+                                width: width * 0.06,
+                                height: width * 0.06,
+                              }}
+                              source={
+                                question.answer === chosenAnswers[question.code]
+                                  ? CHECK
+                                  : CROSS
+                              }
+                            />
+                          </View>
+                        </View>
+                        {question.choices.map(choice => (
+                          <>
+                            <View
+                              style={{
+                                ...styles.hairlineLeft,
+                                marginTop: height * 0.02,
+                                marginBottom: height * 0.01,
+                              }}></View>
+                            <Text
+                              style={{
+                                color: getResultAnsColor({
+                                  question,
+                                  chosenAns: chosenAnswers[question.code],
+                                  currentChoice: choice,
+                                }),
+                                textAlign: 'right',
+                                fontWeight: 'bold',
+                                fontSize: 15,
+                              }}>
+                              {choice}
+                            </Text>
+                          </>
+                        ))}
+                      </View>
+                    ))}
+                    <Pressable
+                      style={{
+                        ...styles.button,
+                        borderRadius: width * 0.05,
+                        backgroundColor: '#eaaa00',
+                        width: width * 0.9,
+                        alignSelf: 'center',
+                      }}
+                      onPress={() => {
+                        setScore(0);
+                        setCurrentIndex(0);
+                        setAnswerPressed(false);
+                      }}>
+                      <Text
+                        style={{
+                          ...styles.buttonText,
+                          color: 'white',
+                          fontWeight: 'bold',
+                          fontSize: 22,
+                        }}>
+                        إعادة الإمتحان
+                      </Text>
+                    </Pressable>
+                  </View>
+                </ScrollView>
+              )}
+            </>
           </>
         );
       case 2:
         return (
-          <ScrollView
-            style={{
-              paddingTop: '3%',
-            }}>
-            {lessonKeyWords?.map((keyword, index) => {
-              return <KeywordCard key={index} {...keyword}></KeywordCard>;
-            })}
-          </ScrollView>
+          <>
+            <ScrollView
+              style={{
+                paddingTop: '3%',
+              }}>
+              {lessonKeyWords?.map((keyword, index) => {
+                return <KeywordCard key={index} {...keyword}></KeywordCard>;
+              })}
+            </ScrollView>
+          </>
         );
       case 3:
         return (
-          <ScrollView>
-            {grammar?.map((g, index) => {
-              return <Card key={index} {...g}></Card>;
-            })}
-          </ScrollView>
+          <>
+            <ScrollView>
+              {grammar?.map((g, index) => {
+                return <Card key={index} {...g}></Card>;
+              })}
+            </ScrollView>
+          </>
         );
       default:
         return null;
@@ -1119,129 +1137,138 @@ export default function LessonScreen(props) {
   renderphoto = lessonId => {
     switch (activeTab) {
       case 0:
+        console.log('renderphoto case 0');
         return (
-          <View style={styles.photoContainer}>
-            <ImageBackground
-              style={styles.photo}
-              source={{uri: props?.route?.params?.image}}
-              resizeMode="cover">
-              <View style={styles.outerContainer}>
-                <DoneLearning lessonId={props?.route?.params?.lessonId} />
+          <>
+            <View style={styles.photoContainer}>
+              <ImageBackground
+                style={styles.photo}
+                source={{uri: props?.route?.params?.image}}
+                resizeMode="cover">
+                <View style={styles.outerContainer}>
+                  <DoneLearning lessonId={props?.route?.params?.lessonId} />
 
-                <View style={styles.textContainer}>
-                  {selectedWord && SelectedWordTranslation && (
-                    <View style={styles.translationContainer}>
-                      <View style={styles.cardContainer_}>
-                        <View style={styles.cardHead}>
-                          <Text style={styles.selectedWordText}>
-                            {selectedWord}
+                  <View style={styles.textContainer}>
+                    {selectedWord && SelectedWordTranslation && (
+                      <View style={styles.translationContainer}>
+                        <View style={styles.cardContainer_}>
+                          <View style={styles.cardHead}>
+                            <Text style={styles.selectedWordText}>
+                              {selectedWord}
+                            </Text>
+                          </View>
+                          <Text style={styles.translationText}>
+                            {SelectedWordTranslation}
                           </Text>
                         </View>
-                        <Text style={styles.translationText}>
-                          {SelectedWordTranslation}
-                        </Text>
-                      </View>
 
-                      <View style={styles.cardButtons}>
-                        <Pressable
-                          style={
-                            userKeywords.filter(
-                              ({text}) => text === selectedWord,
-                            ).length > 0
-                              ? // trainingPressed
-                                styles.cardButtonUpPressed
-                              : styles.cardButtonUp
-                          }
-                          onPress={() => {
-                            userKeywords.filter(
-                              ({text}) => text === selectedWord,
-                            ).length > 0
-                              ? //setTrainingPressed(false)
-                                dispatch(
-                                  removeUserWords({
-                                    word: selectedWord,
-                                  }),
-                                )
-                              : dispatch(
-                                  setUserWords({
-                                    text: selectedWord,
-                                    translation: SelectedWordTranslation,
-                                    audio: selectedWordAudio,
-                                    category: 'new',
-                                  }),
-                                );
-                          }}>
-                          <FontAwesomeIcon icon="dumbbell" />
-                        </Pressable>
-                        <Pressable
-                          style={
-                            playPressed
-                              ? styles.cardButtonDownPressed
-                              : styles.cardButtonDown
-                          }
-                          onPress={() => {
-                            playPressed
-                              ? setPlayPressed(false)
-                              : setPlayPressed(true);
-                          }}>
-                          <FontAwesomeIcon icon="play" />
-                        </Pressable>
+                        <View style={styles.cardButtons}>
+                          <Pressable
+                            style={
+                              userKeywords.filter(
+                                ({text}) => text === selectedWord,
+                              ).length > 0
+                                ? // trainingPressed
+                                  styles.cardButtonUpPressed
+                                : styles.cardButtonUp
+                            }
+                            onPress={() => {
+                              userKeywords.filter(
+                                ({text}) => text === selectedWord,
+                              ).length > 0
+                                ? //setTrainingPressed(false)
+                                  dispatch(
+                                    removeUserWords({
+                                      word: selectedWord,
+                                    }),
+                                  )
+                                : dispatch(
+                                    setUserWords({
+                                      text: selectedWord,
+                                      translation: SelectedWordTranslation,
+                                      audio: selectedWordAudio,
+                                      category: 'new',
+                                    }),
+                                  );
+                            }}>
+                            <FontAwesomeIcon icon="dumbbell" />
+                          </Pressable>
+                          <Pressable
+                            style={
+                              playPressed
+                                ? styles.cardButtonDownPressed
+                                : styles.cardButtonDown
+                            }
+                            onPress={() => {
+                              playPressed
+                                ? setPlayPressed(false)
+                                : setPlayPressed(true);
+                            }}>
+                            <FontAwesomeIcon icon="play" />
+                          </Pressable>
+                        </View>
                       </View>
-                    </View>
-                  )}
+                    )}
+                  </View>
                 </View>
-              </View>
-            </ImageBackground>
-          </View>
+              </ImageBackground>
+            </View>
+          </>
         );
       case 1:
+        console.log('renderphoto case 1');
         return (
-          <View style={{...styles.photoContainer, backgroundColor: '#eaaa00'}}>
-            <AnimatedCircularProgress
-              size={150}
-              width={15}
-              fill={((currentIndex + 1) / quizData?.length) * 100}
-              tintColor="white"
-              onAnimationComplete={() => console.log('onAnimationComplete')}
-              backgroundColor="#3d5875"
-              rotation={0}>
-              {fill => (
-                <Text
-                  style={{fontSize: 25, fontWeight: 'bold', color: 'white'}}>
-                  {currentIndex + 1 > quizData?.length ? (
-                    <Ionicons name="checkmark" size={80} color="white" />
-                  ) : (
-                    currentIndex + 1 + ' / ' + quizData?.length
-                  )}
-                </Text>
-              )}
-            </AnimatedCircularProgress>
-          </View>
+          <>
+            <View
+              style={{...styles.photoContainer, backgroundColor: '#eaaa00'}}>
+              <AnimatedCircularProgress
+                size={150}
+                width={15}
+                fill={((currentIndex + 1) / quizData?.length) * 100}
+                tintColor="white"
+                onAnimationComplete={() => console.log('onAnimationComplete')}
+                backgroundColor="#3d5875"
+                rotation={0}>
+                {fill => (
+                  <Text
+                    style={{fontSize: 25, fontWeight: 'bold', color: 'white'}}>
+                    {currentIndex + 1 > quizData?.length ? (
+                      <Ionicons name="checkmark" size={80} color="white" />
+                    ) : (
+                      currentIndex + 1 + ' / ' + quizData?.length
+                    )}
+                  </Text>
+                )}
+              </AnimatedCircularProgress>
+            </View>
+          </>
         );
       case 2:
+        console.log('renderphoto case 2');
         return (
-          <View style={styles.photoContainer}>
-            <ImageBackground
-              style={styles.photo}
-              source={{uri: props?.route?.params?.image}}
-              resizeMode="cover">
-              <DoneLearning lessonId={props?.route?.params?.lessonId} />
-              <View>
-                <View
-                  style={{
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    width: width,
-                    height: height * 0.27,
-                  }}>
+          <>
+            <View style={styles.photoContainer}>
+              <ImageBackground
+                style={styles.photo}
+                source={{uri: props?.route?.params?.image}}
+                resizeMode="cover">
+                <DoneLearning lessonId={props?.route?.params?.lessonId} />
+                <View>
                   <View
                     style={{
-                      flexDirection: 'row-reverse',
-                      display: 'flex',
+                      flexDirection: 'column',
                       justifyContent: 'center',
-                      alignItems: 'center',
+                      width: width,
+                      height: height * 0.27,
                     }}>
-                    {/* <TouchableOpacity
+                    <View
+                      style={{
+                        flexDirection: 'row-reverse',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}>
+                      {/* <TouchableOpacity
                       style={{
                         backgroundColor: '#eaaa00',
 
@@ -1283,85 +1310,91 @@ export default function LessonScreen(props) {
                         />
                       </View>
                     </TouchableOpacity> */}
+                    </View>
                   </View>
                 </View>
-              </View>
-            </ImageBackground>
-          </View>
+              </ImageBackground>
+            </View>
+          </>
         );
       case 3:
+        console.log('renderphoto case 3');
         return (
-          <View style={styles.photoContainer}>
-            <ImageBackground
-              style={styles.photo}
-              source={{uri: props?.route?.params?.image}}
-              resizeMode="cover">
-              <DoneLearning lessonId={props?.route?.params?.lessonId} />
-            </ImageBackground>
-          </View>
+          <>
+            <View style={styles.photoContainer}>
+              <ImageBackground
+                style={styles.photo}
+                source={{uri: props?.route?.params?.image}}
+                resizeMode="cover">
+                <DoneLearning lessonId={props?.route?.params?.lessonId} />
+              </ImageBackground>
+            </View>
+          </>
         );
     }
   };
   return (
-    <View style={styles.container}>
-      {this.renderphoto()}
+    <>
+      <View style={styles.container}>
+        {this.renderphoto()}
 
-      <View style={styles.tabsContainer}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.tabsContentContainer}>
-          {tabs.map((tab, index) => (
-            <TouchableOpacity
-              key={index}
-              style={[styles.tab, activeTab === index && styles.activeTab]}
-              onPress={() => setActiveTab(index)}>
-              <Text
-                style={
-                  activeTab === index ? styles.tabTextActive : styles.tabText
-                }>
-                {tab.text}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
-
-      {/* Content */}
-      {
-        <View style={styles.contentContainer}>
-          {loading && (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator
-                size="large"
-                color="#eaaa00"
-                style={{
-                  flex: 1,
-
-                  justifyContent: 'center',
-
-                  alignItems: 'center',
-
-                  transform: [{scale: 2}], // increase the size
-                }}
-              />
-            </View>
-          )}
-
-          <View style={styles.hairlineLeft}></View>
-          {renderContent()}
+        <View style={styles.tabsContainer}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.tabsContentContainer}>
+            {tabs.map((tab, index) => (
+              <TouchableOpacity
+                key={index}
+                style={[styles.tab, activeTab === index && styles.activeTab]}
+                onPress={() => setActiveTab(index)}>
+                <Text
+                  style={
+                    activeTab === index ? styles.tabTextActive : styles.tabText
+                  }>
+                  {tab.text}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
         </View>
-      }
-      <CustomAudioPlayer
-        audioUrl={audioSrc}
-        setHighlightIndex={setHighlightIndex}
-        setTranslationHighlightIndex={setTranslationHighlightIndex}
-        timePoints={timePoints}
-        storyParagraph={storyParagraph}
-        textRef={textRef}
-        scrollTo={scrollTo}
-      />
-    </View>
+
+        {/* Content */}
+        {
+          <View style={styles.contentContainer}>
+            {loading && (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator
+                  size="large"
+                  color="#eaaa00"
+                  style={{
+                    flex: 1,
+
+                    justifyContent: 'center',
+
+                    alignItems: 'center',
+
+                    transform: [{scale: 2}], // increase the size
+                  }}
+                />
+              </View>
+            )}
+
+            <View style={styles.hairlineLeft}></View>
+            {renderContent()}
+          </View>
+        }
+        <CustomAudioPlayer
+          audioUrl={audioSrc}
+          setHighlightIndex={setHighlightIndex}
+          setTranslationHighlightIndex={setTranslationHighlightIndex}
+          timePoints={timePoints}
+          storyParagraph={storyParagraph}
+          textRef={textRef}
+          scrollTo={scrollTo}
+        />
+      </View>
+    </>
   );
 }
 const styles = StyleSheet.create({

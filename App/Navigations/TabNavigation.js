@@ -58,7 +58,7 @@ export default function TabNavigation() {
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
             backgroundColor: '#fff',
-            height: height * 0.08,
+            height: height * 0.1,
             display: state.showNavbar ? 'block' : 'none',
           },
         }}>

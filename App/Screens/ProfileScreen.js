@@ -22,6 +22,7 @@ import Colors from './../Utils/Colors';
 
 import {
   createUserWithEmailAndPassword,
+  deleteUser,
   onAuthStateChanged,
   signInWithEmailAndPassword,
 } from 'firebase/auth';
@@ -46,6 +47,55 @@ const ProfileScreen = () => {
     auth?.signOut();
     dispatch(setCurrentUser(null));
     contextDispatch({type: 'IS_SUBSCRIBED', payload: false});
+  };
+
+  const deleteAccount = async () => {
+    const user = auth.currentUser;
+
+    if (!user) {
+      Alert.alert('لا يوجد مستخدم مسجل الدخول');
+      return;
+    }
+    await deleteUser(user)
+      .then(() => {
+        auth?.signOut();
+        dispatch(setCurrentUser(null));
+        contextDispatch({type: 'IS_SUBSCRIBED', payload: false});
+      })
+      .catch(async error => {
+        // Alert.alert('حدث خطأ أثناء مسح الحساب');
+        await reAuthUser();
+        await deleteUser(auth.currentUser)
+          .then(() => {
+            auth?.signOut();
+            dispatch(setCurrentUser(null));
+            contextDispatch({type: 'IS_SUBSCRIBED', payload: false});
+          })
+          .catch(error => {
+            console.log(error);
+            Alert.alert('حدث خطأ أثناء مسح الحساب');
+          });
+      });
+  };
+
+  const showConfirmation = () => {
+    Alert.alert(
+      'تأكيد', // Title
+      'هل أنت متأكد أنك تريد مسح الحساب؟', // Message
+      [
+        {
+          text: 'إلغاء',
+          style: 'cancel',
+        },
+        {
+          text: 'نعم',
+          onPress: () => {
+            deleteAccount();
+          },
+        },
+      ],
+      {cancelable: false},
+    );
   };
 
   const checkIsSubscribed = async () => {
@@ -85,7 +135,7 @@ const ProfileScreen = () => {
     }
   };
 
-  const reAuthUser = () => {
+  const reAuthUser = async () => {
     const currentStoredUser = auth.currentUser;
     if (!currentUser?.email || !currentUser?.password || currentStoredUser) {
       console.log(
@@ -120,7 +170,7 @@ const ProfileScreen = () => {
         setIsLoggedIn(false);
       }
     });
-      return () => {
+    return () => {
       contextDispatch({type: 'SHOW_NAVBAR', payload: true});
     };
   }, []);
@@ -131,56 +181,64 @@ const ProfileScreen = () => {
 
   const LearningProgressCard = ({title, storiesCount, wordsCount}) => {
     return (
-      <View style={styles.card}>
-        <Text style={styles.header}>{title}</Text>
-        <View style={styles.row}>
-          <View style={styles.labelContainer}>
-            <Text style={styles.label}>تم التعلم</Text>
+      <SafeAreaView>
+        <View style={styles.card}>
+          <Text style={styles.header}>{title}</Text>
+          <View style={styles.row}>
+            <View style={styles.labelContainer}>
+              <Text style={styles.label}>تم التعلم</Text>
+            </View>
+            <View style={styles.labelContainer}>
+              <Text style={styles.label}>تعلمت</Text>
+            </View>
           </View>
-          <View style={styles.labelContainer}>
-            <Text style={styles.label}>تعلمت</Text>
+          <View style={styles.row}>
+            <View style={styles.counterContainer}>
+              <Text style={styles.counter}>{storiesCount} قصص</Text>
+            </View>
+            <View style={styles.counterContainer}>
+              <Text style={styles.counter}>{wordsCount} كلمات</Text>
+            </View>
           </View>
         </View>
-        <View style={styles.row}>
-          <View style={styles.counterContainer}>
-            <Text style={styles.counter}>{storiesCount} قصص</Text>
-          </View>
-          <View style={styles.counterContainer}>
-            <Text style={styles.counter}>{wordsCount} كلمات</Text>
-          </View>
-        </View>
-      </View>
+      </SafeAreaView>
     );
   };
 
   const ReadingStreakCard = ({title}) => {
     return (
-      <View style={styles.card}>
-        <Text style={styles.header}>
-          {title}
-          <Image source={fire} style={styles.icon} />
-        </Text>
-        <View style={styles.col}>
-          <Image source={login} style={styles.icon} />
-          <Text style={styles.label}>قم بتسجيل الدخول لتتبع تقدمك</Text>
+      <SafeAreaView>
+        <View style={styles.card}>
+          <View style={styles.flexView}>
+            <Text style={styles.header}>{title}</Text>
+            <Image source={fire} style={styles.icon} />
+          </View>
+          <View style={styles.col}>
+            <Image source={login} style={styles.icon} />
+            <Text style={styles.label}>قم بتسجيل الدخول لتتبع تقدمك</Text>
+          </View>
         </View>
-      </View>
+      </SafeAreaView>
     );
   };
 
   const ReaderTrakerCard = ({title, storiesCount}) => {
     return (
-      <View style={styles.card}>
-        <Text style={styles.header}>{title}</Text>
-        <View style={styles.row}>
-          <Text style={styles.counter}>{storiesCount}</Text>
-          <Text style={styles.label}>القصص المقروءة</Text>
+      <SafeAreaView>
+        <View style={styles.card}>
+          <Text style={styles.header}>{title}</Text>
+          <View style={styles.row}>
+            <Text style={styles.counter}>{storiesCount}</Text>
+            <Text style={styles.label}>القصص المقروءة</Text>
+          </View>
+          <View style={styles.col}>
+            <MaterialCommunityIcons name="calendar" size={24} color="black" />
+            <Text style={styles.calendarLabel}>
+              قم بتسجيل الدخول لتتبع تقدمك
+            </Text>
+          </View>
         </View>
-        <View style={styles.col}>
-          <MaterialCommunityIcons name="calendar" size={24} color="black" />
-          <Text style={styles.calendarLabel}>قم بتسجيل الدخول لتتبع تقدمك</Text>
-        </View>
-      </View>
+      </SafeAreaView>
     );
   };
 
@@ -213,7 +271,7 @@ const ProfileScreen = () => {
           dispatch(setCurrentUser({...user, password: passwordState}));
           await checkIsSubscribed();
           setPending(false);
-          setIsLoggedIn(true);
+          // setIsLoggedIn(true);
         })
         .catch(error => {
           const errorCode = error.code;
@@ -292,7 +350,7 @@ const ProfileScreen = () => {
           dispatch(setCurrentUser({...user, password: passwordState}));
           await checkIsSubscribed();
           setPending(false);
-          setIsLoggedIn(true);
+          // setIsLoggedIn(true);
         })
         .catch(error => {
           const errorCode = error.code;
@@ -352,7 +410,9 @@ const ProfileScreen = () => {
         </View>
         <View style={styles.profileContainer}>
           <View style={styles.accountTypeContainer}>
-            <Text style={styles.accountTypeText}>نوع الحساب: {state.isSubscribed ? 'مدفوع' : 'مجاني'}</Text>
+            <Text style={styles.accountTypeText}>
+              نوع الحساب: {state.isSubscribed ? 'مدفوع' : 'مجاني'}
+            </Text>
           </View>
           <Image source={user} style={styles.profileImage} />
         </View>
@@ -400,10 +460,13 @@ const ProfileScreen = () => {
         </View>
       ) : (
         <View style={styles.loginButtonContainer}>
-          <Pressable
-            style={{...styles.button, width: '90%'}}
-            onPress={logout}>
+          <Pressable style={{...styles.button, width: '48%'}} onPress={logout}>
             <Text style={styles.buttonText}>تسجيل الخروج</Text>
+          </Pressable>
+          <Pressable
+            style={{...styles.button, width: '48%', backgroundColor: '#FF3131'}}
+            onPress={showConfirmation}>
+            <Text style={styles.buttonText}>مسح الحساب</Text>
           </Pressable>
         </View>
       )}
@@ -425,15 +488,25 @@ const ProfileScreen = () => {
           <Text>TEST</Text>
         </Pressable>
       </View> */}
-      <View>
+      <View
+        style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
         <Text
-          style={{color: 'blue', padding: '8%'}}
+          style={{color: 'blue', padding: '4%'}}
           onPress={() =>
             Linking.openURL(
               'https://belarabi.equant-tech.com/privacypolicy.html',
             )
           }>
-          privacy policy
+          Privacy policy
+        </Text>
+        <Text
+          style={{color: 'blue', padding: '4%'}}
+          onPress={() =>
+            Linking.openURL(
+              'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/',
+            )
+          }>
+          Terms of use
         </Text>
       </View>
     </SafeAreaView>
@@ -441,6 +514,13 @@ const ProfileScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  flexView: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+  },
   loginText: {
     marginBottom: 20,
     fontWeight: 'bold',
@@ -456,8 +536,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 15,
     borderRadius: 10,
-      textAlign: 'right',
-      color: 'black'
+    textAlign: 'right',
+    color: 'black',
   },
   loginHairlineLeft: {
     marginBottom: 20,
@@ -483,6 +563,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   headerContainer: {
+    paddingTop: height * 0.04,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -533,6 +614,7 @@ const styles = StyleSheet.create({
     marginTop: height * 0.015,
   },
   card: {
+    direction: 'rtl',
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: height * 0.02,
@@ -611,15 +693,17 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: 15,
-    marginRight: 10,
+    marginRight: 20,
+    paddingBottom: 20,
   },
   loginButtonContainer: {
-    gap: 20,
+    gap: 15,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: height * 0.015,
     marginBottom: height * 0.015,
+    paddingHorizontal: width * 0.05,
   },
 });
 

@@ -1,14 +1,8 @@
 import * as React from 'react';
-import {View, Text, StyleSheet, Image, Dimensions} from 'react-native';
-// import Constants from "expo-constants";
-import Entypo from 'react-native-vector-icons/Entypo';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-// You can import from local files
+import { Dimensions, StyleSheet, Text, View } from 'react-native';
 
 import Colors from '../Utils/Colors';
-import {ScrollView} from 'react-native-gesture-handler';
 
-// or any pure javascript modules available in npm
 // import { Card } from "react-native-paper";
 
 const {width, height} = Dimensions.get('window');
