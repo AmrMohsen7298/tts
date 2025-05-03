@@ -14,6 +14,7 @@ const itemSKUs = Platform.select({
 
 const useInAppPurchase = () => {
   const [connectionErrorMsg, setConnectionErrorMsg] = useState('');
+  const [isSubscribing, setIsSubscribing] = useState(false);
   const {state, dispatch} = useStateValue();
   const currentUser = useSelector(state => state.storyReducer.user);
   const appDispatch = useDispatch();
@@ -63,7 +64,7 @@ const useInAppPurchase = () => {
     }
     console.log(subscriptions);
   }, [connected, getSubscriptions]);
-  
+
   useEffect(() => {
     if (subscriptions) {
       setOfferToken(
@@ -104,6 +105,7 @@ const useInAppPurchase = () => {
     }
     // If we are connected & have products, purchase the item. Google will handle if user has no internet here.
     else if (subscriptions?.length > 0) {
+      setIsSubscribing(true);
       console.log('SUBSCRIPTIONS', subscriptions);
       console.log('OFFERTOKEN', offerToken);
       let data = await requestSubscription({
@@ -128,12 +130,16 @@ const useInAppPurchase = () => {
         })
         .catch(error => {
           return error;
+        })
+        .finally(() => {
+          setIsSubscribing(false);
         });
 
       console.log('Purchasing products::', data);
     }
     // If we are connected but have no products returned, try to get products and purchase.
     else {
+      setIsSubscribing(true);
       console.log('No products. Now trying to get some...', itemSKUs);
       try {
         const prods = await getProducts({skus: itemSKUs});
@@ -145,6 +151,8 @@ const useInAppPurchase = () => {
         setConnectionErrorMsg('تأكد أن كنت متصل بالانترنت');
         console.log('Everything failed. Error: ', error);
         Alert.alert(JSON.stringify(error.message));
+      } finally {
+        setIsSubscribing(false);
       }
     }
   };
@@ -152,6 +160,7 @@ const useInAppPurchase = () => {
   return {
     isSubscribed,
     connectionErrorMsg,
+    isSubscribing,
     subscribeToApp,
   };
 };

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
+  ActivityIndicator,
   Alert,
   Dimensions,
   Image,
@@ -41,7 +42,8 @@ const ProfileScreen = () => {
   const [viewLoginOrSignupForm, setViewLoginOrSignupForm] = useState();
   const [isLoggedIn, setIsLoggedIn] = useState();
 
-  const {isSubscribed, connectionErrorMsg, subscribeToApp} = useInAppPurchase();
+  const {isSubscribing, isSubscribed, connectionErrorMsg, subscribeToApp} =
+    useInAppPurchase();
 
   const logout = () => {
     auth?.signOut();
@@ -417,7 +419,12 @@ const ProfileScreen = () => {
           <Image source={user} style={styles.profileImage} />
         </View>
         {!isSubscribed && (
-          <View style={{...styles.accountTypeContainer, ...styles.subscribe}}>
+          <View
+            style={{
+              ...styles.accountTypeContainer,
+              ...styles.subscribe,
+              opacity: isSubscribing ? 0.7 : 1,
+            }}>
             <Pressable
               onPress={() => {
                 if (currentUser?.uid) subscribeToApp();
@@ -427,7 +434,24 @@ const ProfileScreen = () => {
                     'يجب تسجيل الدخول أو إنشاء حساب لتتمكن من الاشتراك',
                   );
               }}>
-              <Text style={styles.subscribeText}>إشترك الآن</Text>
+              {isSubscribing ? (
+                <View
+                  style={{
+                    ...styles.loadingContainer,
+                    flex: 1,
+                    flexDirection: 'row',
+                    gap: 10,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  <Text style={styles.subscribeText} disabled={isSubscribing}>
+                    إشترك الآن
+                  </Text>
+                  <ActivityIndicator size="small" color="#ffffff" />
+                </View>
+              ) : (
+                <Text style={styles.subscribeText}>إشترك الآن</Text>
+              )}
             </Pressable>
           </View>
         )}
