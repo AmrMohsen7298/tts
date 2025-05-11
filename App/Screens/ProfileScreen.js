@@ -41,6 +41,7 @@ const ProfileScreen = () => {
   const {user: currentUser} = useSelector(state => state.storyReducer);
   const [viewLoginOrSignupForm, setViewLoginOrSignupForm] = useState();
   const [isLoggedIn, setIsLoggedIn] = useState();
+  const [showSubscribeCTAScreen, setShowSubscribeCTAScreen] = useState(false);
 
   const {isSubscribing, isSubscribed, connectionErrorMsg, subscribeToApp} =
     useInAppPurchase();
@@ -401,6 +402,171 @@ const ProfileScreen = () => {
     );
   };
 
+  const SubscribeCTAScreen = () => {
+    return (
+      <SafeAreaView
+        style={{
+          width: width,
+          height: height,
+          backgroundColor: '#12a586',
+        }}>
+        <View
+          style={{
+            paddingTop: height * 0.1,
+            paddingLeft: width * 0.1,
+            paddingRight: width * 0.1,
+          }}>
+          <View
+            style={{
+              borderRadius: width * 0.2,
+              backgroundColor: 'white',
+              marginBottom: height * 0.03,
+            }}>
+            <Text
+              style={{
+                width: width * 0.8,
+                marginBottom: 10,
+                marginTop: 10,
+                textAlign: 'center',
+                color: '#12a586',
+                fontSize: width * 0.07,
+                fontWeight: 'bold',
+              }}>
+              إشترك الآن و احصل على
+            </Text>
+          </View>
+          <Text
+            style={{
+              color: 'white',
+              fontSize: width * 0.05,
+              textAlign: 'right',
+              marginBottom: height * 0.02,
+            }}>
+            * تعلم قصة جديدة كل يوم
+          </Text>
+          <Text
+            style={{
+              color: 'white',
+              fontSize: width * 0.05,
+              textAlign: 'right',
+              marginBottom: height * 0.02,
+            }}>
+            * الوصول إلي مكتبة قصص تحتوي علي اكثر من 2000 قصة
+          </Text>
+          <Text
+            style={{
+              color: 'white',
+              fontSize: width * 0.05,
+              textAlign: 'right',
+              marginBottom: height * 0.02,
+            }}>
+            * إستمع إلي القصة بصوت ناطق باللغة العربية
+          </Text>
+          <Text
+            style={{
+              color: 'white',
+              fontSize: width * 0.05,
+              textAlign: 'right',
+              marginBottom: height * 0.02,
+            }}>
+            * تصفع مئات من دروس النحو و الإختبارات التفاعلية
+          </Text>
+          <Text
+            style={{
+              color: 'white',
+              fontSize: width * 0.05,
+              textAlign: 'right',
+              marginBottom: height * 0.02,
+            }}>
+            * إتقن الكلمات و العبارات من خلال الكروت السريعة
+          </Text>
+          <View
+            style={{
+              padding: width * 0.05,
+              marginTop: height * 0.03,
+              backgroundColor: '#ffffff50',
+              borderRadius: width * 0.02,
+            }}>
+            <Text
+              style={{
+                color: 'white',
+                textAlign: 'center',
+                fontSize: width * 0.05,
+                fontWeight: 'bold',
+              }}>
+              فقط 9.99 جنيه شهرياً
+            </Text>
+          </View>
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}>
+            <Text
+              style={{color: 'white', padding: '4%'}}
+              onPress={() =>
+                Linking.openURL(
+                  'https://belarabi.equant-tech.com/privacypolicy.html',
+                )
+              }>
+              Privacy policy
+            </Text>
+            <Text
+              style={{color: 'white', padding: '4%'}}
+              onPress={() =>
+                Linking.openURL(
+                  'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/',
+                )
+              }>
+              Terms of use
+            </Text>
+          </View>
+          <View
+            style={{
+              ...styles.accountTypeContainer,
+              ...styles.subscribe,
+              opacity: isSubscribing ? 0.7 : 1,
+            }}>
+            <Pressable
+              onPress={() => {
+                if (currentUser?.uid) subscribeToApp();
+                else
+                  Alert.alert(
+                    'عملية غير مقبولة',
+                    'يجب تسجيل الدخول أو إنشاء حساب لتتمكن من الاشتراك',
+                  );
+              }}>
+              {isSubscribing ? (
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row-reverse',
+                    gap: 10,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    opacity: 0.7,
+                  }}>
+                  <Text style={styles.subscribeText} disabled={isSubscribing}>
+                    إشترك الآن
+                  </Text>
+                  <ActivityIndicator size="small" color="#ffffff" />
+                </View>
+              ) : (
+                <Text style={styles.subscribeText}>إشترك الآن</Text>
+              )}
+            </Pressable>
+          </View>
+          <Text style={{color: 'white', textAlign: 'center'}}>
+            محمي من خلال Play Store
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  };
+
+  if (showSubscribeCTAScreen && !isSubscribed) return <SubscribeCTAScreen />;
   if (!isLoggedIn && viewLoginOrSignupForm === 'login') return <LoginForm />;
   if (!isLoggedIn && viewLoginOrSignupForm === 'signup') return <SignupForm />;
 
@@ -427,12 +593,7 @@ const ProfileScreen = () => {
             }}>
             <Pressable
               onPress={() => {
-                if (currentUser?.uid) subscribeToApp();
-                else
-                  Alert.alert(
-                    'عملية غير مقبولة',
-                    'يجب تسجيل الدخول أو إنشاء حساب لتتمكن من الاشتراك',
-                  );
+                setShowSubscribeCTAScreen(true);
               }}>
               {isSubscribing ? (
                 <View

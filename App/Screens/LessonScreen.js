@@ -533,6 +533,7 @@ export default function LessonScreen(props) {
   };
 
   const renderContent = lessonId => {
+    console.log('cdsvdsvs', activeTab);
     switch (activeTab) {
       case 0:
         return (
@@ -542,12 +543,17 @@ export default function LessonScreen(props) {
               style={{
                 bottom: 'auto',
                 backgroundColor: 'white',
-                overflow: 'croll',
+                overflow: 'scroll',
               }}
               horizontal={false}
               showsHorizontalScrollIndicator={true}
               contentContainerStyle={{paddingHorizontal: 'auto'}}>
-              <View style={{display: 'flex', marginVertical: height * 0.02}}>
+              <View
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-end',
+                  marginVertical: height * 0.02,
+                }}>
                 <Text style={{fontSize: 30, color: 'black'}}>{name}</Text>
               </View>
               <View
@@ -555,7 +561,7 @@ export default function LessonScreen(props) {
                   width: width * 0.9,
                   backgroundColor: 'white',
                   display: 'flex',
-                  direction: 'rtl',
+                  direction: 'ltr',
                 }}>
                 <View
                   style={{
