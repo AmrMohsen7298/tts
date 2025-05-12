@@ -60,6 +60,14 @@ export default function HomeScreen() {
     levels.C2,
     // levels.C3,
   ];
+  const tabsNamesMapper = [
+    'المستوى الأول',
+    'المستوى الثاني',
+    'المستوى الثالث',
+    'المستوى الرابع',
+    'المستوى الخامس',
+    'المستوى السادس',
+  ];
 
   useEffect(() => {
     getAllLessons(activeTab.current?.text, page?.current).then(resp => {
@@ -342,7 +350,7 @@ export default function HomeScreen() {
                   ? styles.tabTextActive
                   : styles.tabText
               }>
-              {tab.text}
+              {tabsNamesMapper[index]}
             </Text>
           </TouchableOpacity>
         ))}
