@@ -1,27 +1,29 @@
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'; // Correct import statement
+import { SafeAreaView } from 'react-native-safe-area-context';
 import user from './../../../assets/Images/profile.jpg';
-
 
 export default function Header() {
   const navigation = useNavigation();
-  
+
   const onPress = () => {
-    navigation.navigate("ProfileScreen");
+    navigation.navigate('ProfileScreen');
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.row}>
-        <TouchableOpacity onPress={onPress}>
-          <Image source={user} style={styles.image} />
-        </TouchableOpacity>
-        <View>
-          <Text style={styles.text}>اكتشف العربية</Text>
+    <SafeAreaView>
+      <View style={styles.container}>
+        <View style={styles.row}>
+          <TouchableOpacity onPress={onPress}>
+            <Image source={user} style={styles.image} />
+          </TouchableOpacity>
+          <View>
+            <Text style={styles.text}>اكتشف العربية</Text>
+          </View>
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({

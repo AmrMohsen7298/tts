@@ -1,7 +1,7 @@
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
-import { Platform } from 'react-native';
-import { requestPurchase, requestSubscription, useIAP } from 'react-native-iap';
+import { Alert, Platform } from 'react-native';
+import { requestSubscription, useIAP } from 'react-native-iap';
 import { useDispatch, useSelector } from 'react-redux';
 import { db } from '../../firebaseConfig';
 import { useStateValue } from '../store/contextStore/StateContext';
@@ -9,12 +9,14 @@ import { useStateValue } from '../store/contextStore/StateContext';
 // Play store item Ids
 const itemSKUs = Platform.select({
   android: ['belarabisubscription'],
+  ios: ['ttsbelarabi'],
 });
 
 const useInAppPurchase = () => {
   const [connectionErrorMsg, setConnectionErrorMsg] = useState('');
-    const { state, dispatch } = useStateValue();
-    const currentUser = useSelector(state => state.storyReducer.user)
+  const [isSubscribing, setIsSubscribing] = useState(false);
+  const {state, dispatch} = useStateValue();
+  const currentUser = useSelector(state => state.storyReducer.user);
   const appDispatch = useDispatch();
 
   const {
@@ -28,8 +30,8 @@ const useInAppPurchase = () => {
     currentPurchaseError,
   } = useIAP();
 
-    const uid = currentUser?.uid;
-    const email = currentUser?.email;
+  const uid = currentUser?.uid;
+  const email = currentUser?.email;
   const isSubscribed = state.isSubscribed;
   const [subscription, setSubscription] = useState(null);
   const [offerToken, setOfferToken] = useState(null);
@@ -63,6 +65,7 @@ const useInAppPurchase = () => {
     }
     console.log({subscriptions});
   }, [connected, getSubscriptions]);
+
   useEffect(() => {
     if (subscriptions) {
       setOfferToken(
@@ -77,11 +80,13 @@ const useInAppPurchase = () => {
         const receipt = purchase.transactionReceipt;
         console.log('RECEIPT: ', receipt);
         if (receipt) {
-            // Give full app access
-          if (!state.isSubscribed)
-            createSubscription(receipt);
-            try {
-                const ackResult = await finishTransaction({ purchase,isConsumable: false });
+          // Give full app access
+          if (!state.isSubscribed && currentUser) createSubscription(receipt);
+          try {
+            const ackResult = await finishTransaction({
+              purchase,
+              isConsumable: false,
+            });
             console.log('ackResult: ', ackResult);
           } catch (ackErr) {
             // We would need a backend to validate receipts for purhcases that pended for a while and were then declined. So I'll assume most purchase attempts go through successfully (OK ackResult) & take the hit for the ones that don't (user will still have full app access).
@@ -91,7 +96,7 @@ const useInAppPurchase = () => {
       }
     };
     checkCurrentPurchase(currentPurchase);
-  }, [ finishTransaction]);
+  }, [finishTransaction]);
 
   const subscribeToApp = async () => {
     // Reset error msg
@@ -101,6 +106,7 @@ const useInAppPurchase = () => {
     }
     // If we are connected & have products, purchase the item. Google will handle if user has no internet here.
     else if (subscriptions?.length > 0) {
+      setIsSubscribing(true);
       console.log('SUBSCRIPTIONS', subscriptions);
       console.log('OFFERTOKEN', offerToken);
       let data = await requestSubscription({
@@ -125,21 +131,30 @@ const useInAppPurchase = () => {
         })
         .catch(error => {
           return error;
+        })
+        .finally(() => {
+          setIsSubscribing(false);
         });
 
       console.log('Purchasing products:::', data);
     }
     // If we are connected but have no products returned, try to get products and purchase.
     else {
-      console.log('No products. Now trying to get some...');
+      setIsSubscribing(true);
+      console.log('No products. Now trying to get some...', itemSKUs);
       try {
-        await getProducts(itemSKUs);
-        requestPurchase(itemSKUs[0]);
-        console.log('Got products, now purchasing...');
+        const prods = await getSubscriptions({skus: itemSKUs});
+        console.log('Got products, now purchasing...', prods);
+        const subscriptionState = await requestSubscription({
+          sku: itemSKUs[0],
+        });
+        console.log('Purchased successfully', subscriptionState);
       } catch (error) {
-        setConnectionErrorMsg('Please check your internet connection');
+        setConnectionErrorMsg('تأكد أن كنت متصل بالانترنت');
         console.log('Everything failed. Error: ', error);
         Alert.alert(error?.message ?? JSON.stringify(error));
+      } finally {
+        setIsSubscribing(false);
       }
     }
   };
@@ -147,6 +162,7 @@ const useInAppPurchase = () => {
   return {
     isSubscribed,
     connectionErrorMsg,
+    isSubscribing,
     subscribeToApp,
   };
 };

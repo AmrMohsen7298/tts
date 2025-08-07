@@ -1,14 +1,14 @@
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import {
   Dimensions,
+  SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View
 } from 'react-native';
-// import Colors from '../../Utils/Colors';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { useNavigation } from '@react-navigation/native';
 
 import { useSelector } from 'react-redux';
 export default function Library() {
@@ -16,81 +16,89 @@ export default function Library() {
   const {favorites, learned} = useSelector(state => state.storyReducer);
   const {width, height} = Dimensions.get('screen');
   return (
-    <View style={{paddingHorizontal: width * 0.05}}>
-      <View
-        style={{
-          display: 'flex',
-          flexDirection: 'row-reverse',
-        }}>
-        <Text
+    <SafeAreaView>
+      <View style={{paddingHorizontal: width * 0.05}}>
+        <View
           style={{
-            color: 'black',
-            fontSize: 24,
-            fontFamily: 'outfit',
-            marginHorizontal: width * 0.05,
-            marginVertical: width * 0.08,
+            display: 'flex',
+            flexDirection: 'row-reverse',
           }}>
-          مكتبتي
-        </Text>
+          <Text
+            style={{
+              color: 'black',
+              fontSize: 24,
+              fontFamily: 'outfit',
+              marginHorizontal: width * 0.05,
+              marginVertical: width * 0.08,
+            }}>
+            مكتبتي
+          </Text>
+        </View>
+        <View
+          style={{
+            // marginTop: height * 0.02,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 20,
+          }}>
+          <TouchableOpacity
+            style={styles.easyButton}
+            onPress={() => {
+              navigator.navigate('المفضله');
+            }}>
+            <FontAwesomeIcon
+              icon="angle-left"
+              style={{color: 'grey'}}></FontAwesomeIcon>
+            <View style={{display: 'flex', flexDirection: 'column', gap: 10}}>
+              <Text
+                style={{
+                  width: '100%',
+                  fontSize: 18,
+                  fontWeight: '500',
+                  color: 'black',
+                }}>
+                المفضلة
+              </Text>
+              <Text style={styles.easyText}>
+                {favorites?.length ?? 0} اغراض
+              </Text>
+            </View>
+            <FontAwesomeIcon
+              icon="heart"
+              size={25}
+              color={'#eaaa00'}></FontAwesomeIcon>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.mediumButton}
+            onPress={() => {
+              navigator.navigate('الدروس المتعلمه');
+            }}>
+            <FontAwesomeIcon
+              icon="angle-left"
+              style={styles.mediumText}></FontAwesomeIcon>
+            <View style={{display: 'flex', flexDirection: 'column', gap: 10}}>
+              <Text
+                style={{
+                  width: '100%',
+                  fontSize: 18,
+                  fontWeight: '500',
+                  color: 'black',
+                }}>
+                الدروس المتعلمة
+              </Text>
+              <Text style={styles.mediumText}>
+                {learned?.length ?? 0} اغراض
+              </Text>
+            </View>
+            <FontAwesomeIcon
+              icon="circle-check"
+              size={25}
+              color={'#eaaa00'}></FontAwesomeIcon>
+          </TouchableOpacity>
+        </View>
       </View>
-      <View
-        style={{
-          // marginTop: height * 0.02,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: 20,
-        }}>
-        <TouchableOpacity
-          style={styles.easyButton}
-          onPress={() => {
-            navigator.navigate('المفضله');
-          }}>
-          <FontAwesomeIcon
-            icon="angle-left"
-            style={{color: 'grey'}}></FontAwesomeIcon>
-          <View style={{display: 'flex', flexDirection: 'column', gap: 10}}>
-            <Text
-              style={{
-                width: '100%',
-                fontSize: 18,
-                fontWeight: '500',
-                color: 'black',
-              }}>
-              المفضلة
-            </Text>
-            <Text style={styles.easyText}>{favorites?.length ?? 0} اغراض</Text>
-          </View>
-          <FontAwesomeIcon
-            icon="heart"
-            size={25}
-            color={'#eaaa00'}></FontAwesomeIcon>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.mediumButton}  onPress={() => {
-            navigator.navigate('الدروس المتعلمه');
-          }}>
-          <FontAwesomeIcon
-            icon="angle-left"
-            style={styles.mediumText}></FontAwesomeIcon>
-          <View style={{display: 'flex', flexDirection: 'column', gap: 10}}>
-            <Text
-              style={{
-                width: '100%',
-                fontSize: 18,
-                fontWeight: '500',
-                color: 'black',
-              }}>
-              الدروس المتعلمة
-            </Text>
-            <Text style={styles.mediumText}>{learned?.length ?? 0} اغراض</Text>
-          </View>
-          <FontAwesomeIcon
-            icon="circle-check"
-            size={25}
-            color={'#eaaa00'}></FontAwesomeIcon>
-        </TouchableOpacity>
-      </View>
-    </View>
+    </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({

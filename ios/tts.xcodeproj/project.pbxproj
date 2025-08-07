@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* ttsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* ttsTests.m */; };
+		04347B4D2D5015C400DE3DEF /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04347B4C2D5015C400DE3DEF /* StoreKit.framework */; };
 		0C80B921A6F3F58F76C31292 /* libPods-tts.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DCACB8F33CDC322A6C60F78 /* libPods-tts.a */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
@@ -31,6 +32,8 @@
 		00E356EE1AD99517003FC87E /* ttsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ttsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* ttsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ttsTests.m; sourceTree = "<group>"; };
+		04347B4C2D5015C400DE3DEF /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		049ABA3E2D68CBFF004DCC8C /* runscript.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = runscript.sh; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* tts.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = tts.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = tts/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = tts/AppDelegate.mm; sourceTree = "<group>"; };
@@ -40,7 +43,7 @@
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = tts/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		19F6CBCC0A4E27FBF8BF4A61 /* libPods-tts-ttsTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-tts-ttsTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B4392A12AC88292D35C810B /* Pods-tts.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tts.debug.xcconfig"; path = "Target Support Files/Pods-tts/Pods-tts.debug.xcconfig"; sourceTree = "<group>"; };
-		3D6D8B9E1B7EDF73E94A9DC0 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = tts/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		3D6D8B9E1B7EDF73E94A9DC0 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = tts/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		5709B34CF0A7D63546082F79 /* Pods-tts.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tts.release.xcconfig"; path = "Target Support Files/Pods-tts/Pods-tts.release.xcconfig"; sourceTree = "<group>"; };
 		5B7EB9410499542E8C5724F5 /* Pods-tts-ttsTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tts-ttsTests.debug.xcconfig"; path = "Target Support Files/Pods-tts-ttsTests/Pods-tts-ttsTests.debug.xcconfig"; sourceTree = "<group>"; };
 		5DCACB8F33CDC322A6C60F78 /* libPods-tts.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-tts.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -63,6 +66,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0C80B921A6F3F58F76C31292 /* libPods-tts.a in Frameworks */,
+				04347B4D2D5015C400DE3DEF /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -104,6 +108,7 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				04347B4C2D5015C400DE3DEF /* StoreKit.framework */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				5DCACB8F33CDC322A6C60F78 /* libPods-tts.a */,
 				19F6CBCC0A4E27FBF8BF4A61 /* libPods-tts-ttsTests.a */,
@@ -126,6 +131,7 @@
 				00E356EF1AD99517003FC87E /* ttsTests */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
+				049ABA3E2D68CBFF004DCC8C /* runscript.sh */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
 			);
 			indentWidth = 2;
@@ -473,7 +479,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 1.5;
 				DEVELOPMENT_TEAM = P45R89G5G6;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = tts/Info.plist;
@@ -488,7 +494,7 @@
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.tts.belarabi;
-				PRODUCT_NAME = tts;
+				PRODUCT_NAME = Belarabi;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -504,7 +510,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 1.5;
 				DEVELOPMENT_TEAM = P45R89G5G6;
 				INFOPLIST_FILE = tts/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -518,7 +524,7 @@
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.tts.belarabi;
-				PRODUCT_NAME = tts;
+				PRODUCT_NAME = Belarabi;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
