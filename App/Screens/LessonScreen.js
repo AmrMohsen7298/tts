@@ -1,9 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useRef,
-  useState
-} from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 // import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from "expo-av";
 import { faCheck, faHeart } from '@fortawesome/free-solid-svg-icons'; // Import specific icons
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -17,8 +12,9 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from 'react-native';
+import AnimatedCircularProgress from 'react-native-circular-progress';
 // import { faDumbbell, faPlay } from "@fortawesome/free-solid-svg-icons";
 import TRANSLATE from '../../assets/translate.png';
 
@@ -33,9 +29,16 @@ import {
   getStoryById,
   getWordByText,
 } from '../Services/LessonServices';
+import Colors from '../Utils/Colors';
 import { LessonTabs } from '../Utils/constants';
 
+import Sound from 'react-native-sound';
 import { useDispatch, useSelector } from 'react-redux';
+import RNFetchBlob from 'rn-fetch-blob';
+import CROSS from '../../assets/check-cross.png';
+import CHECK from '../../assets/check-orange.png';
+import CHECKMARKWHITE from '../../assets/checkmark-white.png';
+import TROPHY from '../../assets/trophy.png';
 import {
   addFavorite,
   addToLearned,
@@ -44,11 +47,10 @@ import {
   removeUserWords,
   setAudioPlaying,
   setUserWords,
-  setWordTraining
+  setWordTraining,
 } from '../Actions/StoryActions';
 import CustomAudioPlayer from '../Components/AudioPlayer/CustomAudioPlayer';
 import { useStateValue } from '../store/contextStore/StateContext';
-import Colors from '../Utils/Colors';
 import { tabs as levelsTabs } from '../Utils/constants';
 import { tabsNamesMapper } from './HomeScreen';
 // import CustomAudioPlayer from "../Components/AudioPlayer/CustomAudioPlayer";
@@ -97,28 +99,39 @@ const DoneLearning = ({lessonId}) => {
     learned = [];
   } else {
     return (
-      <View style={styles.buttonWrapper}>
+      <>
         <View
           style={{
-            ...styles.buttonContainer,
-            backgroundColor: learned?.some(id => id == lessonId)
-              ? '#eaaa00'
-              : '#333',
+            ...styles.buttonWrapper,
+            marginTop: height * 0.03,
           }}>
-          <TouchableOpacity
-            style={styles.touchable}
-            onPress={() => {
-              !learned?.some(id => id == lessonId)
-                ? dispatch(addToLearned(lessonId))
-                : dispatch(removeFromLearned(lessonId));
+          <View
+            style={{
+              ...styles.buttonContainer,
+              borderRadius: 20,
+              paddingVertical: height * 0.008,
+              minWidth: width * 0.28,
+              backgroundColor: learned?.some(id => id == lessonId)
+                ? '#eaaa00'
+                : '#333',
             }}>
-            <Text style={styles.touchableText}>
-              تم التعلم{' '}
+            <TouchableOpacity
+              style={{
+                ...styles.touchable,
+                display: 'flex',
+                flexDirection: 'row',
+              }}
+              onPress={() => {
+                !learned?.some(id => id == lessonId)
+                  ? dispatch(addToLearned(lessonId))
+                  : dispatch(removeFromLearned(lessonId));
+              }}>
               <Image source={CHECKMARKWHITE} style={{width: 20, height: 20}} />
-            </Text>
-          </TouchableOpacity>
+              <Text style={styles.touchableText}>تم التعلم</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
+      </>
     );
   }
 };
@@ -329,42 +342,46 @@ export default function LessonScreen(props) {
     setLoading(true);
     contextDispatch({type: 'SHOW_NAVBAR', payload: false});
 
-    getQuizByTutorialId(props?.route?.params?.lessonId).then(res => {
-      setQuizData(res?.questions);
-    });
-    getKeywordsbyTutorialId(props?.route?.params?.lessonId).then(res => {
-      res?.map(key => {
-        dispatch(setWordTraining(key));
-      });
-
-      setLessonKeyWords(res);
-    });
-    getGrammerByTutorialId(props?.route?.params?.lessonId).then(res => {
-      setGrammar(res);
-    });
-    getStoryById(props?.route?.params?.lessonId).then(resp => {
-      setStoryParagraph(resp?.paragraph);
-      setTranslation(resp?.translation);
-      setName(resp?.name);
-      getStoryAudio(resp?.id).then(res => {
-        var reader = new FileReader();
-        reader.readAsDataURL(res);
-        reader.onload = () => {
-          setAudioSrc(reader?.result?.split(',')[1]);
-        };
-      });
-      getAudioTimePoints(resp?.id).then(res => {
-        res?.map(time => {
-          setTimePoints(prevTimePoints => [
-            ...prevTimePoints,
-            time?.['timeSeconds_'],
-          ]);
+    Promise.all([
+      getQuizByTutorialId(props?.route?.params?.lessonId).then(res => {
+        setQuizData(res?.questions);
+      }),
+      getKeywordsbyTutorialId(props?.route?.params?.lessonId).then(res => {
+        res?.map(key => {
+          dispatch(setWordTraining(key));
         });
-      });
+
+        setLessonKeyWords(res);
+      }),
+      getGrammerByTutorialId(props?.route?.params?.lessonId).then(res => {
+        setGrammar(res);
+      }),
+      getStoryById(props?.route?.params?.lessonId).then(resp => {
+        setStoryParagraph(resp?.paragraph);
+        setTranslation(resp?.translation);
+        setName(resp?.name);
+        getStoryAudio(resp?.id).then(res => {
+          var reader = new FileReader();
+          reader.readAsDataURL(res);
+          reader.onload = () => {
+            setAudioSrc(reader?.result?.split(',')[1]);
+          };
+        });
+        getAudioTimePoints(resp?.id).then(res => {
+          res?.map(time => {
+            setTimePoints(prevTimePoints => [
+              ...prevTimePoints,
+              time?.['timeSeconds_'],
+            ]);
+          });
+        });
+      }),
+    ]).then(() => {
+      setLoading(false);
     });
-      return () => {
-          contextDispatch({ type: 'SHOW_NAVBAR', payload: true });
-      };
+    return () => {
+      contextDispatch({type: 'SHOW_NAVBAR', payload: true});
+    };
   }, []);
   useEffect(() => {
     if (storyParagraph) {
@@ -520,6 +537,7 @@ export default function LessonScreen(props) {
   console.log('aefa', props?.route?.params?.level);
 
   const renderContent = lessonId => {
+    console.log('cdsvdsvs', activeTab);
     switch (activeTab) {
       case 0:
         return (
@@ -812,56 +830,58 @@ export default function LessonScreen(props) {
                                 }
                                 // onLayout={(event) => {
 
-                              //     const {y} = event.nativeEvent.layout
+                                //     const {y} = event.nativeEvent.layout
 
-                              //     pressablePositions[index] = y;
+                                //     pressablePositions[index] = y;
 
-                              //   }}
-                            >
-                              <Text
-                              // onLayout={(event)=> {
-                              //     // console.log("event", event.nativeEvent)
-                              //     const {x, y, height, width} = event.nativeEvent.layout;
-                              //     setLayoutIds([...layoutIds, y ])
-                              //   }
-                              // }>
+                                //   }}
                               >
                                 <Text
-                                  ref={textRef}
-                                  collapsable={false}
-                                  samaga={index}
-                                  style={{
-                                    color: highlightIndex?.some(
-                                      idx => idx == index,
-                                    )
-                                      ? 'white'
-                                      : 'black',
-                                    fontFamily: 'outfit',
-                                    fontSize: 20,
-                                    textAlign: 'center',
-                                  }}>
-                                  {word}
+                                // onLayout={(event)=> {
+                                //     // console.log("event", event.nativeEvent)
+                                //     const {x, y, height, width} = event.nativeEvent.layout;
+                                //     setLayoutIds([...layoutIds, y ])
+                                //   }
+                                // }>
+                                >
+                                  <Text
+                                    ref={textRef}
+                                    collapsable={false}
+                                    samaga={index}
+                                    style={{
+                                      color: highlightIndex?.some(
+                                        idx => idx == index,
+                                      )
+                                        ? 'white'
+                                        : 'black',
+                                      fontFamily: 'outfit',
+                                      fontSize: 20,
+                                      textAlign: 'center',
+                                    }}>
+                                    {word}
+                                  </Text>
                                 </Text>
-                              </Text>
-                            </Pressable>
-                          );
-                        }
-                      })}
+                              </Pressable>
+                            );
+                          }
+                        })}
+                </View>
               </View>
-            </View>
-          </ScrollView>
+            </ScrollView>
+          </>
         );
       case 1:
         return (
           <>
-            {currentIndex < quizData?.length ? (
-              <View
-                style={{
-                  flexDirection: 'column',
-                  gap: 40,
-                  alignItems: 'center',
-                }}>
-                {/* <AntDesign
+            <>
+              {currentIndex < quizData?.length ? (
+                <View
+                  style={{
+                    flexDirection: 'column',
+                    gap: 40,
+                    alignItems: 'center',
+                  }}>
+                  {/* <AntDesign
                   name="sound"
                   size={25}
                   color="#eaaa00"
@@ -1144,22 +1164,26 @@ export default function LessonScreen(props) {
         );
       case 2:
         return (
-          <ScrollView
-            style={{
-              paddingTop: '3%',
-            }}>
-            {lessonKeyWords?.map((keyword, index) => {
-              return <KeywordCard key={index} {...keyword}></KeywordCard>;
-            })}
-          </ScrollView>
+          <>
+            <ScrollView
+              style={{
+                paddingTop: '3%',
+              }}>
+              {lessonKeyWords?.map((keyword, index) => {
+                return <KeywordCard key={index} {...keyword}></KeywordCard>;
+              })}
+            </ScrollView>
+          </>
         );
       case 3:
         return (
-          <ScrollView>
-            {grammar?.map((g, index) => {
-              return <Card key={index} {...g}></Card>;
-            })}
-          </ScrollView>
+          <>
+            <ScrollView>
+              {grammar?.map((g, index) => {
+                return <Card key={index} {...g}></Card>;
+              })}
+            </ScrollView>
+          </>
         );
       default:
         return null;
@@ -1168,82 +1192,86 @@ export default function LessonScreen(props) {
   renderphoto = lessonId => {
     switch (activeTab) {
       case 0:
+        console.log('renderphoto case 0');
         return (
-          <View style={styles.photoContainer}>
-            <ImageBackground
-              style={styles.photo}
-              source={{uri: props?.route?.params?.image}}
-              resizeMode="cover">
-              <View style={styles.outerContainer}>
-                <DoneLearning lessonId={props?.route?.params?.lessonId} />
+          <>
+            <View style={styles.photoContainer}>
+              <ImageBackground
+                style={styles.photo}
+                source={{uri: props?.route?.params?.image}}
+                resizeMode="cover">
+                <View style={styles.outerContainer}>
+                  <DoneLearning lessonId={props?.route?.params?.lessonId} />
 
-                <View style={styles.textContainer}>
-                  {selectedWord && SelectedWordTranslation && (
-                    <View style={styles.translationContainer}>
-                      <View style={styles.cardContainer_}>
-                        <View style={styles.cardHead}>
-                          <Text style={styles.selectedWordText}>
-                            {selectedWord}
+                  <View style={styles.textContainer}>
+                    {selectedWord && SelectedWordTranslation && (
+                      <View style={styles.translationContainer}>
+                        <View style={styles.cardContainer_}>
+                          <View style={styles.cardHead}>
+                            <Text style={styles.selectedWordText}>
+                              {selectedWord}
+                            </Text>
+                          </View>
+                          <Text style={styles.translationText}>
+                            {SelectedWordTranslation}
                           </Text>
                         </View>
-                        <Text style={styles.translationText}>
-                          {SelectedWordTranslation}
-                        </Text>
-                      </View>
 
-                      <View style={styles.cardButtons}>
-                        <Pressable
-                          style={
-                            userKeywords.filter(
-                              ({text}) => text === selectedWord,
-                            ).length > 0
-                              ? // trainingPressed
-                                styles.cardButtonUpPressed
-                              : styles.cardButtonUp
-                          }
-                          onPress={() => {
-                            userKeywords.filter(
-                              ({text}) => text === selectedWord,
-                            ).length > 0
-                              ? //setTrainingPressed(false)
-                                dispatch(
-                                  removeUserWords({
-                                    word: selectedWord,
-                                  }),
-                                )
-                              : dispatch(
-                                  setUserWords({
-                                    text: selectedWord,
-                                    translation: SelectedWordTranslation,
-                                    audio: selectedWordAudio,
-                                    category: 'new',
-                                  }),
-                                );
-                          }}>
-                          <FontAwesomeIcon icon="dumbbell" />
-                        </Pressable>
-                        <Pressable
-                          style={
-                            playPressed
-                              ? styles.cardButtonDownPressed
-                              : styles.cardButtonDown
-                          }
-                          onPress={() => {
-                            playPressed
-                              ? setPlayPressed(false)
-                              : setPlayPressed(true);
-                          }}>
-                          <FontAwesomeIcon icon="play" />
-                        </Pressable>
+                        <View style={styles.cardButtons}>
+                          <Pressable
+                            style={
+                              userKeywords.filter(
+                                ({text}) => text === selectedWord,
+                              ).length > 0
+                                ? // trainingPressed
+                                  styles.cardButtonUpPressed
+                                : styles.cardButtonUp
+                            }
+                            onPress={() => {
+                              userKeywords.filter(
+                                ({text}) => text === selectedWord,
+                              ).length > 0
+                                ? //setTrainingPressed(false)
+                                  dispatch(
+                                    removeUserWords({
+                                      word: selectedWord,
+                                    }),
+                                  )
+                                : dispatch(
+                                    setUserWords({
+                                      text: selectedWord,
+                                      translation: SelectedWordTranslation,
+                                      audio: selectedWordAudio,
+                                      category: 'new',
+                                    }),
+                                  );
+                            }}>
+                            <FontAwesomeIcon icon="dumbbell" />
+                          </Pressable>
+                          <Pressable
+                            style={
+                              playPressed
+                                ? styles.cardButtonDownPressed
+                                : styles.cardButtonDown
+                            }
+                            onPress={() => {
+                              playPressed
+                                ? setPlayPressed(false)
+                                : setPlayPressed(true);
+                            }}>
+                            <FontAwesomeIcon icon="play" />
+                          </Pressable>
+                        </View>
                       </View>
-                    </View>
-                  )}
+                    )}
+                  </View>
                 </View>
-              </View>
-            </ImageBackground>
-          </View>
+              </ImageBackground>
+            </View>
+          </>
         );
       case 1:
+        console.log('renderphoto case 1');
         return (
           <>
             <View
@@ -1272,29 +1300,31 @@ export default function LessonScreen(props) {
           </>
         );
       case 2:
+        console.log('renderphoto case 2');
         return (
-          <View style={styles.photoContainer}>
-            <ImageBackground
-              style={styles.photo}
-              source={{uri: props?.route?.params?.image}}
-              resizeMode="cover">
-              <DoneLearning lessonId={props?.route?.params?.lessonId} />
-              <View>
-                <View
-                  style={{
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    width: width,
-                    height: height * 0.27,
-                  }}>
+          <>
+            <View style={styles.photoContainer}>
+              <ImageBackground
+                style={styles.photo}
+                source={{uri: props?.route?.params?.image}}
+                resizeMode="cover">
+                <DoneLearning lessonId={props?.route?.params?.lessonId} />
+                <View>
                   <View
                     style={{
-                      flexDirection: 'row-reverse',
-                      display: 'flex',
+                      flexDirection: 'column',
                       justifyContent: 'center',
-                      alignItems: 'center',
+                      width: width,
+                      height: height * 0.27,
                     }}>
-                    {/* <TouchableOpacity
+                    <View
+                      style={{
+                        flexDirection: 'row-reverse',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}>
+                      {/* <TouchableOpacity
                       style={{
                         backgroundColor: '#eaaa00',
 
@@ -1336,85 +1366,91 @@ export default function LessonScreen(props) {
                         />
                       </View>
                     </TouchableOpacity> */}
+                    </View>
                   </View>
                 </View>
-              </View>
-            </ImageBackground>
-          </View>
+              </ImageBackground>
+            </View>
+          </>
         );
       case 3:
+        console.log('renderphoto case 3');
         return (
-          <View style={styles.photoContainer}>
-            <ImageBackground
-              style={styles.photo}
-              source={{uri: props?.route?.params?.image}}
-              resizeMode="cover">
-              <DoneLearning lessonId={props?.route?.params?.lessonId} />
-            </ImageBackground>
-          </View>
+          <>
+            <View style={styles.photoContainer}>
+              <ImageBackground
+                style={styles.photo}
+                source={{uri: props?.route?.params?.image}}
+                resizeMode="cover">
+                <DoneLearning lessonId={props?.route?.params?.lessonId} />
+              </ImageBackground>
+            </View>
+          </>
         );
     }
   };
   return (
-    <View style={styles.container}>
-      {this.renderphoto()}
+    <>
+      <View style={styles.container}>
+        {this.renderphoto()}
 
-      <View style={styles.tabsContainer}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.tabsContentContainer}>
-          {tabs.map((tab, index) => (
-            <TouchableOpacity
-              key={index}
-              style={[styles.tab, activeTab === index && styles.activeTab]}
-              onPress={() => setActiveTab(index)}>
-              <Text
-                style={
-                  activeTab === index ? styles.tabTextActive : styles.tabText
-                }>
-                {tab.text}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
-
-      {/* Content */}
-      {
-        <View style={styles.contentContainer}>
-          {loading && (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator
-                size="large"
-                color="#eaaa00"
-                style={{
-                  flex: 1,
-
-                  justifyContent: 'center',
-
-                  alignItems: 'center',
-
-                  transform: [{scale: 2}], // increase the size
-                }}
-              />
-            </View>
-          )}
-
-          <View style={styles.hairlineLeft}></View>
-          {renderContent()}
+        <View style={styles.tabsContainer}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.tabsContentContainer}>
+            {tabs.map((tab, index) => (
+              <TouchableOpacity
+                key={index}
+                style={[styles.tab, activeTab === index && styles.activeTab]}
+                onPress={() => setActiveTab(index)}>
+                <Text
+                  style={
+                    activeTab === index ? styles.tabTextActive : styles.tabText
+                  }>
+                  {tab.text}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
         </View>
-      }
-      <CustomAudioPlayer
-        audioUrl={audioSrc}
-        setHighlightIndex={setHighlightIndex}
-        setTranslationHighlightIndex={setTranslationHighlightIndex}
-        timePoints={timePoints}
-        storyParagraph={storyParagraph}
-        textRef={textRef}
-        scrollTo={scrollTo}
-      />
-    </View>
+
+        {/* Content */}
+        {
+          <View style={styles.contentContainer}>
+            {loading && (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator
+                  size="large"
+                  color="#eaaa00"
+                  style={{
+                    flex: 1,
+
+                    justifyContent: 'center',
+
+                    alignItems: 'center',
+
+                    transform: [{scale: 2}], // increase the size
+                  }}
+                />
+              </View>
+            )}
+
+            <View style={styles.hairlineLeft}></View>
+            {renderContent()}
+          </View>
+        }
+        <CustomAudioPlayer
+          audioUrl={audioSrc}
+          setHighlightIndex={setHighlightIndex}
+          setTranslationHighlightIndex={setTranslationHighlightIndex}
+          timePoints={timePoints}
+          storyParagraph={storyParagraph}
+          textRef={textRef}
+          scrollTo={scrollTo}
+        />
+      </View>
+    </>
   );
 }
 const styles = StyleSheet.create({
