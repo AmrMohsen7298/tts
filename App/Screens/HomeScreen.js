@@ -244,9 +244,8 @@ export default function HomeScreen() {
     if (!currentUser?.email || !currentUser?.password || currentFirebaseUser) {
       if (currentFirebaseUser == null) {
         setLock(true);
-      } else {
-        setLock(false);
       }
+
       console.log(
         'User is already signed in or no credentials found.',
         lock,
@@ -291,6 +290,7 @@ export default function HomeScreen() {
       type: 'IS_SUBSCRIBED',
       payload: isSubscribed,
     });
+    setLock(!isSubscribed);
   };
 
   useEffect(() => {
