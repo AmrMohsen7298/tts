@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 // import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from "expo-av";
+import { faCheck, faHeart } from '@fortawesome/free-solid-svg-icons'; // Import specific icons
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   ActivityIndicator,
@@ -15,9 +16,8 @@ import {
 } from 'react-native';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 // import { faDumbbell, faPlay } from "@fortawesome/free-solid-svg-icons";
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import TRANSLATE from '../../assets/translate.png';
 
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Card from '../Components/Card';
 import KeywordCard from '../Components/KeyWordCard/KeywordCard';
 import {
@@ -51,6 +51,8 @@ import {
 } from '../Actions/StoryActions';
 import CustomAudioPlayer from '../Components/AudioPlayer/CustomAudioPlayer';
 import { useStateValue } from '../store/contextStore/StateContext';
+import { tabs as levelsTabs } from '../Utils/constants';
+import { tabsNamesMapper } from './HomeScreen';
 // import CustomAudioPlayer from "../Components/AudioPlayer/CustomAudioPlayer";
 
 const {width, height} = Dimensions.get('window');
@@ -532,6 +534,8 @@ export default function LessonScreen(props) {
     return 'black';
   };
 
+  console.log('aefa', props?.route?.params?.level);
+
   const renderContent = lessonId => {
     console.log('cdsvdsvs', activeTab);
     switch (activeTab) {
@@ -554,7 +558,10 @@ export default function LessonScreen(props) {
                   alignItems: 'flex-end',
                   marginVertical: height * 0.02,
                 }}>
-                <Text style={{fontSize: 30, color: 'black'}}>{name}</Text>
+                <Text
+                  style={{fontSize: 30, color: 'black', textAlign: 'right'}}>
+                  {name}
+                </Text>
               </View>
               <View
                 style={{
@@ -566,33 +573,55 @@ export default function LessonScreen(props) {
                 <View
                   style={{
                     flexDirection: 'row',
-                    justifyContent: 'flex-start',
+                    justifyContent: 'flex-end',
                     gap: 15,
-                    // padding: 'auto',
-                    paddingBottom: height * 0.02,
-                    position: 'absolute',
-                    right: 1,
+                    paddingBottom: 0,
+                    paddingTop: 0,
+                    marginBottom: height * 0.005,
+                    marginTop: height * 0.005,
                   }}>
                   <View>
-                    <Text style={styles.card_level}>A1</Text>
+                    <Text style={styles.card_level}>
+                      {
+                        tabsNamesMapper[
+                          levelsTabs.indexOf(props?.route?.params?.level)
+                        ]
+                      }
+                    </Text>
                   </View>
 
-                  <MaterialIcons
-                    name="translate"
-                    size={22}
-                    color={translateButton ? '#eaaa00' : 'rgba(0, 0, 0, 0.2)'}
-                    onPress={() => setTranslateButton(!translateButton)}
-                  />
-                  <MaterialIcons
-                    name="favorite"
-                    size={22}
-                    color={favoriteButton ? 'red' : 'rgba(0, 0, 0, 0.2)'}
+                  <Pressable
+                    style={{
+                      width: 22,
+                      height: 22,
+                    }}
+                    onPress={() => setTranslateButton(!translateButton)}>
+                    <Image
+                      source={TRANSLATE}
+                      style={{
+                        width: 22,
+                        height: 22,
+                        opacity: translateButton ? 0.9 : 0.2,
+                      }}
+                    />
+                  </Pressable>
+                  <Pressable
+                    style={{
+                      width: 22,
+                      height: 22,
+                    }}
                     onPress={() =>
-                      favoriteButton
-                        ? setFavorites(false, props?.route?.params?.lessonId)
-                        : setFavorites(true, props?.route?.params?.lessonId)
-                    }
-                  />
+                      setFavorites(
+                        !favoriteButton,
+                        props?.route?.params?.lessonId,
+                      )
+                    }>
+                    <FontAwesomeIcon
+                      icon={faHeart}
+                      size={22}
+                      color={favoriteButton ? 'red' : 'rgba(0, 0, 0, 0.2)'}
+                    />
+                  </Pressable>
                 </View>
 
                 <View
@@ -601,7 +630,7 @@ export default function LessonScreen(props) {
                     flexWrap: 'wrap',
                     gap: translateButton ? 3 : 0,
                     position: 'relative',
-                    paddingTop: height * 0.06,
+                    paddingTop: height * 0.01,
                   }}>
                   {translateButton
                     ? storyParagraph?.split('.').map((word, index) => {
@@ -907,7 +936,11 @@ export default function LessonScreen(props) {
               ) : (
                 <ScrollView style={styles.scrollableResults}>
                   <View style={styles.resultsHeader}>
-                    <View style={styles.resultsHeaderTextContainer}>
+                    <View
+                      style={{
+                        ...styles.resultsHeaderTextContainer,
+                        width: width * 0.9,
+                      }}>
                       <Text style={styles.resultsHeaderText}>
                         {(score / quizData?.length) * 100 > 50
                           ? (score / quizData?.length) * 100 > 75
@@ -915,13 +948,28 @@ export default function LessonScreen(props) {
                             : 'عمل جيد '
                           : 'ابذل مجهود اكثر'}
                       </Text>
-                      <Text style={styles.resultsBodyText}>
-                        لقد حصلت على {score} من {quizData?.length}. إستمر على
-                        مستواك!
+                      <Text
+                        style={{
+                          ...styles.resultsBodyText,
+                          textAlign: 'left',
+                          direction: 'rtl',
+                        }}>
+                        لقد حصلت على {score} من {quizData?.length}
+                        {(score / quizData?.length) * 100 > 50 ? '\n' : '. '}
+                        {(score / quizData?.length) * 100 > 50
+                          ? (score / quizData?.length) * 100 > 75
+                            ? 'إستمر على مستواك!'
+                            : 'إستمر في التقدم!'
+                          : 'حاول مرة أخرى!'}
                       </Text>
                     </View>
                     <View style={styles.resultsHeaderIconContainer}>
-                      <Image source={TROPHY} style={{width: 80, height: 80}} />
+                      {(score / quizData?.length) * 100 > 50 && (
+                        <Image
+                          source={TROPHY}
+                          style={{width: 80, height: 80}}
+                        />
+                      )}
                     </View>
                   </View>
                   <View style={styles.quizResults}>
@@ -962,7 +1010,7 @@ export default function LessonScreen(props) {
                         <Text
                           style={{
                             ...styles.correctIncorrectNumbers,
-                            color: '#eaaa00',
+                            color: '#d69e02',
                             backgroundColor: '#eaaa0030',
                           }}>
                           {score}
@@ -970,7 +1018,7 @@ export default function LessonScreen(props) {
                         <Text
                           style={{
                             ...styles.correctIncorrectNumbers,
-                            color: '#ff0000',
+                            color: '#d60202',
                             backgroundColor: '#ff000020',
                           }}>
                           {quizData?.length - score}
@@ -1006,6 +1054,7 @@ export default function LessonScreen(props) {
                       ...styles.resultsHeaderText,
                       marginTop: height * 0.03,
                       marginRight: width * 0.05,
+                      paddingLeft: width * 0.05,
                     }}>
                     إجاباتك
                   </Text>
@@ -1239,7 +1288,8 @@ export default function LessonScreen(props) {
                   <Text
                     style={{fontSize: 25, fontWeight: 'bold', color: 'white'}}>
                     {currentIndex + 1 > quizData?.length ? (
-                      <Ionicons name="checkmark" size={80} color="white" />
+                      // <Ionicons name="checkmark" size={80} color="white" />
+                      <FontAwesomeIcon icon={faCheck} size={80} color="white" />
                     ) : (
                       currentIndex + 1 + ' / ' + quizData?.length
                     )}
@@ -1466,6 +1516,8 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#000',
+    direction: 'rtl',
+    textAlign: 'left',
   },
   resultsBodyText: {
     fontSize: 18,
@@ -1480,6 +1532,8 @@ const styles = StyleSheet.create({
     color: 'black',
     fontWeight: 'bold',
     fontSize: 18,
+    direction: 'rtl',
+    textAlign: 'left',
   },
   correctIncorrectNumbers: {
     fontWeight: 'bold',
@@ -1490,6 +1544,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    textAlign: 'center',
+    paddingVertical: height * 0.005,
   },
   container: {
     flex: 1,
@@ -1550,7 +1606,6 @@ const styles = StyleSheet.create({
     color: Colors.black,
     fontFamily: 'outfit',
     fontSize: 14,
-    padding: 'auto',
   },
   button: {
     backgroundColor: 'white',

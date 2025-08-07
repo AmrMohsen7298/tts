@@ -39,8 +39,8 @@ const useInAppPurchase = () => {
   const createSubscription = async receipt => {
     try {
       const docRef = await addDoc(collection(db, 'subscriptions'), {
-        uid,
-        email,
+        uid: uid ?? 0,
+        email: email ?? '',
         receipt: receipt,
         timestamp: new Date().getTime(),
         endDateTimestamp: new Date().getTime() + 60 * 60 * 24 * 30 * 1000,
@@ -58,11 +58,12 @@ const useInAppPurchase = () => {
       console.log('itemsSkus', itemSKUs);
       let sub = async () => {
         let subs = await getSubscriptions({skus: itemSKUs});
+        console.log('Current Subscriptions: ', subs);
       };
       sub();
       console.log('Getting subscriptions...');
     }
-    console.log(subscriptions);
+    console.log({subscriptions});
   }, [connected, getSubscriptions]);
 
   useEffect(() => {
@@ -80,7 +81,7 @@ const useInAppPurchase = () => {
         console.log('RECEIPT: ', receipt);
         if (receipt) {
           // Give full app access
-          if (!state.isSubscribed) createSubscription(receipt);
+          if (!state.isSubscribed && currentUser) createSubscription(receipt);
           try {
             const ackResult = await finishTransaction({
               purchase,
@@ -125,7 +126,7 @@ const useInAppPurchase = () => {
             (requestSubscriptionIAP[0]?.transactionReceipt ||
               requestSubscriptionIAP?.transactionReceipt)
           ) {
-            console.log('RECEIPT', requestSubscriptionIAP);
+            console.log('RECEIPT:::', requestSubscriptionIAP);
           }
         })
         .catch(error => {
@@ -135,22 +136,23 @@ const useInAppPurchase = () => {
           setIsSubscribing(false);
         });
 
-      console.log('Purchasing products::', data);
+      console.log('Purchasing products:::', data);
     }
     // If we are connected but have no products returned, try to get products and purchase.
     else {
       setIsSubscribing(true);
       console.log('No products. Now trying to get some...', itemSKUs);
       try {
-        const prods = await getProducts({skus: itemSKUs});
+        const prods = await getSubscriptions({skus: itemSKUs});
         console.log('Got products, now purchasing...', prods);
-        await requestSubscription({
+        const subscriptionState = await requestSubscription({
           sku: itemSKUs[0],
         });
+        console.log('Purchased successfully', subscriptionState);
       } catch (error) {
         setConnectionErrorMsg('تأكد أن كنت متصل بالانترنت');
         console.log('Everything failed. Error: ', error);
-        Alert.alert(JSON.stringify(error.message));
+        Alert.alert(error?.message ?? JSON.stringify(error));
       } finally {
         setIsSubscribing(false);
       }

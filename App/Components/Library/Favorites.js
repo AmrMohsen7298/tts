@@ -11,13 +11,15 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useSelector } from 'react-redux';
 import { getLessonById } from '../../Services/LessonServices';
 
+import { faHeart } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useIsFocused } from '@react-navigation/native';
+import { tabsNamesMapper } from '../../Screens/HomeScreen';
 import { useStateValue } from '../../store/contextStore/StateContext';
-import { levels } from '../../Utils/constants';
+import { tabs } from '../../Utils/constants';
 const {width, height} = Dimensions.get('window');
 export default function Favorites() {
   const navigation = useNavigation();
@@ -28,20 +30,6 @@ export default function Favorites() {
   const {state, dispatch} = useStateValue();
   const favorites = useSelector(state => state.storyReducer.favorites);
   const [favoritesLocal, setFavoritesLocal] = useState([]);
-  const tabs = [
-    levels.A1,
-    levels.A2,
-    levels.A3,
-    levels.A4,
-    levels.A5,
-    levels.A6,
-    levels.B1,
-    levels.B2,
-    levels.B3,
-    levels.C1,
-    levels.C2,
-    levels.C3,
-  ];
 
   useEffect(() => {
     console.log(favorites);
@@ -76,7 +64,7 @@ export default function Favorites() {
     if (!isSubscribed && isLessonPaid) {
       Alert.alert(
         'عملية غير مقبولة',
-        'يجب تسجيل الدخول و الاشتراك للحصول على هذا الدرس',
+        'يجب الاشتراك للحصول على هذا الدرس',
       );
       return;
     }
@@ -114,11 +102,9 @@ export default function Favorites() {
           <View
             style={{
               display: 'flex',
-
               flexDirection: 'row',
               gap: 1,
               justifyContent: 'flex-end',
-
               borderRadius: 6,
               padding: 5,
               left: '3%',
@@ -130,7 +116,7 @@ export default function Favorites() {
                 color: 'black',
                 paddingRight: '15%',
               }}>
-              بحث بالمستوي : كل
+              بحث بالمستوي : {tabsNamesMapper[activeTab]}{' '}
             </Text>
           </View>
           <View style={styles.tabsContainer}>
@@ -138,12 +124,12 @@ export default function Favorites() {
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.tabsContentContainer}>
-              {tabs.map((tab, index) => (
+              {tabs.slice(0, 6).map((tab, index) => (
                 <TouchableOpacity
                   key={index}
                   style={[styles.tab, activeTab === index && styles.activeTab]}
                   onPress={() => setActiveTab(index)}>
-                  <Text style={styles.tabText}>{tab.text}</Text>
+                  <Text style={styles.tabText}>{tabsNamesMapper[index]}</Text>
                 </TouchableOpacity>
               ))}
             </ScrollView>
@@ -153,53 +139,60 @@ export default function Favorites() {
               horizontal={false}
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{paddingHorizontal: 10, gap: 12}}>
-              {lessons.map((lesson, index) => (
-                <TouchableOpacity
-                  key={index}
-                  onPress={() =>
-                    handleOnPress(
-                      lesson?.id,
-                      'data:image/png;base64,' + lesson?.image,
-                    )
-                  }>
-                  <View style={styles.Cardcontainer}>
-                    <View style={styles.card}>
-                      <Image
-                        source={{uri: 'data:image/png;base64,' + lesson?.image}}
-                        style={styles.image}
-                      />
-                      <View
-                        style={{
-                          flex: 0,
-                          flexDirection: 'col',
-                          overflow: 'hidden',
-                          gap: 10,
-                        }}>
-                        <View style={styles.text_container}>
-                          <Text style={styles.title}>{lesson?.title}</Text>
-                          <Text style={styles.description}>
-                            {lesson?.description}
-                          </Text>
-                        </View>
-                        <View
-                          style={{
-                            flexDirection: 'row',
-                            justifyContent: 'flex-end',
-                            alignItems: 'center',
-                            gap: 120,
-                          }}>
-                          <Text style={styles.date}>1 ابريل 2024</Text>
-                          <MaterialIcons
-                            name="favorite"
-                            size={22}
-                            color="red"
+              <View style={styles.Cardcontainer}>
+                {lessons.map(
+                  (lesson, index) =>
+                    tabs[activeTab] == lesson.level && (
+                      <TouchableOpacity
+                        key={index}
+                        onPress={() =>
+                          handleOnPress(
+                            lesson?.id,
+                            'data:image/png;base64,' + lesson?.image,
+                          )
+                        }>
+                        <View style={styles.card}>
+                          <Image
+                            source={{
+                              uri: 'data:image/png;base64,' + lesson?.image,
+                            }}
+                            style={styles.image}
                           />
+                          <View
+                            style={{
+                              flex: 0,
+                              flexDirection: 'col',
+                              overflow: 'hidden',
+                              alignItems: 'flex-end',
+                              gap: 10,
+                            }}>
+                            <View style={styles.text_container}>
+                              <Text style={styles.title}>{lesson?.title}</Text>
+                              <Text style={styles.description}>
+                                {lesson?.description}
+                              </Text>
+                            </View>
+                            <View
+                              style={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                width: width * 0.5,
+                              }}>
+                              <Text style={styles.date}>{lesson?.date}</Text>
+                              <FontAwesomeIcon
+                                icon={faHeart}
+                                size={22}
+                                color="red"
+                              />
+                            </View>
+                          </View>
                         </View>
-                      </View>
-                    </View>
-                  </View>
-                </TouchableOpacity>
-              ))}
+                      </TouchableOpacity>
+                    ),
+                )}
+              </View>
             </ScrollView>
           </View>
         </View>
@@ -228,20 +221,19 @@ const styles = StyleSheet.create({
   },
   tab: {
     paddingVertical: 5,
-    paddingHorizontal: 15,
-    marginHorizontal: 5,
+    paddingHorizontal: 7,
+    marginHorizontal: 2,
     borderRadius: 20,
     borderWidth: 1,
     borderColor: 'transparent',
   },
   activeTab: {
+    color: 'white',
     backgroundColor: '#eaaa00',
-    borderColor: 'white',
     borderRadius: 20,
   },
   tabText: {
     fontSize: 17,
-    color: '#333',
   },
 
   image: {
@@ -275,11 +267,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
     color: 'black',
+    direction: 'rtl',
+    textAlign: 'left',
   },
   description: {
     fontSize: 12,
     color: '#666',
     marginTop: 5,
+    direction: 'rtl',
+    textAlign: 'left',
   },
   Cardcontainer: {
     backgroundColor: '#f5f5f5',

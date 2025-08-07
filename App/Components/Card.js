@@ -30,7 +30,7 @@ export default function App(props) {
           <View style={styles.hairlineLeft}></View>
           <Text style={styles.example_title}>الوصف</Text>
           <Text style={styles.card_title}>{description}</Text>
-          <View style={styles.innerBox}>
+          {/* <View style={styles.innerBox}>
             <Text style={styles.card_desc}>
               مثال: الرجل، الجبل، المدينة، الكتاب
             </Text>
@@ -48,7 +48,7 @@ export default function App(props) {
             <Text style={styles.card_desc}>
               مثال: الرجل، الجبل، المدينة، الكتاب
             </Text>
-          </View>
+          </View> */}
         </View>
       </View>
     </View>

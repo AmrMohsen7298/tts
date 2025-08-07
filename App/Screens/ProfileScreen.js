@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { auth, db } from '../../firebaseConfig';
+import { auth } from '../../firebaseConfig';
 import login from './../../assets/eye.png';
 import fire from './../../assets/fire.png';
 import user from './../../assets/Images/profile.jpg';
@@ -27,11 +27,11 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
 } from 'firebase/auth';
-import { collection, getDocs, query, where } from 'firebase/firestore';
 import { useDispatch, useSelector } from 'react-redux';
-import { setCurrentUser, setIsSubscribed } from '../Actions/StoryActions';
+import { setCurrentUser } from '../Actions/StoryActions';
 import useInAppPurchase from '../Hooks/useInAppPurchase';
 import { useStateValue } from '../store/contextStore/StateContext';
+import { checkIosSubscription } from './HomeScreen';
 
 const {width, height} = Dimensions.get('window');
 
@@ -49,7 +49,7 @@ const ProfileScreen = () => {
   const logout = () => {
     auth?.signOut();
     dispatch(setCurrentUser(null));
-    contextDispatch({type: 'IS_SUBSCRIBED', payload: false});
+    // contextDispatch({type: 'IS_SUBSCRIBED', payload: false});
   };
 
   const deleteAccount = async () => {
@@ -63,7 +63,7 @@ const ProfileScreen = () => {
       .then(() => {
         auth?.signOut();
         dispatch(setCurrentUser(null));
-        contextDispatch({type: 'IS_SUBSCRIBED', payload: false});
+        // contextDispatch({type: 'IS_SUBSCRIBED', payload: false});
       })
       .catch(async error => {
         // Alert.alert('حدث خطأ أثناء مسح الحساب');
@@ -72,7 +72,7 @@ const ProfileScreen = () => {
           .then(() => {
             auth?.signOut();
             dispatch(setCurrentUser(null));
-            contextDispatch({type: 'IS_SUBSCRIBED', payload: false});
+            // contextDispatch({type: 'IS_SUBSCRIBED', payload: false});
           })
           .catch(error => {
             console.log(error);
@@ -102,40 +102,12 @@ const ProfileScreen = () => {
   };
 
   const checkIsSubscribed = async () => {
-    try {
-      if (!currentUser) throw new Error('user not signed in');
-      const now = new Date().getTime();
-
-      const q = query(
-        collection(db, 'subscriptions'),
-        where('uid', '==', currentUser.uid),
-        where('endDateTimestamp', '>', now),
-      );
-      const querySnapshot = await getDocs(q);
-
-      if (querySnapshot.empty) {
-        contextDispatch({type: 'IS_SUBSCRIBED', payload: false});
-        console.log('NOT SUBSCRIBED');
-        return;
-      }
-
-      const subscriptions = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      if (subscriptions.some(doc => +doc.endDateTimestamp > now)) {
-        contextDispatch({type: 'IS_SUBSCRIBED', payload: true});
-        console.log(subscriptions);
-        console.log('SUBSCRIBED');
-      } else {
-        dispatch(setIsSubscribed(false));
-        contextDispatch({type: 'IS_SUBSCRIBED', payload: false});
-        console.log('NOT SUBSCRIBED');
-      }
-    } catch (e) {
-      console.log(e.message ?? 'user not signed in');
-    }
+    const isSubscribed = await checkIosSubscription();
+    console.log('IS_SUBSCRIBED_asfdsaf', isSubscribed);
+    contextDispatch({
+      type: 'IS_SUBSCRIBED',
+      payload: isSubscribed,
+    });
   };
 
   const reAuthUser = async () => {
@@ -531,12 +503,12 @@ const ProfileScreen = () => {
             }}>
             <Pressable
               onPress={() => {
-                if (currentUser?.uid) subscribeToApp();
-                else
-                  Alert.alert(
-                    'عملية غير مقبولة',
-                    'يجب تسجيل الدخول أو إنشاء حساب لتتمكن من الاشتراك',
-                  );
+                try {
+                  subscribeToApp();
+                } catch (e) {
+                  console.log(e);
+                  Alert.alert('حدث خطأ', e?.message ?? JSON.stringify(e));
+                }
               }}>
               {isSubscribing ? (
                 <View
@@ -593,6 +565,7 @@ const ProfileScreen = () => {
             }}>
             <Pressable
               onPress={() => {
+                // console.log('fsafsaf', state, currentUser);
                 setShowSubscribeCTAScreen(true);
               }}>
               {isSubscribing ? (
@@ -658,21 +631,6 @@ const ProfileScreen = () => {
 
       <View style={styles.hairlineLeft}></View>
 
-      {/* <View>
-        <Pressable
-          onPress={() => {
-            // console.log(auth.currentUser);
-            // console.log({
-            //   email: currentUser?.email,
-            //   password: currentUser?.password,
-            // });
-            // console.log("");
-            // checkIsSubscribed()
-            console.log({isLoggedIn, viewLoginOrSignupForm, isSubscribed});
-          }}>
-          <Text>TEST</Text>
-        </Pressable>
-      </View> */}
       <View
         style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
         <Text

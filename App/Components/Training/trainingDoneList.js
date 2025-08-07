@@ -1,12 +1,14 @@
-import {faDumbbell} from '@fortawesome/free-solid-svg-icons';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {useNavigation} from '@react-navigation/native';
-import {useEffect} from 'react';
-import {View, Text, Pressable, StyleSheet, Dimensions} from 'react-native';
-import {ScrollView} from 'react-native-gesture-handler';
-import {useDispatch, useSelector} from 'react-redux';
-import {removeWordTraining} from '../../Actions/StoryActions';
+import { faDumbbell } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { useNavigation } from '@react-navigation/native';
+import { useEffect } from 'react';
+import { Dimensions, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
+import { useDispatch, useSelector } from 'react-redux';
 import PLAYGREY from '../../../assets/play-grey.png';
+import { removeWordTraining } from '../../Actions/StoryActions';
+import { tabsNamesMapper } from '../../Screens/HomeScreen';
+import { tabs } from '../../Utils/constants';
 
 const {height, width} = Dimensions.get('screen');
 
@@ -64,7 +66,7 @@ const ListDone = () => {
                   paddingHorizontal: width * 0.015,
                   borderRadius: width * 0.015,
                 }}>
-                A1
+                {tabsNamesMapper[tabs.indexOf(item?.level)]}
               </Text>
               <Text style={{color: '#333', fontSize: 18}}>{item.word}</Text>
               <Text style={{color: '#aaa', fontSize: 18}}>- noun</Text>

@@ -5,10 +5,9 @@ import {
 } from '@fortawesome/free-solid-svg-icons'; // Import specific icons
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { doc, getDoc } from 'firebase/firestore';
 import React, { useEffect } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
-import { db } from '../../firebaseConfig';
+import { checkIosSubscription } from '../Screens/HomeScreen';
 import { useStateValue } from '../store/contextStore/StateContext';
 import LibraryStack from './LibraryStack';
 import StackNavigation from './StackNavigation';
@@ -22,25 +21,11 @@ export default function TabNavigation() {
   const {state, dispatch} = useStateValue();
 
   const checkUserSubscription = async () => {
-    const timestamp = new Date().getMilliseconds();
-    const query = query(collection(db, 'subscriptions'), where('timestamp', '<', timestamp));
-    const docRef = doc(db, 'subscriptions', userId);
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-      const userSubscription = docSnap.data();
-      if (userSubscription.is_subscribed) {
-        dispatch({
-          type: 'IS_SUBSCRIBED',
-          payload: userSubscription.is_subscribed,
-        });
-      }
-    } else {
-      dispatch({
-        type: 'IS_SUBSCRIBED',
-        payload: false,
-      });
-    }
+    const isSubscribed = await checkIosSubscription();
+    dispatch({
+      type: 'IS_SUBSCRIBED',
+      payload: isSubscribed,
+    });
   };
 
   useEffect(() => {

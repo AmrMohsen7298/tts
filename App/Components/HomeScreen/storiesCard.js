@@ -1,16 +1,16 @@
 import React from 'react';
-import {View, Text, StyleSheet, Image, Dimensions} from 'react-native';
+import { Dimensions, Image, StyleSheet, Text, View } from 'react-native';
 
 // You can import from local files
 
-import {Colors} from '../../Utils/Colors';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
+import { tabsNamesMapper } from '../../Screens/HomeScreen';
+import { tabs } from '../../Utils/constants';
 
 // or any pure javascript modules available in npm
 // import { Card } from "react-native-paper";
 
 const {width, height} = Dimensions.get('window');
-
 export default function App(props) {
   const navigation = useNavigation();
   return (
@@ -18,7 +18,9 @@ export default function App(props) {
       <View style={styles.card_template}>
         <Image style={styles.card_image} source={{uri: props?.image}} />
         <View style={styles.level_container}>
-          <Text style={styles.card_level}>A1</Text>
+          <Text style={styles.card_level}>
+            {tabsNamesMapper[tabs.indexOf(props?.level)]}
+          </Text>
         </View>
         <View style={styles.text_container}>
           <Text style={styles.card_title}>{props?.title}</Text>
@@ -78,7 +80,7 @@ const styles = StyleSheet.create({
   level_container: {
     position: 'absolute',
     alignSelf: 'center',
-    width: '12%',
+    // width: '12%',
     height: '12%',
     textAlign: 'center',
     alignItems: 'center',
@@ -88,7 +90,7 @@ const styles = StyleSheet.create({
     left: '3.5%',
     padding: 5,
     backgroundColor: '#ffffff',
-    opacity: 0.90,
+    opacity: 0.9,
     borderRadius: 50,
   },
 });
