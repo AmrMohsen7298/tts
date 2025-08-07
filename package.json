@@ -37,7 +37,7 @@
     "react": "18.2.0",
     "react-native": "0.74.1",
     "react-native-base64": "^0.2.1",
-    "react-native-circular-progress": "^1.4.0",
+    "react-native-circular-progress": "^1.4.1",
     "react-native-fs": "^2.20.0",
     "react-native-gesture-handler": "~2.14.0",
     "react-native-iap": "^12.15.4",

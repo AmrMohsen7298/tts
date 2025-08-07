@@ -5075,7 +5075,7 @@ __metadata:
     react: 18.2.0
     react-native: 0.74.1
     react-native-base64: ^0.2.1
-    react-native-circular-progress: ^1.4.0
+    react-native-circular-progress: ^1.4.1
     react-native-fs: ^2.20.0
     react-native-gesture-handler: ~2.14.0
     react-native-iap: ^12.15.4
@@ -9628,7 +9628,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-circular-progress@npm:^1.4.0":
+"react-native-circular-progress@npm:^1.4.1":
   version: 1.4.1
   resolution: "react-native-circular-progress@npm:1.4.1"
   dependencies:

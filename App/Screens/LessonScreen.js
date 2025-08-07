@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 // import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from "expo-av";
-import { faHeart } from '@fortawesome/free-solid-svg-icons'; // Import specific icons
+import { faCheck, faHeart } from '@fortawesome/free-solid-svg-icons'; // Import specific icons
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {
   ActivityIndicator,
@@ -14,6 +14,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { AnimatedCircularProgress } from 'react-native-circular-progress';
 // import { faDumbbell, faPlay } from "@fortawesome/free-solid-svg-icons";
 import TRANSLATE from '../../assets/translate.png';
 
@@ -975,7 +976,7 @@ export default function LessonScreen(props) {
                     <Text style={styles.resultsHeaderText}>نتيجتك</Text>
                     <View style={styles.resultsDetailsBox}>
                       <Text style={styles.resultsHeaderText}>
-                        {/* <AnimatedCircularProgress
+                        <AnimatedCircularProgress
                           size={60}
                           width={6}
                           fill={(score / quizData?.length) * 100}
@@ -995,7 +996,7 @@ export default function LessonScreen(props) {
                               {(score / quizData?.length) * 100}%
                             </Text>
                           )}
-                        </AnimatedCircularProgress> */}
+                        </AnimatedCircularProgress>
                       </Text>
                       <View style={styles.correctIncorrect}>
                         <Text style={styles.correctIncorrectText}>
@@ -1275,7 +1276,7 @@ export default function LessonScreen(props) {
           <>
             <View
               style={{...styles.photoContainer, backgroundColor: '#eaaa00'}}>
-              {/* <AnimatedCircularProgress
+              <AnimatedCircularProgress
                 size={150}
                 width={15}
                 fill={((currentIndex + 1) / quizData?.length) * 100}
@@ -1294,7 +1295,7 @@ export default function LessonScreen(props) {
                     )}
                   </Text>
                 )}
-              </AnimatedCircularProgress> */}
+              </AnimatedCircularProgress>
             </View>
           </>
         );
