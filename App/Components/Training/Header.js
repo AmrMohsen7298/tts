@@ -1,27 +1,25 @@
-import React, {useEffect, useState} from 'react';
 import {
-  View,
-  Text,
-  Image,
-  Button,
-  Pressable,
-  StyleSheet,
-  TouchableOpacity,
-  Modal,
-  Alert,
-} from 'react-native';
-import Colors from '../../Utils/Colors';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {
-  faCircleInfo,
   faAngleLeft,
   faCalendar,
   faCheck,
+  faCircleInfo,
 } from '@fortawesome/free-solid-svg-icons';
-import {useNavigation} from '@react-navigation/native';
-import {useDispatch, useSelector} from 'react-redux';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import {
+  Alert,
+  Modal,
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
+import { setUserWords, setWordTraining } from '../../Actions/StoryActions';
 import { getKeyWordsForTraining } from '../../Services/LessonServices';
-import { setUserWords, setWordTraining, setWordsTrainingList } from '../../Actions/StoryActions';
+import Colors from '../../Utils/Colors';
 
 export default function Header() {
   const navigation = useNavigation();

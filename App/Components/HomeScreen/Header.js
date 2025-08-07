@@ -1,8 +1,7 @@
-import { View, Text, Image, TouchableOpacity , StyleSheet} from 'react-native'; // Correct import statement
-import React from 'react';
-import user from './../../../assets/Images/profile.jpg';
-import Colors from '../../Utils/Colors';
 import { useNavigation } from "@react-navigation/native";
+import React from 'react';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'; // Correct import statement
+import user from './../../../assets/Images/profile.jpg';
 
 
 export default function Header() {

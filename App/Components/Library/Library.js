@@ -1,21 +1,16 @@
+import React from 'react';
 import {
-  View,
-  Text,
-  Image,
-  Button,
-  Pressable,
-  StyleSheet,
-  TouchableOpacity,
-  Modal,
   Dimensions,
-  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
-import React, {useState} from 'react';
-import Colors from '../../Utils/Colors';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {useNavigation} from '@react-navigation/native';
+// import Colors from '../../Utils/Colors';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { useNavigation } from '@react-navigation/native';
 
-import {useSelector} from 'react-redux';
+import { useSelector } from 'react-redux';
 export default function Library() {
   const navigator = useNavigation();
   const {favorites, learned} = useSelector(state => state.storyReducer);

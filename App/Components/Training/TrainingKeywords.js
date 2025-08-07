@@ -1,24 +1,22 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  TouchableHighlight,
   Dimensions,
+  Image,
   Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
-import user from './../../../assets/Images/userProfile.jpg';
-import Colors from '../../Utils/Colors';
-import {useDispatch, useSelector} from 'react-redux';
-import {setUserWords, setWordTraining} from '../../Actions/StoryActions';
-import {useNavigation} from '@react-navigation/native';
-import RNFetchBlob from 'rn-fetch-blob';
+// import Colors from '../../Utils/Colors';
+import { useNavigation } from '@react-navigation/native';
 import Sound from 'react-native-sound';
+import { useDispatch, useSelector } from 'react-redux';
+import RNFetchBlob from 'rn-fetch-blob';
 import FILETRAYFULL from '../../../assets/file-tray-full.png';
-import VOLUMEHIGHOUTLINE from '../../../assets/volume-high-outline.png';
 import REPEAT from '../../../assets/repeat.png';
+import VOLUMEHIGHOUTLINE from '../../../assets/volume-high-outline.png';
+import { setUserWords } from '../../Actions/StoryActions';
 
 const {width, height} = Dimensions.get('screen');
 

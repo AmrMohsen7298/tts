@@ -1,7 +1,7 @@
-import { View, Text ,Image, TouchableOpacity} from 'react-native'
-import React from 'react'
-import app from './../../assets/splash.png'
-import Colors from '../Utils/Colors'
+import React from 'react';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
+import Colors from '../Utils/Colors';
+import app from './../../assets/splash.png';
 export default function LoginScreen() {
   return (
     <View style={{display:'flex',alignItems:'center',width:'100%'}}>

@@ -4,7 +4,6 @@ import { Platform } from 'react-native';
 import { requestPurchase, requestSubscription, useIAP } from 'react-native-iap';
 import { useDispatch, useSelector } from 'react-redux';
 import { db } from '../../firebaseConfig';
-import { setIsSubscribed } from '../Actions/StoryActions';
 import { useStateValue } from '../store/contextStore/StateContext';
 
 // Play store item Ids
@@ -38,8 +37,8 @@ const useInAppPurchase = () => {
   const createSubscription = async receipt => {
     try {
       const docRef = await addDoc(collection(db, 'subscriptions'), {
-        uid,
-        email,
+        uid: uid ?? 0,
+        email: email ?? '',
         receipt: receipt,
         timestamp: new Date().getTime(),
         endDateTimestamp: new Date().getTime() + 60 * 60 * 24 * 30 * 1000,
@@ -57,11 +56,12 @@ const useInAppPurchase = () => {
       console.log('itemsSkus', itemSKUs);
       let sub = async () => {
         let subs = await getSubscriptions({skus: itemSKUs});
+        console.log('Current Subscriptions: ', subs);
       };
       sub();
       console.log('Getting subscriptions...');
     }
-    console.log(subscriptions);
+    console.log({subscriptions});
   }, [connected, getSubscriptions]);
   useEffect(() => {
     if (subscriptions) {
@@ -120,14 +120,14 @@ const useInAppPurchase = () => {
             (requestSubscriptionIAP[0]?.transactionReceipt ||
               requestSubscriptionIAP?.transactionReceipt)
           ) {
-            console.log('RECEIPT', requestSubscriptionIAP);
+            console.log('RECEIPT:::', requestSubscriptionIAP);
           }
         })
         .catch(error => {
           return error;
         });
 
-      console.log('Purchasing products::', data);
+      console.log('Purchasing products:::', data);
     }
     // If we are connected but have no products returned, try to get products and purchase.
     else {
@@ -139,6 +139,7 @@ const useInAppPurchase = () => {
       } catch (error) {
         setConnectionErrorMsg('Please check your internet connection');
         console.log('Everything failed. Error: ', error);
+        Alert.alert(error?.message ?? JSON.stringify(error));
       }
     }
   };

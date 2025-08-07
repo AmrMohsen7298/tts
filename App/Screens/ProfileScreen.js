@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { auth, db } from '../../firebaseConfig';
+import { auth } from '../../firebaseConfig';
 import login from './../../assets/eye.png';
 import fire from './../../assets/fire.png';
 import user from './../../assets/Images/profile.jpg';
@@ -25,11 +25,11 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
 } from 'firebase/auth';
-import { collection, getDocs, query, where } from 'firebase/firestore';
 import { useDispatch, useSelector } from 'react-redux';
-import { setCurrentUser, setIsSubscribed } from '../Actions/StoryActions';
+import { setCurrentUser } from '../Actions/StoryActions';
 import useInAppPurchase from '../Hooks/useInAppPurchase';
 import { useStateValue } from '../store/contextStore/StateContext';
+import { checkIosSubscription } from './HomeScreen';
 
 const {width, height} = Dimensions.get('window');
 
@@ -45,44 +45,65 @@ const ProfileScreen = () => {
   const logout = () => {
     auth?.signOut();
     dispatch(setCurrentUser(null));
-    contextDispatch({type: 'IS_SUBSCRIBED', payload: false});
+    // contextDispatch({type: 'IS_SUBSCRIBED', payload: false});
+  };
+
+  const deleteAccount = async () => {
+    const user = auth.currentUser;
+
+    if (!user) {
+      Alert.alert('لا يوجد مستخدم مسجل الدخول');
+      return;
+    }
+    await deleteUser(user)
+      .then(() => {
+        auth?.signOut();
+        dispatch(setCurrentUser(null));
+        // contextDispatch({type: 'IS_SUBSCRIBED', payload: false});
+      })
+      .catch(async error => {
+        // Alert.alert('حدث خطأ أثناء مسح الحساب');
+        await reAuthUser();
+        await deleteUser(auth.currentUser)
+          .then(() => {
+            auth?.signOut();
+            dispatch(setCurrentUser(null));
+            // contextDispatch({type: 'IS_SUBSCRIBED', payload: false});
+          })
+          .catch(error => {
+            console.log(error);
+            Alert.alert('حدث خطأ أثناء مسح الحساب');
+          });
+      });
+  };
+
+  const showConfirmation = () => {
+    Alert.alert(
+      'تأكيد', // Title
+      'هل أنت متأكد أنك تريد مسح الحساب؟', // Message
+      [
+        {
+          text: 'إلغاء',
+          style: 'cancel',
+        },
+        {
+          text: 'نعم',
+          onPress: () => {
+            deleteAccount();
+          },
+        },
+      ],
+      {cancelable: false},
+    );
   };
 
   const checkIsSubscribed = async () => {
-    try {
-      if (!currentUser) throw new Error('user not signed in');
-      const now = new Date().getTime();
-
-      const q = query(
-        collection(db, 'subscriptions'),
-        where('uid', '==', currentUser.uid),
-        where('endDateTimestamp', '>', now),
-      );
-      const querySnapshot = await getDocs(q);
-
-      if (querySnapshot.empty) {
-        contextDispatch({type: 'IS_SUBSCRIBED', payload: false});
-        console.log('NOT SUBSCRIBED');
-        return;
-      }
-
-      const subscriptions = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      if (subscriptions.some(doc => +doc.endDateTimestamp > now)) {
-        contextDispatch({type: 'IS_SUBSCRIBED', payload: true});
-        console.log(subscriptions);
-        console.log('SUBSCRIBED');
-      } else {
-        dispatch(setIsSubscribed(false));
-        contextDispatch({type: 'IS_SUBSCRIBED', payload: false});
-        console.log('NOT SUBSCRIBED');
-      }
-    } catch (e) {
-      console.log(e.message ?? 'user not signed in');
-    }
+    const isSubscribed = await checkIosSubscription();
+    console.log('IS_SUBSCRIBED_asfdsaf', isSubscribed);
+    contextDispatch({
+      type: 'IS_SUBSCRIBED',
+      payload: isSubscribed,
+    });
   };
 
   const reAuthUser = () => {
@@ -170,17 +191,21 @@ const ProfileScreen = () => {
 
   const ReaderTrakerCard = ({title, storiesCount}) => {
     return (
-      <View style={styles.card}>
-        <Text style={styles.header}>{title}</Text>
-        <View style={styles.row}>
-          <Text style={styles.counter}>{storiesCount}</Text>
-          <Text style={styles.label}>القصص المقروءة</Text>
+      <SafeAreaView>
+        <View style={styles.card}>
+          <Text style={styles.header}>{title}</Text>
+          <View style={styles.row}>
+            <Text style={styles.counter}>{storiesCount}</Text>
+            <Text style={styles.label}>القصص المقروءة</Text>
+          </View>
+          <View style={styles.col}>
+            <MaterialCommunityIcons name="calendar" size={24} color="black" />
+            <Text style={styles.calendarLabel}>
+              قم بتسجيل الدخول لتتبع تقدمك
+            </Text>
+          </View>
         </View>
-        <View style={styles.col}>
-          <MaterialCommunityIcons name="calendar" size={24} color="black" />
-          <Text style={styles.calendarLabel}>قم بتسجيل الدخول لتتبع تقدمك</Text>
-        </View>
-      </View>
+      </SafeAreaView>
     );
   };
 
@@ -341,6 +366,171 @@ const ProfileScreen = () => {
     );
   };
 
+  const SubscribeCTAScreen = () => {
+    return (
+      <SafeAreaView
+        style={{
+          width: width,
+          height: height,
+          backgroundColor: '#12a586',
+        }}>
+        <View
+          style={{
+            paddingTop: height * 0.1,
+            paddingLeft: width * 0.1,
+            paddingRight: width * 0.1,
+          }}>
+          <View
+            style={{
+              borderRadius: width * 0.2,
+              backgroundColor: 'white',
+              marginBottom: height * 0.03,
+            }}>
+            <Text
+              style={{
+                width: width * 0.8,
+                marginBottom: 10,
+                marginTop: 10,
+                textAlign: 'center',
+                color: '#12a586',
+                fontSize: width * 0.07,
+                fontWeight: 'bold',
+              }}>
+              إشترك الآن و احصل على
+            </Text>
+          </View>
+          <Text
+            style={{
+              color: 'white',
+              fontSize: width * 0.05,
+              textAlign: 'right',
+              marginBottom: height * 0.02,
+            }}>
+            * تعلم قصة جديدة كل يوم
+          </Text>
+          <Text
+            style={{
+              color: 'white',
+              fontSize: width * 0.05,
+              textAlign: 'right',
+              marginBottom: height * 0.02,
+            }}>
+            * الوصول إلي مكتبة قصص تحتوي علي اكثر من 2000 قصة
+          </Text>
+          <Text
+            style={{
+              color: 'white',
+              fontSize: width * 0.05,
+              textAlign: 'right',
+              marginBottom: height * 0.02,
+            }}>
+            * إستمع إلي القصة بصوت ناطق باللغة العربية
+          </Text>
+          <Text
+            style={{
+              color: 'white',
+              fontSize: width * 0.05,
+              textAlign: 'right',
+              marginBottom: height * 0.02,
+            }}>
+            * تصفع مئات من دروس النحو و الإختبارات التفاعلية
+          </Text>
+          <Text
+            style={{
+              color: 'white',
+              fontSize: width * 0.05,
+              textAlign: 'right',
+              marginBottom: height * 0.02,
+            }}>
+            * إتقن الكلمات و العبارات من خلال الكروت السريعة
+          </Text>
+          <View
+            style={{
+              padding: width * 0.05,
+              marginTop: height * 0.03,
+              backgroundColor: '#ffffff50',
+              borderRadius: width * 0.02,
+            }}>
+            <Text
+              style={{
+                color: 'white',
+                textAlign: 'center',
+                fontSize: width * 0.05,
+                fontWeight: 'bold',
+              }}>
+              فقط 9.99 جنيه شهرياً
+            </Text>
+          </View>
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}>
+            <Text
+              style={{color: 'white', padding: '4%'}}
+              onPress={() =>
+                Linking.openURL(
+                  'https://belarabi.equant-tech.com/privacypolicy.html',
+                )
+              }>
+              Privacy policy
+            </Text>
+            <Text
+              style={{color: 'white', padding: '4%'}}
+              onPress={() =>
+                Linking.openURL(
+                  'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/',
+                )
+              }>
+              Terms of use
+            </Text>
+          </View>
+          <View
+            style={{
+              ...styles.accountTypeContainer,
+              ...styles.subscribe,
+              opacity: isSubscribing ? 0.7 : 1,
+            }}>
+            <Pressable
+              onPress={() => {
+                try {
+                  subscribeToApp();
+                } catch (e) {
+                  console.log(e);
+                  Alert.alert('حدث خطأ', e?.message ?? JSON.stringify(e));
+                }
+              }}>
+              {isSubscribing ? (
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row-reverse',
+                    gap: 10,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    opacity: 0.7,
+                  }}>
+                  <Text style={styles.subscribeText} disabled={isSubscribing}>
+                    إشترك الآن
+                  </Text>
+                  <ActivityIndicator size="small" color="#ffffff" />
+                </View>
+              ) : (
+                <Text style={styles.subscribeText}>إشترك الآن</Text>
+              )}
+            </Pressable>
+          </View>
+          <Text style={{color: 'white', textAlign: 'center'}}>
+            محمي من خلال Play Store
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  };
+
+  if (showSubscribeCTAScreen && !isSubscribed) return <SubscribeCTAScreen />;
   if (!isLoggedIn && viewLoginOrSignupForm === 'login') return <LoginForm />;
   if (!isLoggedIn && viewLoginOrSignupForm === 'signup') return <SignupForm />;
 
@@ -360,14 +550,27 @@ const ProfileScreen = () => {
           <View style={{...styles.accountTypeContainer, ...styles.subscribe}}>
             <Pressable
               onPress={() => {
-                if (currentUser?.uid) subscribeToApp();
-                else
-                  Alert.alert(
-                    'عملية غير مقبولة',
-                    'يجب تسجيل الدخول أو إنشاء حساب لتتمكن من الاشتراك',
-                  );
+                // console.log('fsafsaf', state, currentUser);
+                setShowSubscribeCTAScreen(true);
               }}>
-              <Text style={styles.subscribeText}>إشترك الآن</Text>
+              {isSubscribing ? (
+                <View
+                  style={{
+                    ...styles.loadingContainer,
+                    flex: 1,
+                    flexDirection: 'row',
+                    gap: 10,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  <Text style={styles.subscribeText} disabled={isSubscribing}>
+                    إشترك الآن
+                  </Text>
+                  <ActivityIndicator size="small" color="#ffffff" />
+                </View>
+              ) : (
+                <Text style={styles.subscribeText}>إشترك الآن</Text>
+              )}
             </Pressable>
           </View>
         )}
@@ -410,22 +613,8 @@ const ProfileScreen = () => {
 
       <View style={styles.hairlineLeft}></View>
 
-      {/* <View>
-        <Pressable
-          onPress={() => {
-            // console.log(auth.currentUser);
-            // console.log({
-            //   email: currentUser?.email,
-            //   password: currentUser?.password,
-            // });
-            // console.log("");
-            // checkIsSubscribed()
-            console.log({isLoggedIn, viewLoginOrSignupForm, isSubscribed});
-          }}>
-          <Text>TEST</Text>
-        </Pressable>
-      </View> */}
-      <View>
+      <View
+        style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
         <Text
           style={{color: 'blue', padding: '8%'}}
           onPress={() =>

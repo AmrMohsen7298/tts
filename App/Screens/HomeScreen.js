@@ -1,5 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useEffect, useState, useRef } from 'react';
+import { onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -14,18 +15,69 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { getReceiptIOS } from 'react-native-iap';
 import { useSelector } from 'react-redux';
 import CIRCLECHECK from '../../assets/circle-check.png';
 import GIFT from '../../assets/gift.png';
+import { auth } from '../../firebaseConfig';
 import Header from '../Components/HomeScreen/Header';
 import LevelsCard from '../Components/HomeScreen/levelsCard';
 import StoriesCard from '../Components/HomeScreen/storiesCard';
-import { getAllLessons, getLessonById, getFreeLessons } from '../Services/LessonServices';
+import { getAllLessons, getFreeLessons, getLessonById } from '../Services/LessonServices';
 import { levels } from '../Utils/constants';
 import { useStateValue } from '../store/contextStore/StateContext';
-import { auth } from '../../firebaseConfig';
-import { onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
 const {width, height} = Dimensions.get('window');
+
+export const checkIosSubscription = async () => {
+  const receipt = await getReceiptIOS({forceRefresh: true});
+
+  if (!receipt) return false;
+
+  // const receiptRawData = await fetch(
+  //   'https://sandbox.itunes.apple.com/verifyReceipt',
+  //   {
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //     method: 'POST',
+  //     body: JSON.stringify({
+  //       'receipt-data': receipt,
+  //       password: 'd3b4c38539554446a92839184c748367',
+  //     }),
+  //   },
+  // );
+
+  const receiptRawData = await fetch(
+    'https://checkiphonereceipt-npuzkgg7pq-uc.a.run.app',
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      method: 'POST',
+      body: JSON.stringify({receipt}),
+    },
+  );
+
+  const receiptData = await receiptRawData.json();
+
+  return (
+    receiptData?.status === 0 &&
+    receiptData.latest_receipt_info.some(
+      r =>
+        Number(r.purchase_date_ms) + 30 * 24 * 60 * 60 * 1000 > Date.now() &&
+        r.product_id === 'ttsbelarabi',
+    )
+  );
+};
+
+export const tabsNamesMapper = [
+  'المستوى الأول',
+  'المستوى الثاني',
+  'المستوى الثالث',
+  'المستوى الرابع',
+  'المستوى الخامس',
+  'المستوى السادس',
+];
 
 export default function HomeScreen() {
   const navigation = useNavigation();
@@ -54,7 +106,7 @@ export default function HomeScreen() {
     levels.B3,
     levels.C1,
     levels.C2,
-    levels.C3,
+    // levels.C3,
   ];
 
     useEffect(() => {
@@ -267,7 +319,7 @@ export default function HomeScreen() {
         reAuthUser();
     }, [currentUser]);
 
-  const handleOnPress = (lessonId, lessonImage) => {
+  const handleOnPress = (lessonId, level, lessonImage) => {
     const isSubscribed = state.isSubscribed;
     const isLessonPaid = lessons.find(lesson => lesson.id === lessonId).paid;
       if (!isSubscribed && isLessonPaid) {
@@ -280,24 +332,26 @@ export default function HomeScreen() {
       }
     
     getLessonById(lessonId).then(resp => {
-      navigation.navigate('LessonScreen', {lessonId, image: lessonImage});
+      navigation.navigate('LessonScreen', {lessonId, level, image: lessonImage});
     });
     };
 
-    const handleOnPressFree = (lessonId, lessonImage) => {
-        const isSubscribed = state.isSubscribed;
-        const isLessonPaid = freeLessons.find(lesson => lesson.id === lessonId).paid;
-        if (!isSubscribed && isLessonPaid) {
-            Alert.alert(
-                'عملية غير مقبولة',
-                'يجب تسجيل الدخول و الاشتراك للحصول على هذا الدرس',
-            );
-            return;
-        }
-        getLessonById(lessonId).then(resp => {
-            navigation.navigate('LessonScreen', { lessonId, image: lessonImage });
-        });
-    };
+  const handleOnPressFree = (lessonId, level, lessonImage) => {
+    const isSubscribed = state.isSubscribed;
+    const isLessonPaid = freeLessons.find(
+      lesson => lesson.id === lessonId,
+    ).paid;
+    if (!isSubscribed && isLessonPaid) {
+      Alert.alert(
+        'عملية غير مقبولة',
+        'يجب الاشتراك للحصول على هذا الدرس',
+      );
+      return;
+    }
+    getLessonById(lessonId).then(resp => {
+      navigation.navigate('LessonScreen', {lessonId, level, image: lessonImage});
+    });
+  };
 
   const HorizontalFlatList = () => {
       return (
@@ -314,53 +368,47 @@ export default function HomeScreen() {
         showsHorizontalScrollIndicator={false}
         renderItem={({item, index}) =>
             !item.paid && (
-
-            <Pressable
-                    style={{
-                        paddingRight: index !== freeLessons.length - 1 ? width * 0.03 : 0,
-              }}
-              onPress={() =>
-                  handleOnPressFree(item.id, 'data:image/png;base64,' + item.image)
-              }>
-              <StoriesCard
-                title={item.title}
-                description={item.description}
-                image={'data:image/png;base64,' + item.image}
-              />
-                </Pressable>
-
-          )
-        }
-
-              />
-              <View   style={styles.loginButtonContainer}>
-                  <Pressable
-                      style={{
-                          ...styles.button, width: '100%', marginTop: width * 0.02,
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                      }}
-                      onPress={() => increaseFreePage()}
-                      disabled={loadingMore}
-                  >
-                      {loadingMore ? (
-
-                          <ActivityIndicator size="small" color="black" />
-
-                      ) : (
-
-                          <Text style={styles.buttonText}>المزيد</Text>
-
-                      )}
-
-                  
-                      
-
-                      
-                  </Pressable>
-              </View>
-          </View>
-
+              <Pressable
+                style={{
+                  paddingRight:
+                    index !== freeLessons.length - 1 ? width * 0.03 : 0,
+                }}
+                onPress={() =>
+                  handleOnPressFree(
+                    item.id,
+                    item.level,
+                    'data:image/png;base64,' + item.image,
+                  )
+                }>
+                <StoriesCard
+                  title={item.title}
+                  description={item.description}
+                  level={item.level}
+                  image={'data:image/png;base64,' + item.image}
+                />
+              </Pressable>
+            )
+          }
+        />
+        <View style={styles.loginButtonContainer}>
+          <Pressable
+            style={{
+              ...styles.button,
+              width: '100%',
+              marginTop: width * 0.02,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+            onPress={() => increaseFreePage()}
+            disabled={loadingMore}>
+            {loadingMore ? (
+              <ActivityIndicator size="small" color="black" />
+            ) : (
+              <Text style={styles.buttonText}>المزيد</Text>
+            )}
+          </Pressable>
+        </View>
+      </View>
     );
   };
 
@@ -370,7 +418,7 @@ export default function HomeScreen() {
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.tabsContentContainer}>
-        {tabs.map((tab, index) => (
+        {tabs.slice(0, 6).map((tab, index) => (
           <TouchableOpacity
             key={index}
             style={[styles.tab, activeTab.current === tab && styles.activeTab]}
@@ -379,7 +427,7 @@ export default function HomeScreen() {
               style={
                 activeTab.current === tab ? styles.tabTextActive : styles.tabText
               }>
-              {tab.text}
+              {tabsNamesMapper[index]}
             </Text>
           </TouchableOpacity>
         ))}
@@ -474,16 +522,14 @@ export default function HomeScreen() {
             <View
               style={{
                 display: 'flex',
-
                 flexDirection: 'row',
                 gap: 10,
-                justifyContent: 'flex-end',
-
+                justifyContent: 'space-between',
+                alignItems: 'center',
                 borderRadius: '',
-                padding: '5%',
-                // left: '3%',
+                padding: width * 0.05,
               }}>
-              <View style={{paddingRight: width * 0.28}}>
+              <View>
                 <TouchableOpacity
                   style={hideLearned ? styles.activeLearned : styles.hideButton}
                   onPress={() => setHideLearned(!hideLearned)}>
@@ -494,7 +540,7 @@ export default function HomeScreen() {
                       color: '#33333395',
                     }}>
                     {/* <FontAwesomeIcon
-                      name={faCheckCircle}
+                      name={faCheck}
                       size={18}
                       color="#33333395"
                     /> */}
@@ -508,7 +554,8 @@ export default function HomeScreen() {
               </View>
               <Text
                 style={{fontFamily: 'outfit', fontSize: 17, color: 'black'}}>
-                بحث بالمستوي : كل
+                بحث بالمستوي :{' '}
+                {tabsNamesMapper[tabs.indexOf(activeTab.current)]}
               </Text>
             </View>
 
@@ -538,12 +585,15 @@ export default function HomeScreen() {
                           onPress={() =>
                             handleOnPress(
                               lesson?.id,
+                              lesson?.level,
                               'data:image/png;base64,' + lesson?.image,
                             )
                           }>
                           <View>
                             <LevelsCard
+                              lessonId={lesson?.id}
                               title={lesson?.title}
+                              level={lesson?.level}
                               description={lesson?.description}
                               image={'data:image/png;base64,' + lesson?.image}
                                key={index}

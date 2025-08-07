@@ -1,11 +1,21 @@
-import React from 'react';
-import {View, Text, StyleSheet, Image, Dimensions} from 'react-native';
+import React, { useState } from 'react';
+import {
+  Dimensions,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 // import Constants from "expo-constants";
-import Entypo from 'react-native-vector-icons/Entypo';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+// import Entypo from 'react-native-vector-icons/Entypo';
+import { faHeart, faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { useDispatch, useSelector } from 'react-redux';
+import { addFavorite, removeFavorite } from '../../Actions/StoryActions';
+import { tabsNamesMapper } from '../../Screens/HomeScreen';
+import { levels } from '../../Utils/constants';
 // You can import from local files
-import pic from '../../../assets/Images/bird.jpg';
-import Colors from '../../Utils/Colors';
 
 // or any pure javascript modules available in npm
 // import { Card } from "react-native-paper";
@@ -13,14 +23,55 @@ import Colors from '../../Utils/Colors';
 const {width, height} = Dimensions.get('window');
 
 export default function App(props) {
+  const favorites = useSelector(state => state.storyReducer.favorites);
+  const dispatch = useDispatch();
+  const [favoriteButton, setfavoriteButton] = useState(
+    favorites.some(id => id == props?.lessonId),
+  );
+
+  const setFavorites = (flag, lessonId) => {
+    if (!favorites) {
+      favorites = [];
+    } else {
+      if (flag) {
+        dispatch(addFavorite(lessonId));
+      } else {
+        dispatch(removeFavorite(lessonId));
+      }
+
+      setfavoriteButton(!favoriteButton);
+    }
+  };
+
+  const tabs = [
+    levels.A1.text,
+    levels.A2.text,
+    levels.A3.text,
+    levels.A4.text,
+    levels.A5.text,
+    levels.A6.text,
+    levels.B1.text,
+    levels.B2.text,
+    levels.B3.text,
+    levels.C1.text,
+    levels.C2.text,
+  ];
+
   return (
     <View style={styles.container}>
       <View style={styles.card_template}>
-              <Image style={styles.card_image} source={{ uri: props?.image }} />
-              {props.showLock && (
-                  <View style={styles.lock_container}>
-                      <Entypo name="lock" size={15} color="white" />
-                  </View>)}
+        <Image style={styles.card_image} source={{uri: props?.image}} />
+        {props.showLock ? (
+          <View style={styles.lock_container}>
+            {/* <Entypo name="lock" size={15} color="white" /> */}
+            <FontAwesomeIcon icon={faLock} size={15} color="white" />
+          </View>
+        ) : (
+          <View style={styles.lock_container}>
+            {/* <Entypo name="lock" size={15} color="white" /> */}
+            <FontAwesomeIcon icon={faLockOpen} size={15} color="white" />
+          </View>
+        )}
         <View style={styles.text_container}>
           <Text style={styles.card_title}>{props?.title}</Text>
           <Text style={styles.card_desc} numberOfLines={1}>
@@ -28,15 +79,19 @@ export default function App(props) {
           </Text>
           <View style={styles.info_row}>
             <View style={styles.level_container}>
-              <Text style={styles.card_level}>A1</Text>
+              <Text style={styles.card_level}>
+                {tabsNamesMapper[tabs.indexOf(props?.level)]}
+              </Text>
             </View>
-            <Text style={styles.date}>1 ابريل 2024</Text>
-            <MaterialIcons
-              name="favorite"
-              size={22}
-              color="rgba(0, 0, 0, 0.2)"
-              style={styles.favorite_icon}
-            />
+            <Text style={styles.date}>{props?.date}</Text>
+            <Pressable
+              onPress={() => setFavorites(!favoriteButton, props?.lessonId)}>
+              <FontAwesomeIcon
+                icon={faHeart}
+                size={22}
+                color={favoriteButton ? 'red' : 'rgba(0, 0, 0, 0.2)'}
+              />
+            </Pressable>
           </View>
         </View>
       </View>
@@ -96,8 +151,9 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   level_container: {
-    width: width * 0.07,
+    // width: width * 0.07,
     height: width * 0.07,
+    paddingHorizontal: 10,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#eaaa0050',

@@ -1,14 +1,13 @@
-import {View, Text, Dimensions, Image} from 'react-native';
+import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator, HeaderBackButton} from '@react-navigation/stack';
-import LessonScreen from '../Screens/LessonScreen';
-import HomeScreen from '../Screens/HomeScreen';
-import ProfileScreen from '../Screens/ProfileScreen';
-import {useStateValue} from '../store/contextStore/StateContext';
+import { Dimensions, Image } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 import ARROWBACKBLACK from '../../assets/arrow-back-black.png';
 import ARROWBACKWHITE from '../../assets/arrow-back-white.png';
-import {TouchableOpacity} from 'react-native-gesture-handler';
+import HomeScreen from '../Screens/HomeScreen';
+import LessonScreen from '../Screens/LessonScreen';
+import ProfileScreen from '../Screens/ProfileScreen';
+import { useStateValue } from '../store/contextStore/StateContext';
 const {width, height} = Dimensions.get('window');
 const Stack = createStackNavigator();
 

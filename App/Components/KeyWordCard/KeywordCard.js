@@ -1,31 +1,25 @@
+import React, { useEffect, useRef, useState } from 'react';
 import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  Pressable,
-  TouchableOpacity,
   Dimensions,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View
 } from 'react-native';
-import React, {useEffect, useRef, useState} from 'react';
-import user from './../../../assets/Images/userProfile.jpg';
-import Colors from '../../Utils/Colors';
-import {TouchableHighlight} from 'react-native-gesture-handler';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {text} from '@fortawesome/fontawesome-svg-core';
+// import Colors from '../../Utils/Colors';
+import { faDumbbell } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import Sound from 'react-native-sound';
+import { useDispatch, useSelector } from 'react-redux';
 import RNFetchBlob from 'rn-fetch-blob';
-import {useDispatch, useSelector} from 'react-redux';
+import PLAYGREY from '../../../assets/play-grey.png';
+import PLAY from '../../../assets/play.png';
 import {
   removeUserWords,
-  removeWordTraining,
   setAudioPlaying,
-  setUserWords,
-  setWordTraining,
+  setUserWords
 } from '../../Actions/StoryActions';
-import {faDumbbell} from '@fortawesome/free-solid-svg-icons';
-import PLAY from '../../../assets/play.png';
-import PLAYGREY from '../../../assets/play-grey.png';
 
 const {width, height} = Dimensions.get('window');
 export default function KeywordCard(props) {
