@@ -20,8 +20,8 @@ const Tab = createBottomTabNavigator();
 export default function TabNavigation() {
   const {state, dispatch} = useStateValue();
 
-  const checkUserSubscription = async () => {
-    const isSubscribed = await checkIosSubscription();
+  const checkUserSubscription = async email => {
+    const isSubscribed = await checkIosSubscription(email);
     dispatch({
       type: 'IS_SUBSCRIBED',
       payload: isSubscribed,
