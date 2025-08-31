@@ -244,6 +244,8 @@ export default function HomeScreen() {
     if (!currentUser?.email || !currentUser?.password || currentFirebaseUser) {
       if (currentFirebaseUser == null) {
         setLock(true);
+      } else {
+        setLock(false);
       }
       console.log(
         'User is already signed in or no credentials found.',
@@ -289,7 +291,6 @@ export default function HomeScreen() {
       type: 'IS_SUBSCRIBED',
       payload: isSubscribed,
     });
-    setLock(!isSubscribed);
   };
 
   useEffect(() => {
@@ -301,17 +302,16 @@ export default function HomeScreen() {
     const isSubscribed = state.isSubscribed;
     const isLessonPaid = lessons.find(lesson => lesson.id === lessonId).paid;
     if (!isSubscribed && isLessonPaid) {
-      Alert.alert('عملية غير مقبولة', 'يجب الاشتراك للحصول على هذا الدرس');
+      Alert.alert(
+        'عملية غير مقبولة',
+        'يجب الاشتراك للحصول على هذا الدرس',
+      );
 
       return;
     }
 
     getLessonById(lessonId).then(resp => {
-      navigation.navigate('LessonScreen', {
-        lessonId,
-        level,
-        image: lessonImage,
-      });
+      navigation.navigate('LessonScreen', {lessonId, level, image: lessonImage});
     });
   };
 
@@ -321,15 +321,14 @@ export default function HomeScreen() {
       lesson => lesson.id === lessonId,
     ).paid;
     if (!isSubscribed && isLessonPaid) {
-      Alert.alert('عملية غير مقبولة', 'يجب الاشتراك للحصول على هذا الدرس');
+      Alert.alert(
+        'عملية غير مقبولة',
+        'يجب الاشتراك للحصول على هذا الدرس',
+      );
       return;
     }
     getLessonById(lessonId).then(resp => {
-      navigation.navigate('LessonScreen', {
-        lessonId,
-        level,
-        image: lessonImage,
-      });
+      navigation.navigate('LessonScreen', {lessonId, level, image: lessonImage});
     });
   };
 
