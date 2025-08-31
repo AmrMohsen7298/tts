@@ -1,13 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
 import { onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
-import {
-  collection,
-  getDocs,
-  limit,
-  orderBy,
-  query,
-  where,
-} from 'firebase/firestore';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -23,10 +15,11 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { getReceiptIOS } from 'react-native-iap';
 import { useSelector } from 'react-redux';
 import CIRCLECHECK from '../../assets/circle-check.png';
 import GIFT from '../../assets/gift.png';
-import { auth, db } from '../../firebaseConfig';
+import { auth } from '../../firebaseConfig';
 import Header from '../Components/HomeScreen/Header';
 import LevelsCard from '../Components/HomeScreen/levelsCard';
 import StoriesCard from '../Components/HomeScreen/storiesCard';
@@ -39,51 +32,46 @@ import { levels } from '../Utils/constants';
 import { useStateValue } from '../store/contextStore/StateContext';
 const {width, height} = Dimensions.get('window');
 
-export const checkAndroidSubscription = async email => {
-  try {
-    // Create a query to get the latest subscription for the user
-    const subscriptionsRef = collection(db, 'subscriptions');
-    const q = query(
-      subscriptionsRef,
-      where('email', '==', email || ''),
-      where('uid', '!=', 0),
-      orderBy('createdAt', 'desc'),
-      limit(1),
-    );
+export const checkIosSubscription = async () => {
+  const receipt = await getReceiptIOS({forceRefresh: true});
 
-    // Execute the query
-    const querySnapshot = await getDocs(q);
+  if (!receipt) return false;
 
-    if (querySnapshot.empty) {
-      console.log('No subscription found for user:', uid);
-      return false;
-    }
+  // const receiptRawData = await fetch(
+  //   'https://sandbox.itunes.apple.com/verifyReceipt',
+  //   {
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //     method: 'POST',
+  //     body: JSON.stringify({
+  //       'receipt-data': receipt,
+  //       password: 'd3b4c38539554446a92839184c748367',
+  //     }),
+  //   },
+  // );
 
-    // Get the latest subscription document
-    const latestSubscription = querySnapshot.docs[0].data();
-    console.log('Latest subscription:', latestSubscription);
+  const receiptRawData = await fetch(
+    'https://checkiphonereceipt-npuzkgg7pq-uc.a.run.app',
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      method: 'POST',
+      body: JSON.stringify({receipt}),
+    },
+  );
 
-    // Get current timestamp
-    const currentTimestamp = new Date().getTime();
+  const receiptData = await receiptRawData.json();
 
-    // Check if subscription is still valid
-    const isValid = latestSubscription.endDateTimestamp > currentTimestamp;
-
-    console.log('Subscription validation:', {
-      endDateTimestamp: latestSubscription.endDateTimestamp,
-      currentTimestamp: currentTimestamp,
-      isValid: isValid,
-      endDate: new Date(
-        latestSubscription.endDateTimestamp,
-      ).toLocaleDateString(),
-      currentDate: new Date(currentTimestamp).toLocaleDateString(),
-    });
-
-    return isValid;
-  } catch (error) {
-    console.error('Error checking subscription:', error);
-    return false;
-  }
+  return (
+    receiptData?.status === 0 &&
+    receiptData.latest_receipt_info.some(
+      r =>
+        Number(r.purchase_date_ms) + 30 * 24 * 60 * 60 * 1000 > Date.now() &&
+        r.product_id === 'ttsbelarabi',
+    )
+  );
 };
 
 export const tabsNamesMapper = [
@@ -282,21 +270,19 @@ export default function HomeScreen() {
   useEffect(() => {
     onAuthStateChanged(auth, async user => {
       if (user) {
-        const email = user.email;
+        const uid = user.uid;
         setIsLoggedIn(true);
 
-        await checkIsSubscribed(email);
+        await checkIsSubscribed();
       } else {
         setIsLoggedIn(false);
       }
     });
   }, []);
 
-  const checkIsSubscribed = async email => {
+  const checkIsSubscribed = async () => {
     console.log('checking subscription - 1');
-    const isSubscribed = await checkAndroidSubscription(
-      email || currentUser?.email,
-    );
+    const isSubscribed = await checkIosSubscription();
 
     console.log('checking subscription - 2', isSubscribed);
     dispatch({

@@ -5,6 +5,7 @@ import {
   Dimensions,
   Image,
   Linking,
+  Platform,
   Pressable,
   SafeAreaView,
   StyleSheet,
@@ -102,12 +103,14 @@ const ProfileScreen = () => {
   };
 
   const checkIsSubscribed = async () => {
-    const isSubscribed = await checkIosSubscription();
-    console.log('IS_SUBSCRIBED_asfdsaf', isSubscribed);
-    contextDispatch({
-      type: 'IS_SUBSCRIBED',
-      payload: isSubscribed,
-    });
+    if (Platform.OS === 'ios') {
+      const isSubscribed = await checkIosSubscription();
+      console.log('IS_SUBSCRIBED_asfdsaf', isSubscribed);
+      contextDispatch({
+        type: 'IS_SUBSCRIBED',
+        payload: isSubscribed,
+      });
+    }
   };
 
   const reAuthUser = async () => {
