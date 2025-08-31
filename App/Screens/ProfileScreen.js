@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { auth } from '../../firebaseConfig';
+import { auth,db } from '../../firebaseConfig';
 import login from './../../assets/eye.png';
 import fire from './../../assets/fire.png';
 import user from './../../assets/Images/profile.jpg';
@@ -28,6 +28,7 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
 } from 'firebase/auth';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import { useDispatch, useSelector } from 'react-redux';
 import { setCurrentUser } from '../Actions/StoryActions';
 import useInAppPurchase from '../Hooks/useInAppPurchase';
@@ -50,7 +51,7 @@ const ProfileScreen = () => {
   const logout = () => {
     auth?.signOut();
     dispatch(setCurrentUser(null));
-    // contextDispatch({type: 'IS_SUBSCRIBED', payload: false});
+    contextDispatch({type: 'IS_SUBSCRIBED', payload: false});
   };
 
   const deleteAccount = async () => {
@@ -103,14 +104,50 @@ const ProfileScreen = () => {
   };
 
   const checkIsSubscribed = async () => {
-    if (Platform.OS === 'ios') {
-      const isSubscribed = await checkIosSubscription();
-      console.log('IS_SUBSCRIBED_asfdsaf', isSubscribed);
-      contextDispatch({
-        type: 'IS_SUBSCRIBED',
-        payload: isSubscribed,
-      });
-    }
+      if (Platform.OS === 'ios') {
+          const isSubscribed = await checkIosSubscription();
+          console.log('IS_SUBSCRIBED_asfdsaf', isSubscribed);
+          contextDispatch({
+              type: 'IS_SUBSCRIBED',
+              payload: isSubscribed,
+          });
+      }
+      else {
+          try {
+              if (!currentUser) throw new Error('user not signed in');
+              const now = new Date().getTime();
+
+              const q = query(
+                  collection(db, 'subscriptions'),
+                  where('uid', '==', currentUser.uid),
+                  where('endDateTimestamp', '>', now),
+              );
+              const querySnapshot = await getDocs(q);
+
+              if (querySnapshot.empty) {
+                  contextDispatch({ type: 'IS_SUBSCRIBED', payload: false });
+                  console.log('NOT SUBSCRIBED');
+                  return;
+              }
+
+              const subscriptions = querySnapshot.docs.map(doc => ({
+                  id: doc.id,
+                  ...doc.data(),
+              }));
+
+              if (subscriptions.some(doc => +doc.endDateTimestamp > now)) {
+                  contextDispatch({ type: 'IS_SUBSCRIBED', payload: true });
+                  console.log(subscriptions);
+                  console.log('SUBSCRIBED');
+              } else {
+                  dispatch(setIsSubscribed(false));
+                  contextDispatch({ type: 'IS_SUBSCRIBED', payload: false });
+                  console.log('NOT SUBSCRIBED');
+              }
+          } catch (e) {
+              console.log(e.message ?? 'user not signed in');
+          }
+      }
   };
 
   const reAuthUser = async () => {

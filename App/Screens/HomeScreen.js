@@ -35,7 +35,10 @@ const {width, height} = Dimensions.get('window');
 export const checkIosSubscription = async () => {
   const receipt = await getReceiptIOS({forceRefresh: true});
 
-  if (!receipt) return false;
+    if (!receipt) return false;
+    else {
+
+    }
 
   // const receiptRawData = await fetch(
   //   'https://sandbox.itunes.apple.com/verifyReceipt',
@@ -125,7 +128,8 @@ export default function HomeScreen() {
     return () => {
       page.current = 0;
       setLessons([]);
-    };
+      };
+      
   }, []);
   const increaseFreePage = () => {
     //pageFree.current += 1;
@@ -245,7 +249,8 @@ export default function HomeScreen() {
       if (currentFirebaseUser == null) {
         setLock(true);
       } else {
-        setLock(false);
+          setLock(false);
+          console.log("paid lock")
       }
       console.log(
         'User is already signed in or no credentials found.',
@@ -258,11 +263,21 @@ export default function HomeScreen() {
     }
     console.log('LOGGING USER IN AGAIN');
     signInWithEmailAndPassword(auth, currentUser?.email, currentUser?.password)
-      .then(userCredential => {
-        // Signed in
-        const user = userCredential.user;
-        console.log('USER LOGGED IN AGAIN');
-      })
+        .then(userCredential => {
+            // Signed in
+            const user = userCredential.user;
+            console.log('USER LOGGED IN AGAIN');
+            const currentFirebaseUser = auth.currentUser;
+            if (!currentUser?.email || !currentUser?.password || currentFirebaseUser) {
+                if (currentFirebaseUser == null) {
+                    setLock(true);
+                } else {
+                    setLock(false);
+                    console.log("paid lock")
+                }
+
+            }
+        })
       .catch(error => {
         const errorCode = error.code;
         const errorMessage = error.message;
